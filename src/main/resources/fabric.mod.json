@@ -9,7 +9,9 @@
     "Wolfie_Waffle", "qxeii"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/hardcore-torches"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/hardcore-torches-reignited",
+    "sources": "https://github.com/qxeii/hardcore-torches-reignited",
+    "issues": "https://github.com/qxeii/hardcore-torches-reignited/issues"
   },
 
   "license": "CC0-1.0",

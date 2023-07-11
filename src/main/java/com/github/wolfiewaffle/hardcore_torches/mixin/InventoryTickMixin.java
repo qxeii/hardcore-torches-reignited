@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.collection.DefaultedList;
@@ -23,14 +24,13 @@ import java.util.Random;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class InventoryTickMixin {
-    private static Random random = new Random();
+    @Shadow public abstract ServerWorld getServerWorld();
 
-    @Shadow
-    public abstract World getWorld();
+    private static Random random = new Random();
 
     @Inject(at = @At("TAIL"), method = "tick")
     private void tick(CallbackInfo info) {
-        if (!getWorld().isClient) {
+        if (!this.getServerWorld().isClient) {
             ServerPlayerEntity player = ((ServerPlayerEntity) (Object) this);
 
             PlayerInventory inventory = player.getInventory(); //idek man, Commobile told me to do it
@@ -104,16 +104,16 @@ public abstract class InventoryTickMixin {
         Item item = stack.getItem();
 
         if (item instanceof LanternItem && ((LanternItem) item).isLit) {
-            if (Mod.config.tickInInventory) list.set(index, LanternItem.addFuel(stack, getWorld(),-1));
+            if (Mod.config.tickInInventory) list.set(index, LanternItem.addFuel(stack, this.getServerWorld(),-1));
         }
 
         if (item instanceof TorchItem) {
             ETorchState state = ((TorchItem) item).getTorchState();
 
             if (state == ETorchState.LIT) {
-                if (Mod.config.tickInInventory) list.set(index, TorchItem.addFuel(stack, getWorld(),-1));
+                if (Mod.config.tickInInventory) list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
             } else if (state == ETorchState.SMOLDERING) {
-                if (Mod.config.tickInInventory && random.nextInt(3) == 0) list.set(index, TorchItem.addFuel(stack, getWorld(),-1));
+                if (Mod.config.tickInInventory && random.nextInt(3) == 0) list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
             }
         }
     }

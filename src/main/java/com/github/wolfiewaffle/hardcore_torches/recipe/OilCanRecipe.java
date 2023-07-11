@@ -5,12 +5,14 @@ import com.github.wolfiewaffle.hardcore_torches.config.HardcoreTorchesConfig;
 import com.github.wolfiewaffle.hardcore_torches.item.OilCanItem;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
@@ -30,16 +32,15 @@ public class OilCanRecipe extends ShapelessRecipe {
     }
 
     @Override
-    public boolean matches(CraftingInventory craftingInventory, World world) {
+    public boolean matches(RecipeInputInventory recipeInputInventory, World world) {
         if (configType == 0 && !Mod.config.enableFatOil) return false;
         if (configType == 1 && !Mod.config.enableCoalOil) return false;
-        return super.matches(craftingInventory, world);
+        return super.matches(recipeInputInventory, world);
     }
 
     @Override
-    public ItemStack craft(CraftingInventory grid) {
+    public ItemStack craft(RecipeInputInventory grid, DynamicRegistryManager dynamicRegistryManager){
         int startFuel;
-
         for(int i = 0; i < grid.size(); ++i) {
             ItemStack itemstack = grid.getStack(i);
 
@@ -73,7 +74,7 @@ public class OilCanRecipe extends ShapelessRecipe {
             int fuel = json.get("fuel").getAsInt();
             int configType = json.get("config_type").getAsInt();
 
-            return new OilCanRecipe(recipe.getId(), recipe.getGroup(), recipe.getOutput(), recipe.getIngredients(), fuel, configType);
+            return new OilCanRecipe(recipe.getId(), recipe.getGroup(), recipe.getOutput(DynamicRegistryManager.EMPTY), recipe.getIngredients(), fuel, configType);
         }
 
         @Override
@@ -82,12 +83,12 @@ public class OilCanRecipe extends ShapelessRecipe {
             int fuelValue = friendlyByteBuf.readVarInt();
             int configType = friendlyByteBuf.readVarInt();
 
-            return new OilCanRecipe(recipe.getId(), recipe.getGroup(), recipe.getOutput(), recipe.getIngredients(), fuelValue, configType);
+            return new OilCanRecipe(recipe.getId(), recipe.getGroup(), recipe.getOutput(DynamicRegistryManager.EMPTY), recipe.getIngredients(), fuelValue, configType);
         }
 
         @Override
         public void write(PacketByteBuf friendlyByteBuf, OilCanRecipe oilCanRecipe) {
-            ShapelessRecipe rec = new ShapelessRecipe(oilCanRecipe.getId(), oilCanRecipe.getGroup(), CraftingRecipeCategory.EQUIPMENT, oilCanRecipe.getOutput(), oilCanRecipe.getIngredients());
+            ShapelessRecipe rec = new ShapelessRecipe(oilCanRecipe.getId(), oilCanRecipe.getGroup(), CraftingRecipeCategory.EQUIPMENT, oilCanRecipe.getOutput(DynamicRegistryManager.EMPTY), oilCanRecipe.getIngredients());
             ShapelessRecipe.Serializer.SHAPELESS.write(friendlyByteBuf, rec);
 
             friendlyByteBuf.writeVarInt(oilCanRecipe.fuelAmount);

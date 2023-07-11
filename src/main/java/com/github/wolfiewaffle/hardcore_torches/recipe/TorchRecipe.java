@@ -5,6 +5,7 @@ import com.github.wolfiewaffle.hardcore_torches.item.TorchItem;
 import com.github.wolfiewaffle.hardcore_torches.util.ETorchState;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -12,6 +13,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -26,8 +28,8 @@ public class TorchRecipe extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack craft(CraftingInventory grid) {
-        ItemStack stack = getOutput();
+    public ItemStack craft(RecipeInputInventory recipeInputInventory, DynamicRegistryManager dynamicRegistryManager) {
+        ItemStack stack = getOutput(DynamicRegistryManager.EMPTY);
         Item stackItem;
 
         if (stack.getItem() instanceof TorchItem && Mod.config.craftUnlit) {
@@ -49,19 +51,19 @@ public class TorchRecipe extends ShapedRecipe {
         public TorchRecipe read(Identifier resourceLocation, JsonObject json) {
             ShapedRecipe recipe = ShapedRecipe.Serializer.SHAPED.read(resourceLocation, json);
 
-            return new TorchRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getOutput());
+            return new TorchRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getOutput(DynamicRegistryManager.EMPTY));
         }
 
         @Override
         public TorchRecipe read(Identifier resourceLocation, PacketByteBuf friendlyByteBuf) {
             ShapedRecipe recipe = ShapedRecipe.Serializer.SHAPED.read(resourceLocation, friendlyByteBuf);
 
-            return new TorchRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getOutput());
+            return new TorchRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getOutput(DynamicRegistryManager.EMPTY));
         }
 
         @Override
         public void write(PacketByteBuf friendlyByteBuf, TorchRecipe torchRecipe) {
-            ShapedRecipe rec = new ShapedRecipe(torchRecipe.getId(), torchRecipe.getGroup(), CraftingRecipeCategory.EQUIPMENT, torchRecipe.getWidth(), torchRecipe.getHeight(), torchRecipe.getIngredients(), torchRecipe.getOutput());
+            ShapedRecipe rec = new ShapedRecipe(torchRecipe.getId(), torchRecipe.getGroup(), CraftingRecipeCategory.EQUIPMENT, torchRecipe.getWidth(), torchRecipe.getHeight(), torchRecipe.getIngredients(), torchRecipe.getOutput(DynamicRegistryManager.EMPTY));
 
             ShapedRecipe.Serializer.SHAPED.write(friendlyByteBuf, rec);
         }

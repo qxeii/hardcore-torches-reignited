@@ -19,7 +19,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -63,7 +65,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 
     public void extinguish(World world, BlockPos pos, BlockState state, boolean playSound) {
         if (!world.isClient) {
-            if (playSound) world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
+            if (playSound) world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
             TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
             TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
             TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
@@ -74,7 +76,15 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 
     public void light(World world, BlockPos pos, BlockState state) {
         if (!world.isClient) {
-            world.playSound(null, pos, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 1f, 1f);
+            world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
+            world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
+            world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 1f);
+            world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
+            world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
+            world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
+            ServerWorld serverWorld = (ServerWorld) world;
+            serverWorld.spawnParticles(ParticleTypes.SMOKE, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, 10, 0.15, 0.15, 0.15, 0.001);
+            serverWorld.spawnParticles(ParticleTypes.LAVA, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, 2, 0.15, 0.15, 0.15, 0.001);
             setState(world, pos, true);
         }
     }
@@ -116,7 +126,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
         if (player.isSneaking() && Mod.config.pickUpLanterns) {
             if (!world.isClient) player.giveItemStack(getStack(world, pos));
             world.setBlockState(pos, Blocks.AIR.getDefaultState());
-            if (!world.isClient) world.playSound(null, pos, SoundEvents.BLOCK_LANTERN_PLACE, SoundCategory.BLOCKS, 1f, 1f);
+            if (!world.isClient) world.playSound(null, pos, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1f, 1f);
             player.swingHand(hand);
             return ActionResult.SUCCESS;
         }
@@ -127,7 +137,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
             // If not enough fuel to light
             if (((FuelBlockEntity) world.getBlockEntity(pos)).getFuel() < Mod.config.minLanternIgnitionFuel) {
                 if (!world.isClient) {
-                    world.playSound(null, pos, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1f, 1f);
+                    world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 2, 2);
                     player.sendMessage(MutableText.of(new LiteralTextContent("Not enough fuel to ignite!")), true);
                 }
                 player.swingHand(hand);
@@ -148,9 +158,10 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 
                 if (oldFuel < Mod.config.defaultLanternFuel) {
                     if (oldFuel + Mod.config.defLanternFuelItem < Mod.config.defaultLanternFuel) {
-                        if (!world.isClient) world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1f, 1f);
+                        world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON, SoundCategory.BLOCKS, 1f, 0f);
+                        world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON, SoundCategory.BLOCKS, 1f, 2f);
                     } else {
-                        if (!world.isClient) world.playSound(null, pos, SoundEvents.ITEM_BUCKET_FILL, SoundCategory.BLOCKS, 1f, 1f);
+                        if (!world.isClient) world.playSound(null, pos, SoundEvents.BLOCK_HONEY_BLOCK_STEP, SoundCategory.BLOCKS, 1f, 0f);
                     }
 
                     stack.decrement(1);
@@ -165,7 +176,9 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
         if (stack.getItem() instanceof OilCanItem && Mod.config.lanternsNeedCan) {
             if (be instanceof FuelBlockEntity && !world.isClient) {
                 if (OilCanItem.fuelBlock((FuelBlockEntity) be, world, stack)) {
-                    world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1f, 1f);
+                    world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON, SoundCategory.BLOCKS, 1f, 0f);
+                    world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON, SoundCategory.BLOCKS, 1f, 2f);
+                    world.playSound(null, pos, SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.BLOCKS, 0.3f, 0f);
                 }
             }
             player.swingHand(hand);
@@ -180,7 +193,8 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
         }
 
         if (Mod.config.lanternsNeedCan && !stack.isEmpty() && hand == Hand.MAIN_HAND && stack.getItem() != Mod.OIL_CAN && !world.isClient) {
-            player.sendMessage(MutableText.of(new LiteralTextContent("Requires an Oil Can to fuel!")), true);
+            player.sendMessage(MutableText.of(new LiteralTextContent("Requires an Oil Canister to fuel!")), true);
+            world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 2, 2);
         }
 
         // Hand extinguish
