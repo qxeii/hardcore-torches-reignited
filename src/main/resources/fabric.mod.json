@@ -6,7 +6,7 @@
   "name": "Hardcore Torches",
   "description": "Makes light sources burn out over time and adds lanterns with fuel.",
   "authors": [
-    "Wolfie_Waffle"
+    "Wolfie_Waffle", "qxeii"
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/hardcore-torches"
@@ -29,9 +29,9 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.11.3",
+    "fabricloader": ">=0.14.21",
     "fabric": "*",
-    "minecraft": "1.19.x",
+    "minecraft": ">=1.20",
     "java": ">=17"
   }
 }
