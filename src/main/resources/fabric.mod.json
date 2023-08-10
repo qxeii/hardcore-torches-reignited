@@ -6,7 +6,7 @@
   "name": "Hardcore Torches",
   "description": "Makes light sources burn out over time and adds lanterns with fuel.",
   "authors": [
-    "Wolfie_Waffle", "qxeii"
+    "qxeii"
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/hardcore-torches-reignited",
@@ -20,10 +20,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.github.wolfiewaffle.hardcore_torches.Mod"
+      "net.qxeii.hardcore_torches.Mod"
     ],
     "client": [
-      "com.github.wolfiewaffle.hardcore_torches.ClientMod"
+      "net.qxeii.hardcore_torches.ClientMod"
     ]
   },
   "mixins": [
