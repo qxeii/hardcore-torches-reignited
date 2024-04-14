@@ -6,11 +6,11 @@ import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
 @Config(name = "hardcore_torches")
 public class HardcoreTorchesConfig implements ConfigData {
-    @Comment("Torches will extinguish if broken. default true")
-    public boolean torchesExtinguishWhenBroken = true;
+    @Comment("Torches will extinguish if broken. default false")
+    public boolean torchesExtinguishWhenBroken = false;
 
-    @Comment("Torches are fully expended when broken. Overrides torchesExtinguishWhenBroken. default true")
-    public boolean torchesBurnWhenDropped = true;
+    @Comment("Torches are fully expended when broken. Overrides torchesExtinguishWhenBroken. default false")
+    public boolean torchesBurnWhenDropped = false;
 
     @Comment("Torches become unlit in rain. If torchesSmolder is true, they will instead smolder in rain. default true")
     public boolean torchesRain = true;
@@ -18,14 +18,14 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("Only matters if torchesRain is true. In rain, torches will extinguish but emit smoke, and consume fuel at 1/3 the rate until fully extinguished or re-lit. default true")
     public boolean torchesSmolder = true;
 
-    @Comment("Burnt torches drop as vanilla stick when broken instead of a burnt torch. default true")
-    public boolean burntStick = true;
+    @Comment("Burnt torches drop as vanilla stick when broken instead of a burnt torch. default false")
+    public boolean burntStick = false;
 
-    @Comment("The amount of ticks the torch lasts. Default is 48000. 20 ticks per second, 48000 = 20 minutes")
-    public int defaultTorchFuel = 48000;
+    @Comment("The amount of ticks the torch lasts. Default is 24000. 20 ticks per second, 24000 = 20 minutes")
+    public int defaultTorchFuel = 24000;
 
-    @Comment("The amount of ticks the lantern can last. Default is 144000. 20 ticks per second, 144000 = 60 minutes")
-    public int defaultLanternFuel = 144000;
+    @Comment("The amount of ticks the lantern can last. Default is 72000. 20 ticks per second, 72000 = 60 minutes")
+    public int defaultLanternFuel = 72000;
 
     @Comment("The amount a fuel item adds to the lantern by default. default 72000")
     public int defLanternFuelItem = 72000;
@@ -33,13 +33,13 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("A lantern must have at least this much fuel (min 1) to be ignited from unlit. Once lit it will continue to burn to 0. default 1")
     public int minLanternIgnitionFuel = 1;
 
-    @Comment("Are torches crafted unlit. default false")
-    public boolean craftUnlit = false;
+    @Comment("Are torches crafted unlit. default true")
+    public boolean craftUnlit = true;
 
     @Comment("Do torches become unlit when placed in storage. default false")
     public boolean unlightInChest = false;
 
-    @Comment("Do torches lose fuel while the player has then in their inventory. default false")
+    @Comment("Do torches lose fuel while the player has then in their inventory. default true")
     public boolean tickInInventory = true;
 
     @Comment("How many torches are crafted. default 4")
@@ -72,17 +72,17 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("If true, you can craft coal with an oil can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. default false")
     public boolean enableCoalOil = false;
 
-    @Comment("If true, you can right click torches to extinguish them while not holding fuel or a torch to light. default false")
-    public boolean handUnlightTorch = false;
+    @Comment("If true, you can right click torches to extinguish them while not holding fuel or a torch to light. default true")
+    public boolean handUnlightTorch = true;
 
-    @Comment("If true, you can right click lanterns to extinguish them while not holding fuel or a torch to light. default false")
-    public boolean handUnlightLantern = false;
+    @Comment("If true, you can right click lanterns to extinguish them while not holding fuel or a torch to light. default true")
+    public boolean handUnlightLantern = true;
 
-    @Comment("0: When going underwater, torches in your inventory will be unaffected\n1: When going underwater, torches in mainhand or offhand will be extinguished\n2: When going underwater, torches in inventory will be extinguished. default 2")
-    public int invExtinguishInWater = 2;
+    @Comment("0: When going underwater, torches in your inventory will be unaffected\n1: When going underwater, torches in mainhand or offhand will be extinguished\n2: When going underwater, torches in inventory will be extinguished. default 1")
+    public int invExtinguishInWater = 1;
 
-    @Comment("0: When in rain, torches in your inventory will be unaffected\n1: When in rain, torches in mainhand or offhand will be extinguished or smolder\n2: When in rain, torches in inventory will be extinguished or smolder. default 2")
-    public int invExtinguishInRain = 2;
+    @Comment("0: When in rain, torches in your inventory will be unaffected\n1: When in rain, torches in mainhand or offhand will be extinguished or smolder\n2: When in rain, torches in inventory will be extinguished or smolder. default 1")
+    public int invExtinguishInRain = 1;
 
     @Comment("Can the fire starter light campfires. default true")
     public boolean starterLightCampfires = true;
@@ -94,10 +94,10 @@ public class HardcoreTorchesConfig implements ConfigData {
     public boolean starterStartFires = true;
 
     @Comment("Can the fire starter light lanterns. default true")
-    public boolean starterLightLanterns = false;
+    public boolean starterLightLanterns = true;
 
-    @Comment("Percentage chance that the fire starter works. default 0.33")
-    public float starterSuccessChance = 0.33f;
+    @Comment("Percentage chance that the fire starter works. default 0.5")
+    public float starterSuccessChance = 0.5f;
 
     @Comment("Default fuel that a lantern starts with when crafted. default 0")
     public int startingLanternFuel = 0;
