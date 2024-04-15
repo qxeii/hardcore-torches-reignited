@@ -217,6 +217,11 @@ public class TorchItem extends VerticallyAttachableBlockItem implements FabricIt
         return Mod.config.defaultTorchFuel;
     }
 
+    public static void setFuel(ItemStack stack, int fuel) {
+        NbtCompound nbt = stack.getNbt();
+        nbt.putInt("Fuel", fuel);
+    }
+
     public ETorchState getTorchState() {
         return torchState;
     }
