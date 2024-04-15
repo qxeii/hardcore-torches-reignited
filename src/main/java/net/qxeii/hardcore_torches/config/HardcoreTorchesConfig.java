@@ -33,6 +33,8 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("A lantern must have at least this much fuel (min 1) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 1")
     public int minLanternIgnitionFuel = 1;
 
+    @Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 400")
+    public int torchesExtinguishConditionLoss = 400;
 
     @Comment("Are torches crafted unlit. Default: true")
     public boolean craftUnlit = true;
