@@ -36,9 +36,6 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 400")
     public int torchesExtinguishConditionLoss = 400;
 
-    @Comment("Are torches crafted unlit. Default: true")
-    public boolean craftUnlit = true;
-
     @Comment("Do torches become unlit when placed in storage. Default: false")
     public boolean unlightInChest = false;
 
