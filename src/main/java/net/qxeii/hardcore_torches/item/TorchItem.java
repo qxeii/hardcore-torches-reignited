@@ -360,11 +360,33 @@ public class TorchItem extends VerticallyAttachableBlockItem {
             AbstractHardcoreTorchBlock newBlock = (AbstractHardcoreTorchBlock) ((BlockItem)inputStack.getItem()).getBlock();
             TorchItem newItem = (TorchItem) newBlock.group.getStandingTorch(newState).asItem();
 
-            outputStack = changedCopy(inputStack, newItem);
+            outputStack = modifiedItemForReplacement(inputStack, newItem);
             if (newState == ETorchState.BURNT) outputStack.setNbt(null);
         }
 
         return outputStack;
+    }
+
+    public ETorchState getTorchState() {
+        return torchState;
+    }
+
+    public TorchGroup getTorchGroup() {
+        return torchGroup;
+    }
+
+    public static ItemStack modifiedItemForReplacement(ItemStack stack, Item replacementItem) {
+        if (stack.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+
+        ItemStack itemStack = new ItemStack(replacementItem, stack.getCount());
+        
+        if (stack.getNbt() != null) {
+            itemStack.setNbt(stack.getNbt().copy());
+        }
+        
+        return itemStack;
     }
 
     public static int getFuel(ItemStack stack) {
@@ -376,30 +398,6 @@ public class TorchItem extends VerticallyAttachableBlockItem {
         }
 
         return Mod.config.defaultTorchFuel;
-    }
-
-    public static void setFuel(ItemStack stack, int fuel) {
-        NbtCompound nbt = stack.getNbt();
-        nbt.putInt("Fuel", fuel);
-    }
-
-    public ETorchState getTorchState() {
-        return torchState;
-    }
-
-    public TorchGroup getTorchGroup() {
-        return torchGroup;
-    }
-
-    public static ItemStack changedCopy(ItemStack stack, Item replacementItem) {
-        if (stack.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack itemStack = new ItemStack(replacementItem, stack.getCount());
-        if (stack.getNbt() != null) {
-            itemStack.setNbt(stack.getNbt().copy());
-        }
-        return itemStack;
     }
 
     public static ItemStack addFuel(ItemStack stack, World world, int amount) {
