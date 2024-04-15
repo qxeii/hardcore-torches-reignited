@@ -5,7 +5,6 @@ import net.qxeii.hardcore_torches.util.TorchGroup;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.StackReference;
@@ -15,7 +14,6 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
@@ -101,14 +99,12 @@ public class TorchItem extends VerticallyAttachableBlockItem {
         switch (torchState) {
             case UNLIT, SMOLDERING: {
                 if (!useFlintAndSteelFromPlayerInventory(player.getInventory())) {
-                    MinecraftClient.getInstance().player.sendMessage(Text.of("Can not light torch, did not find a flint and steel in inventory."));
                     return super.use(world, player, hand);
                 }
 
                 lightTorchInHand(world, player, hand);
                 world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
 
-                MinecraftClient.getInstance().player.sendMessage(Text.of("Succesfully lit a torch in hand."));
                 return super.use(world, player, hand);
             }
             case LIT: {
@@ -118,7 +114,6 @@ public class TorchItem extends VerticallyAttachableBlockItem {
                 return super.use(world, player, hand);
             }
             default:
-                MinecraftClient.getInstance().player.sendMessage(Text.of("Torch is not lit, smouldering, or unlit, bailing use action."));
                 return super.use(world, player, hand);
         }
     }
@@ -131,12 +126,10 @@ public class TorchItem extends VerticallyAttachableBlockItem {
         HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
 
         if (handStackTuple == null) {
-            MinecraftClient.getInstance().player.sendMessage(Text.of("Can not unlight torch, did not find a torch in hands."));
             return;
         }
 
         if (torchState != ETorchState.LIT) {
-            MinecraftClient.getInstance().player.sendMessage(Text.of("Can not unlight torch, torch is not lit."));
             return;
         }
 
@@ -153,8 +146,6 @@ public class TorchItem extends VerticallyAttachableBlockItem {
         PlayerInventory inventory = player.getInventory();
         inventory.setStack(handStackTuple.slot, heldTorchStack);
         player.setStackInHand(handStackTuple.hand, heldTorchStack);
-
-        MinecraftClient.getInstance().player.sendMessage(Text.of("Unlit torch in hand."));
     }
 
     private void lightTorchInHand(World world, PlayerEntity player, Hand hand) {
@@ -168,7 +159,6 @@ public class TorchItem extends VerticallyAttachableBlockItem {
         HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
 
         if (handStackTuple == null) {
-            MinecraftClient.getInstance().player.sendMessage(Text.of("Can not light torch, did not find a torch in hands."));
             return;
         }
 
@@ -188,14 +178,10 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
             inventory.setStack(handStackTuple.slot, heldTorchStack);
             player.setStackInHand(handStackTuple.hand, heldTorchStack);
-
-            MinecraftClient.getInstance().player.sendMessage(Text.of("Lit torch in stack of multiples in hand."));
         } else {
             ItemStack heldTorchStack = stateStack(handStackTuple.stack, ETorchState.LIT);
             inventory.setStack(handStackTuple.slot, heldTorchStack);
             player.setStackInHand(handStackTuple.hand, heldTorchStack);
-            
-            MinecraftClient.getInstance().player.sendMessage(Text.of("Lit torch in stack of one in hand."));
         }
     }
 
@@ -208,22 +194,18 @@ public class TorchItem extends VerticallyAttachableBlockItem {
                 int mainHandSlot = player.getInventory().getSlotWithStack(mainHandStack);
 
                 if (mainHandSlot == -1) {
-                    MinecraftClient.getInstance().player.sendMessage(Text.of("Could not determine slot of torch in main hand."));
                     return null;
                 }
     
-                MinecraftClient.getInstance().player.sendMessage(Text.of("Returned torch in main hand, equal to this instance."));
                 return new HandStackTuple(Hand.MAIN_HAND, mainHandSlot, mainHandStack);
             case OFF_HAND:
                 ItemStack offHandStack = player.getOffHandStack();
                 int offHandSlot = player.getInventory().getSlotWithStack(offHandStack);
 
                 if (offHandSlot == -1) {
-                    MinecraftClient.getInstance().player.sendMessage(Text.of("Could not determine slot of torch in off hand."));
                     return null;
                 }
     
-                MinecraftClient.getInstance().player.sendMessage(Text.of("Returned torch in off hand, equal to this instance."));
                 return new HandStackTuple(Hand.OFF_HAND, offHandSlot, offHandStack);
             default:
                 return null;
