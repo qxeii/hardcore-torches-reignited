@@ -3,7 +3,6 @@ package net.qxeii.hardcore_torches.item;
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 
-import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -29,7 +28,7 @@ import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
 
-public class TorchItem extends VerticallyAttachableBlockItem implements FabricItem {
+public class TorchItem extends VerticallyAttachableBlockItem {
     ETorchState torchState;
     TorchGroup torchGroup;
     int maxFuel;
