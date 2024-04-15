@@ -98,7 +98,7 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
         switch (torchState) {
             case UNLIT, SMOLDERING: {
-                if (!useFlintAndSteelFromPlayerInventory(player.getInventory())) {
+                if (!useFlintAndSteelFromPlayerInventory(player, player.getInventory())) {
                     return super.use(world, player, hand);
                 }
 
@@ -226,7 +226,7 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
     // Flint and Steel Inventory Utilities
 
-    private static boolean useFlintAndSteelFromPlayerInventory(PlayerInventory inventory) {
+    private static boolean useFlintAndSteelFromPlayerInventory(PlayerEntity player, PlayerInventory inventory) {
         // Get flint and steel from player inventory, resolve as stack.
 
         int flintAndSteelItemSlot = getFlintAndSteelSlotFromPlayerInventory(inventory);
@@ -239,7 +239,7 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
         // Deduct one use from flint and steel item stack.
 
-        flintAndSteelItemStack.damage(1, Random.createLocal(), null);
+        flintAndSteelItemStack.damage(1, player, null);
         return true;
     }
 
