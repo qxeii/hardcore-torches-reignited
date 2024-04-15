@@ -105,14 +105,14 @@ public class TorchItem extends VerticallyAttachableBlockItem {
                     return super.use(world, player, hand);
                 }
 
-                lightTorchInPlayerHands(world, player);
+                lightTorchInHand(world, player, hand);
                 world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
 
                 MinecraftClient.getInstance().player.sendMessage(Text.of("Succesfully lit a torch in hand."));
                 return super.use(world, player, hand);
             }
             case LIT: {
-                unlightTorchInPlayerHands(world, player);
+                unlightTorchInHand(world, player, hand);
                 world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1.0f);
 
                 return super.use(world, player, hand);
@@ -125,10 +125,10 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
     // Torch Lighting in Hand Mechanics
 
-    private void unlightTorchInPlayerHands(World world, PlayerEntity player) {
+    private void unlightTorchInHand(World world, PlayerEntity player, Hand hand) {
         // Get lit torch in either hand.
 
-        HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player);
+        HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
 
         if (handStackTuple == null) {
             MinecraftClient.getInstance().player.sendMessage(Text.of("Can not unlight torch, did not find a torch in hands."));
@@ -150,12 +150,14 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
         heldTorchStack = addFuel(heldTorchStack, world, -Mod.config.torchesExtinguishConditionLoss);
         
-        player.getInventory().setStack(handStackTuple.slot, heldTorchStack);
+        PlayerInventory inventory = player.getInventory();
+        inventory.setStack(handStackTuple.slot, heldTorchStack);
+        player.setStackInHand(handStackTuple.hand, heldTorchStack);
 
         MinecraftClient.getInstance().player.sendMessage(Text.of("Unlit torch in hand."));
     }
 
-    private void lightTorchInPlayerHands(World world, PlayerEntity player) {
+    private void lightTorchInHand(World world, PlayerEntity player, Hand hand) {
         // Get unlit torch in either hand.
         // (Branch A) If held stack contains a stack of items, remove one, move remaining stack to inventory, 
         // and replace held stack with new stack of one lit torch.
@@ -163,7 +165,7 @@ public class TorchItem extends VerticallyAttachableBlockItem {
         // with new stack of one lit torch with same torch damage value.
 
         PlayerInventory inventory = player.getInventory();
-        HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player);
+        HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
 
         if (handStackTuple == null) {
             MinecraftClient.getInstance().player.sendMessage(Text.of("Can not light torch, did not find a torch in hands."));
@@ -171,52 +173,61 @@ public class TorchItem extends VerticallyAttachableBlockItem {
         }
 
         if (handStackTuple.stack.getCount() > 1) {
-            ItemStack deductedTorchStack = new ItemStack(handStackTuple.stack.getItem(), handStackTuple.stack.getCount() - 1);
-            inventory.insertStack(deductedTorchStack);
-            
+            int emptySlot = inventory.getEmptySlot();
+            // ItemStack deductedTorchStack = new ItemStack(handStackTuple.stack.getItem(), handStackTuple.stack.getCount() - 1);
+            ItemStack deductedTorchStack = handStackTuple.stack.copyWithCount(handStackTuple.stack.getCount() - 1);            
+
+            if (emptySlot == -1) {
+                player.dropItem(deductedTorchStack, true);
+            } else {
+                inventory.setStack(emptySlot, deductedTorchStack);
+            }
+
             ItemStack heldTorchStack = stateStack(handStackTuple.stack, ETorchState.LIT);
             heldTorchStack.setCount(1);
 
             inventory.setStack(handStackTuple.slot, heldTorchStack);
+            player.setStackInHand(handStackTuple.hand, heldTorchStack);
+
             MinecraftClient.getInstance().player.sendMessage(Text.of("Lit torch in stack of multiples in hand."));
         } else {
             ItemStack heldTorchStack = stateStack(handStackTuple.stack, ETorchState.LIT);
             inventory.setStack(handStackTuple.slot, heldTorchStack);
+            player.setStackInHand(handStackTuple.hand, heldTorchStack);
+            
             MinecraftClient.getInstance().player.sendMessage(Text.of("Lit torch in stack of one in hand."));
         }
     }
 
     // Torch Inventory Utilities
 
-    private HandStackTuple getTorchStackTupleInHandFromPlayer(PlayerEntity player) {
-        ItemStack mainHandStack = player.getMainHandStack();
-        ItemStack offHandStack = player.getOffHandStack();
+    private HandStackTuple getTorchStackTupleInHandFromPlayer(PlayerEntity player, Hand hand) {
+        switch (hand) {
+            case MAIN_HAND:
+                ItemStack mainHandStack = player.getMainHandStack();
+                int mainHandSlot = player.getInventory().getSlotWithStack(mainHandStack);
 
-        if (mainHandStack != null && mainHandStack.getItem() == this) {
-            int mainHandSlot = player.getInventory().getSlotWithStack(mainHandStack);
+                if (mainHandSlot == -1) {
+                    MinecraftClient.getInstance().player.sendMessage(Text.of("Could not determine slot of torch in main hand."));
+                    return null;
+                }
+    
+                MinecraftClient.getInstance().player.sendMessage(Text.of("Returned torch in main hand, equal to this instance."));
+                return new HandStackTuple(Hand.MAIN_HAND, mainHandSlot, mainHandStack);
+            case OFF_HAND:
+                ItemStack offHandStack = player.getOffHandStack();
+                int offHandSlot = player.getInventory().getSlotWithStack(offHandStack);
 
-            if (mainHandSlot == -1) {
-                MinecraftClient.getInstance().player.sendMessage(Text.of("Could not determine slot of torch in main hand."));
+                if (offHandSlot == -1) {
+                    MinecraftClient.getInstance().player.sendMessage(Text.of("Could not determine slot of torch in off hand."));
+                    return null;
+                }
+    
+                MinecraftClient.getInstance().player.sendMessage(Text.of("Returned torch in off hand, equal to this instance."));
+                return new HandStackTuple(Hand.OFF_HAND, offHandSlot, offHandStack);
+            default:
                 return null;
-            }
-
-            MinecraftClient.getInstance().player.sendMessage(Text.of("Returned torch in main hand, equal to this instance."));
-            return new HandStackTuple(Hand.MAIN_HAND, mainHandSlot, mainHandStack);
         }
-
-        if (offHandStack != null && offHandStack.getItem() == this) {
-            int offHandSlot = player.getInventory().getSlotWithStack(offHandStack);
-
-            if (offHandSlot == -1) {
-                MinecraftClient.getInstance().player.sendMessage(Text.of("Could not determine slot of torch in off hand."));
-                return null;
-            }
-
-            MinecraftClient.getInstance().player.sendMessage(Text.of("Returned torch in off hand, equal to this instance."));
-            return new HandStackTuple(Hand.OFF_HAND, offHandSlot, offHandStack);
-        }
-
-        return null;
     }
 
     private static class HandStackTuple {
