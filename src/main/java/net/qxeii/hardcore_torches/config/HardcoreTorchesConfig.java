@@ -6,111 +6,112 @@ import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
 @Config(name = "hardcore_torches")
 public class HardcoreTorchesConfig implements ConfigData {
-    @Comment("Torches will extinguish if broken. default false")
+    @Comment("Torches will extinguish if broken. Default: false")
     public boolean torchesExtinguishWhenBroken = false;
 
-    @Comment("Torches are fully expended when broken. Overrides torchesExtinguishWhenBroken. default false")
+    @Comment("Torches are fully expended when broken. Overrides torchesExtinguishWhenBroken. Default: false")
     public boolean torchesBurnWhenDropped = false;
 
-    @Comment("Torches become unlit in rain. If torchesSmolder is true, they will instead smolder in rain. default true")
+    @Comment("Torches become unlit in rain. If torchesSmolder is true, they will instead smolder in rain. Default: true")
     public boolean torchesRain = true;
 
-    @Comment("Only matters if torchesRain is true. In rain, torches will extinguish but emit smoke, and consume fuel at 1/3 the rate until fully extinguished or re-lit. default true")
+    @Comment("Only matters if torchesRain is true. In rain, torches will extinguish but emit smoke, and consume fuel at 1/3 the rate until fully extinguished or re-lit. Default: true")
     public boolean torchesSmolder = true;
 
-    @Comment("Burnt torches drop as vanilla stick when broken instead of a burnt torch. default false")
+    @Comment("Burnt torches drop as vanilla stick when broken instead of a burnt torch. Default: false")
     public boolean burntStick = false;
 
-    @Comment("The amount of ticks the torch lasts. Default is 24000. 20 ticks per second, 24000 = 20 minutes")
+    @Comment("The amount of ticks the torch lasts. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
     public int defaultTorchFuel = 24000;
 
-    @Comment("The amount of ticks the lantern can last. Default is 72000. 20 ticks per second, 72000 = 60 minutes")
+    @Comment("The amount of ticks the lantern can last. Default: is 72000. 20 ticks per second, 72000 = 60 minutes")
     public int defaultLanternFuel = 72000;
 
-    @Comment("The amount a fuel item adds to the lantern by default. default 72000")
+    @Comment("The amount a fuel item adds to the lantern by default. Default: 72000")
     public int defLanternFuelItem = 72000;
 
-    @Comment("A lantern must have at least this much fuel (min 1) to be ignited from unlit. Once lit it will continue to burn to 0. default 1")
+    @Comment("A lantern must have at least this much fuel (min 1) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 1")
     public int minLanternIgnitionFuel = 1;
 
-    @Comment("Are torches crafted unlit. default true")
+
+    @Comment("Are torches crafted unlit. Default: true")
     public boolean craftUnlit = true;
 
-    @Comment("Do torches become unlit when placed in storage. default false")
+    @Comment("Do torches become unlit when placed in storage. Default: false")
     public boolean unlightInChest = false;
 
-    @Comment("Do torches lose fuel while the player has then in their inventory. default true")
+    @Comment("Do torches lose fuel while the player has then in their inventory. Default: true")
     public boolean tickInInventory = true;
 
-    @Comment("How many torches are crafted. default 4")
-    public int craftAmount = 4;
+    @Comment("How many torches are crafted. Default: 2")
+    public int craftAmount = 2;
 
-    @Comment("How many candles are crafted. default 8")
-    public int candleCraftAmount = 8;
+    @Comment("How many candles are crafted. Default: 4")
+    public int candleCraftAmount = 4;
 
-    @Comment("Right click torch or lantern to see fuel value. default false")
+    @Comment("Right click torch or lantern to see fuel value. Default: false")
     public boolean fuelMessage = false;
 
-    @Comment("Max fuel an oil can holds. default 576000")
+    @Comment("Max fuel an oil can holds. Default: 576000")
     public int maxCanFuel = 576000;
 
-    @Comment("Do lanterns have to be filled using an oil can. default true")
+    @Comment("Do lanterns have to be filled using an oil can. Default: true")
     public boolean lanternsNeedCan = true;
 
-    @Comment("Can you refuel a torch using an oil can. default false")
+    @Comment("Can you refuel a torch using an oil can. Default: false")
     public boolean torchesUseCan = false;
 
-    @Comment("Multiplies the fuel value of all oil can recipes. 0.5 makes all fuel recipes return half as much fuel. default 1")
+    @Comment("Multiplies the fuel value of all oil can recipes. 0.5 makes all fuel recipes return half as much fuel. Default: 1")
     public float oilRecipeMultiplier = 1;
 
-    @Comment("Overrides the oil can fuel recipe if set. default -1")
+    @Comment("Overrides the oil can fuel recipe if set. Default: -1")
     public int oilRecipeOverride = -1;
 
-    @Comment("If true, you can craft animal fat with an oil can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. default true")
+    @Comment("If true, you can craft animal fat with an oil can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. Default: true")
     public boolean enableFatOil = true;
 
-    @Comment("If true, you can craft coal with an oil can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. default false")
+    @Comment("If true, you can craft coal with an oil can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. Default: false")
     public boolean enableCoalOil = false;
 
-    @Comment("If true, you can right click torches to extinguish them while not holding fuel or a torch to light. default true")
+    @Comment("If true, you can right click torches to extinguish them while not holding fuel or a torch to light. Default: true")
     public boolean handUnlightTorch = true;
 
-    @Comment("If true, you can right click lanterns to extinguish them while not holding fuel or a torch to light. default true")
+    @Comment("If true, you can right click lanterns to extinguish them while not holding fuel or a torch to light. Default: true")
     public boolean handUnlightLantern = true;
 
-    @Comment("0: When going underwater, torches in your inventory will be unaffected\n1: When going underwater, torches in mainhand or offhand will be extinguished\n2: When going underwater, torches in inventory will be extinguished. default 1")
+    @Comment("0: When going underwater, torches in your inventory will be unaffected\n1: When going underwater, torches in mainhand or offhand will be extinguished\n2: When going underwater, torches in inventory will be extinguished. Default: 1")
     public int invExtinguishInWater = 1;
 
-    @Comment("0: When in rain, torches in your inventory will be unaffected\n1: When in rain, torches in mainhand or offhand will be extinguished or smolder\n2: When in rain, torches in inventory will be extinguished or smolder. default 1")
+    @Comment("0: When in rain, torches in your inventory will be unaffected\n1: When in rain, torches in mainhand or offhand will be extinguished or smolder\n2: When in rain, torches in inventory will be extinguished or smolder. Default: 1")
     public int invExtinguishInRain = 1;
 
-    @Comment("Can the fire starter light campfires. default true")
+    @Comment("Can the fire starter light campfires. Default: true")
     public boolean starterLightCampfires = true;
 
-    @Comment("Can the fire starter light torches. default true")
+    @Comment("Can the fire starter light torches. Default: true")
     public boolean starterLightTorches = true;
 
-    @Comment("Can the fire starter create full-block fires. default true")
+    @Comment("Can the fire starter create full-block fires. Default: true")
     public boolean starterStartFires = true;
 
-    @Comment("Can the fire starter light lanterns. default true")
+    @Comment("Can the fire starter light lanterns. Default: true")
     public boolean starterLightLanterns = true;
 
-    @Comment("Percentage chance that the fire starter works. default 0.5")
+    @Comment("Percentage chance that the fire starter works. Default: 0.5")
     public float starterSuccessChance = 0.5f;
 
-    @Comment("Default fuel that a lantern starts with when crafted. default 0")
+    @Comment("Default: fuel that a lantern starts with when crafted. Default: 0")
     public int startingLanternFuel = 0;
 
-    @Comment("Allow the player to pick up lanterns with sneak-clicking. default true")
+    @Comment("Allow the player to pick up lanterns with sneak-clicking. Default: true")
     public boolean pickUpLanterns = true;
 
-    @Comment("The fuel that candles start with. default 6000")
+    @Comment("The fuel that candles start with. Default: 6000")
     public int defaultCandleFuel = 6000;
 
-    @Comment("The fuel that glowstone starts with. default 576000")
+    @Comment("The fuel that glowstone starts with. Default: 576000")
     public int defaultGlowstoneFuel = 576000;
 
-    @Comment("The fuel that shroomlights start with. default 10000")
+    @Comment("The fuel that shroomlights start with. Default: 10000")
     public int defaultShroomlightFuel = 10000;
 }
