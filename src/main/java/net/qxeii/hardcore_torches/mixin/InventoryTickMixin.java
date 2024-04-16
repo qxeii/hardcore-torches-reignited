@@ -12,6 +12,7 @@ import net.qxeii.hardcore_torches.util.ETorchState;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -53,6 +54,17 @@ public abstract class InventoryTickMixin {
         }
 
         waterCheck(player, inventory);
+
+        if (Mod.config.convertVanillaTorches) {
+            for (int i = 0; i < inventory.size(); i++) {
+                ItemStack stack = inventory.getStack(i);
+             
+                if (stack.getItem() != Items.TORCH) {
+                    continue;
+                }
+
+                convertVanillaTorch(stack, inventory, i);
+            }
         }
     }
 
@@ -165,5 +177,10 @@ public abstract class InventoryTickMixin {
                 if (Mod.config.tickInInventory && random.nextInt(3) == 0) list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
             }
         }
+    }
+
+    private void convertVanillaTorch(ItemStack stack, PlayerInventory inventory, int index) {
+        // Remove currently held vanilla torch stack and convert to `hardcore_torches:unlit_torch` stack.
+        inventory.setStack(index, new ItemStack(Mod.UNLIT_TORCH, stack.getCount()));
     }
 }
