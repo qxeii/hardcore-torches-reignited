@@ -42,6 +42,9 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 400")
     public int torchesExtinguishConditionLoss = 400;
 
+    @Comment("Torches use up more fuel when held by a player vs. being placed (e.g. 2 means burn time is halved). Default: 2")
+    public int torchFuelUseMultiplierWhenHeld = 2;
+
     @Comment("Do torches become unlit when placed in storage. Default: false")
     public boolean unlightInChest = false;
 

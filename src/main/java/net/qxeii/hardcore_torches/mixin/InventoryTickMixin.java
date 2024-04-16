@@ -19,7 +19,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -121,35 +120,51 @@ public abstract class InventoryTickMixin {
         world.playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
     }
 
-    private void tickTorch(PlayerInventory inventory, int index) {
+    private void tickTorch(PlayerInventory inventory, int slot) {
         if (!Mod.config.tickInInventory) {
             return;
         }
 
-        ItemStack stack = inventory.getStack(index);
+        ItemStack stack = inventory.getStack(slot);
         Item item = stack.getItem();
+
+        // Pre-Pass: Convert vanilla torches
+
+        if (Mod.config.convertVanillaTorches && item == Items.TORCH) {
+            convertVanillaTorch(stack, inventory, slot);
+            return;
+        }
+
+        // Main Pass: Check torch type, burn fuel
 
         ServerWorld world = getServerWorld();
         boolean worldIsNether = WorldUtils.worldIsNether(world);
         boolean worldTimeIsDay = WorldUtils.worldIsDaytime(world);
 
+        int itemFuelUse = 1;
+
+        // If player actively holds torch (as dynamic light), multiply fuel use
+        if (slot == inventory.selectedSlot || slot == PlayerInventory.OFF_HAND_SLOT) {
+            itemFuelUse = itemFuelUse * Mod.config.torchFuelUseMultiplierWhenHeld;
+        }
+
         if (item instanceof LanternItem && ((LanternItem) item).isLit) {
-            ItemStack modifiedItem = LanternItem.addFuel(stack, world, -1);
-            inventory.setStack(index, modifiedItem);
+            ItemStack modifiedItem = LanternItem.addFuel(stack, world, -itemFuelUse);
+            inventory.setStack(slot, modifiedItem);
             return;
         }
 
         if (item instanceof ShroomlightItem) {
             if (worldIsNether) {
                 ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, 15);
-                inventory.setStack(index, modifiedItem);
+                inventory.setStack(slot, modifiedItem);
 
                 return;
             }
             
             if (worldTimeIsDay) {
-                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, -1);
-                inventory.setStack(index, modifiedItem);
+                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, -itemFuelUse);
+                inventory.setStack(slot, modifiedItem);
 
                 return;
             }
@@ -160,13 +175,13 @@ public abstract class InventoryTickMixin {
         if (item instanceof GlowstoneItem) {
             if (worldIsNether) {
                 ItemStack modifiedItem = GlowstoneItem.addFuel(stack, world, 15);
-                inventory.setStack(index, modifiedItem);
+                inventory.setStack(slot, modifiedItem);
 
                 return;
             }
 
-            ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, -1);
-            inventory.setStack(index, modifiedItem);
+            ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, -itemFuelUse);
+            inventory.setStack(slot, modifiedItem);
 
             return;
         }
@@ -175,18 +190,14 @@ public abstract class InventoryTickMixin {
             ETorchState state = ((TorchItem) item).getTorchState();
 
             if (state == ETorchState.LIT) {
-                ItemStack modifiedItem = TorchItem.addFuel(stack, world,-1);
-                inventory.setStack(index, modifiedItem);
+                ItemStack modifiedItem = TorchItem.addFuel(stack, world, -itemFuelUse);
+                inventory.setStack(slot, modifiedItem);
             } else if (state == ETorchState.SMOLDERING && random.nextInt(3) == 0) {
-                ItemStack modifiedItem = TorchItem.addFuel(stack, world,-1);
-                inventory.setStack(index, modifiedItem);
+                ItemStack modifiedItem = TorchItem.addFuel(stack, world, -itemFuelUse);
+                inventory.setStack(slot, modifiedItem);
             }
 
             return;
-        }
-
-        if (Mod.config.convertVanillaTorches && item == Items.TORCH) {
-            convertVanillaTorch(stack, inventory, index);
         }
     }
 
