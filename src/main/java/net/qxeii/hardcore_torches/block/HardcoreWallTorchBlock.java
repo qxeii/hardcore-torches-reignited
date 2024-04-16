@@ -80,8 +80,8 @@ public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock {
 
     // region IHardcoreTorch
     @Override
-    public void smother(World world, BlockPos pos, BlockState state) {
-        super.smother(world, pos, state);
+    public void smother(World world, BlockPos pos, BlockState state, boolean playSound) {
+        super.smother(world, pos, state, playSound);
 
         HardcoreWallTorchBlock newTorch;
         newTorch = group.getWallTorch(ETorchState.SMOLDERING);
