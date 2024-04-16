@@ -193,10 +193,10 @@ public abstract class InventoryTickMixin {
                 ItemStack modifiedStack = TorchItem.addFuel(stack, world, -itemFuelUse);
                 inventory.setStack(slot, modifiedStack);
             } else if (state == ETorchState.SMOLDERING) {
-                if(random.nextInt(3) == 0) {
+                if(random.nextInt(Mod.config.torchesSmolderFuelUseTickChance) == 0) {
                     ItemStack modifiedStack = TorchItem.addFuel(stack, world, -itemFuelUse);
                     inventory.setStack(slot, modifiedStack);
-                } else if (random.nextInt(20) == 0) {
+                } else if (random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
                     ItemStack modifiedStack = TorchItem.stateStack(stack, ETorchState.UNLIT);
                     inventory.setStack(slot, modifiedStack);
                 }

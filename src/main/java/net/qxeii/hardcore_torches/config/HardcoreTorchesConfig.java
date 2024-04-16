@@ -51,6 +51,15 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("Do torches lose fuel while the player has then in their inventory. Default: true")
     public boolean tickInInventory = true;
 
+    @Comment("Chance value for a burning torch to extinguish per tick (1/x). Default: 200 (1/200)")
+    public int torchesRainAffectTickChance = 200;
+
+    @Comment("Chance value for a smoldering torch to consume fuel per tick (1/x). Default: 5 (1/5)")
+    public int torchesSmolderFuelUseTickChance = 5;
+
+    @Comment("Chance value for a smoldering torch to extinguish and become unlit per tick (1/x). Default: 1000 (1/1000)")
+    public int torchesSmolderExtinguishTickChance = 1000;
+
     @Comment("How many torches are crafted. Default: 2")
     public int craftAmount = 2;
 
