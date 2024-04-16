@@ -149,22 +149,22 @@ public abstract class InventoryTickMixin {
         }
 
         if (item instanceof LanternItem && ((LanternItem) item).isLit) {
-            ItemStack modifiedItem = LanternItem.addFuel(stack, world, -itemFuelUse);
-            inventory.setStack(slot, modifiedItem);
+            ItemStack modifiedStack = LanternItem.addFuel(stack, world, -itemFuelUse);
+            inventory.setStack(slot, modifiedStack);
             return;
         }
 
         if (item instanceof ShroomlightItem) {
             if (worldIsNether) {
-                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, 15);
-                inventory.setStack(slot, modifiedItem);
+                ItemStack modifiedStack = ShroomlightItem.addFuel(stack, world, 15);
+                inventory.setStack(slot, modifiedStack);
 
                 return;
             }
             
             if (worldTimeIsDay) {
-                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, -itemFuelUse);
-                inventory.setStack(slot, modifiedItem);
+                ItemStack modifiedStack = ShroomlightItem.addFuel(stack, world, -itemFuelUse);
+                inventory.setStack(slot, modifiedStack);
 
                 return;
             }
@@ -174,14 +174,14 @@ public abstract class InventoryTickMixin {
 
         if (item instanceof GlowstoneItem) {
             if (worldIsNether) {
-                ItemStack modifiedItem = GlowstoneItem.addFuel(stack, world, 15);
-                inventory.setStack(slot, modifiedItem);
+                ItemStack modifiedStack = GlowstoneItem.addFuel(stack, world, 15);
+                inventory.setStack(slot, modifiedStack);
 
                 return;
             }
 
-            ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, -itemFuelUse);
-            inventory.setStack(slot, modifiedItem);
+            ItemStack modifiedStack = ShroomlightItem.addFuel(stack, world, -itemFuelUse);
+            inventory.setStack(slot, modifiedStack);
 
             return;
         }
