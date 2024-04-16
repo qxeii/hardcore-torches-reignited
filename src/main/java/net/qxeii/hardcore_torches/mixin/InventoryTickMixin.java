@@ -46,27 +46,11 @@ public abstract class InventoryTickMixin {
         ServerPlayerEntity player = ((ServerPlayerEntity) (Object) this);
         PlayerInventory inventory = player.getInventory();
 
-        for (int i = 0; i < inventory.offHand.size(); i++) {
-            tickTorch(inventory.offHand.get(i), inventory, i, inventory.offHand);
-        }
-
-        for (int i = 0; i < inventory.main.size(); i++) {
-            tickTorch(inventory.main.get(i), inventory, i, inventory.main);
+        for (int i = 0; i < inventory.size(); i++) {
+            tickTorch(inventory, i);
         }
 
         waterCheck(player, inventory);
-
-        if (Mod.config.convertVanillaTorches) {
-            for (int i = 0; i < inventory.size(); i++) {
-                ItemStack stack = inventory.getStack(i);
-             
-                if (stack.getItem() != Items.TORCH) {
-                    continue;
-                }
-
-                convertVanillaTorch(stack, inventory, i);
-            }
-        }
     }
 
     private void waterCheck(ServerPlayerEntity player, PlayerInventory inventory) {
@@ -136,34 +120,51 @@ public abstract class InventoryTickMixin {
         world.playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
     }
 
-    private void tickTorch(ItemStack stack, PlayerInventory inventory, int index, DefaultedList<ItemStack> list) {
-        Item item = stack.getItem();
-
+    private void tickTorch(PlayerInventory inventory, int index) {
         if (!Mod.config.tickInInventory) {
             return;
         }
 
+        ItemStack stack = inventory.getStack(index);
+        Item item = stack.getItem();
+
+        boolean playerIsInNether = this.getServerWorld().getDimensionKey().equals(DimensionTypes.THE_NETHER);
+        boolean worldTimeIsDay = (this.getServerWorld().getTimeOfDay() % 24000) < 13000;
+
         if (item instanceof LanternItem && ((LanternItem) item).isLit) {
-            list.set(index, LanternItem.addFuel(stack, this.getServerWorld(), -1));
+            ItemStack modifiedItem = LanternItem.addFuel(stack, this.getServerWorld(), -1);
+            inventory.setStack(index, modifiedItem);
             return;
         }
 
         if (item instanceof ShroomlightItem) {
-            if (this.getServerWorld().getDimensionKey().equals(DimensionTypes.THE_NETHER)) {
-                list.set(index, ShroomlightItem.addFuel(stack, this.getServerWorld(), 15));
-            } else if (((this.getServerWorld().getTimeOfDay() % 24000)< 13000)) {
-                list.set(index, ShroomlightItem.addFuel(stack, this.getServerWorld(), -1));
+            if (playerIsInNether) {
+                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, this.getServerWorld(), 15);
+                inventory.setStack(index, modifiedItem);
+
+                return;
+            }
+            
+            if (worldTimeIsDay) {
+                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, this.getServerWorld(), -1);
+                inventory.setStack(index, modifiedItem);
+
+                return;
             }
 
             return;
         }
 
         if (item instanceof GlowstoneItem) {
-            if (this.getServerWorld().getDimensionKey().equals(DimensionTypes.THE_NETHER)) {
-                list.set(index, GlowstoneItem.addFuel(stack, this.getServerWorld(), 15));
-            } else {
-                list.set(index, ShroomlightItem.addFuel(stack, this.getServerWorld(), -1));
+            if (playerIsInNether) {
+                ItemStack modifiedItem = GlowstoneItem.addFuel(stack, this.getServerWorld(), 15);
+                inventory.setStack(index, modifiedItem);
+
+                return;
             }
+
+            ItemStack modifiedItem = ShroomlightItem.addFuel(stack, this.getServerWorld(), -1);
+            inventory.setStack(index, modifiedItem);
 
             return;
         }
@@ -172,12 +173,18 @@ public abstract class InventoryTickMixin {
             ETorchState state = ((TorchItem) item).getTorchState();
 
             if (state == ETorchState.LIT) {
-                list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
+                ItemStack modifiedItem = TorchItem.addFuel(stack, this.getServerWorld(),-1);
+                inventory.setStack(index, modifiedItem);
             } else if (state == ETorchState.SMOLDERING && random.nextInt(3) == 0) {
-                list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
+                ItemStack modifiedItem = TorchItem.addFuel(stack, this.getServerWorld(),-1);
+                inventory.setStack(index, modifiedItem);
             }
 
             return;
+        }
+
+        if (Mod.config.convertVanillaTorches && item == Items.TORCH) {
+            convertVanillaTorch(stack, inventory, index);
         }
     }
 
