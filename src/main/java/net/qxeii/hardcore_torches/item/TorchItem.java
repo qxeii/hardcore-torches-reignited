@@ -247,6 +247,22 @@ public class TorchItem extends VerticallyAttachableBlockItem {
             player.equipStack(EquipmentSlot.MAINHAND, flintAndSteelItemStack);
             player.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND);
             player.equipStack(EquipmentSlot.MAINHAND, actualHandStack);
+
+            if (FabricLoader.getInstance().isModLoaded("ruined_equipment")) {
+                // Get ruined flint and steel from the ruined_equipment mod.
+
+                Identifier ruinedFlintAndSteelId = new Identifier("ruined_equipment", "ruined_flint_and_steel");
+                Item ruinedFlintAndSteel = Registries.ITEM.get(ruinedFlintAndSteelId);
+
+                // Check if the item is registered.
+                if (ruinedFlintAndSteel != Items.AIR) {
+                    // Create an ItemStack of the ruined flint and steel.
+                    ItemStack ruinedFlintAndSteelStack = new ItemStack(ruinedFlintAndSteel, 1);
+
+                    // Add ruined flint and steel to player inventory.
+                    player.getInventory().setStack(flintAndSteelItemSlot, ruinedFlintAndSteelStack);
+                }
+            }
         });
 
         return true;
