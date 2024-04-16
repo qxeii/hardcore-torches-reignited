@@ -1,5 +1,6 @@
 package net.qxeii.hardcore_torches.mixin;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.LightType;
 import net.minecraft.world.dimension.DimensionTypes;
@@ -180,7 +181,8 @@ public abstract class InventoryTickMixin {
     }
 
     private void convertVanillaTorch(ItemStack stack, PlayerInventory inventory, int index) {
-        // Remove currently held vanilla torch stack and convert to `hardcore_torches:unlit_torch` stack.
-        inventory.setStack(index, new ItemStack(Mod.UNLIT_TORCH, stack.getCount()));
+        // Remove currently held vanilla torch stack and give a stack of same quantity of mod torches.
+        Block torchItem = Mod.config.torchesBurnWhenConverted ? Mod.LIT_TORCH : Mod.UNLIT_TORCH;
+        inventory.setStack(index, new ItemStack(torchItem, stack.getCount()));
     }
 }
