@@ -245,8 +245,8 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
     private static int getFlintAndSteelSlotFromPlayerInventory(PlayerInventory inventory) {
         // Iterates through all stacks in the inventory and returns the flint and steel with the lowest condition.
-        int lowestCondition = 0;
-        int lowestConditionItemSlot = -1;
+        int highestDamage = 0;
+        int highestDamageItemSlot = -1;
 
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);
@@ -256,15 +256,15 @@ public class TorchItem extends VerticallyAttachableBlockItem {
                 continue;
             }
 
-            int itemCondition = stack.getDamage();
+            int itemDamage = stack.getDamage();
             
-            if (lowestConditionItemSlot == -1 || itemCondition < lowestCondition) {
-                lowestCondition = itemCondition;
-                lowestConditionItemSlot = i;
+            if (highestDamageItemSlot == -1 || itemDamage > highestDamage) {
+                highestDamage = itemDamage;
+                highestDamageItemSlot = i;
             }
         }
 
-        return lowestConditionItemSlot;
+        return highestDamageItemSlot;
     }
 
     @Override
