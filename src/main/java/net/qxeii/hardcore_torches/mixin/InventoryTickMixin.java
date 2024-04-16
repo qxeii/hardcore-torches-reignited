@@ -139,44 +139,45 @@ public abstract class InventoryTickMixin {
     private void tickTorch(ItemStack stack, PlayerInventory inventory, int index, DefaultedList<ItemStack> list) {
         Item item = stack.getItem();
 
+        if (!Mod.config.tickInInventory) {
+            return;
+        }
+
         if (item instanceof LanternItem && ((LanternItem) item).isLit) {
-            if (Mod.config.tickInInventory) {
-                list.set(index, LanternItem.addFuel(stack, this.getServerWorld(), -1));
-            }
+            list.set(index, LanternItem.addFuel(stack, this.getServerWorld(), -1));
+            return;
         }
 
         if (item instanceof ShroomlightItem) {
-            if (Mod.config.tickInInventory) {
-                if (this.getServerWorld().getDimensionKey().equals(DimensionTypes.THE_NETHER)) {
-                    list.set(index, ShroomlightItem.addFuel(stack, this.getServerWorld(), 15));
-                } else {
-                    if (((this.getServerWorld().getTimeOfDay() % 24000)< 13000)) {
-                        list.set(index, ShroomlightItem.addFuel(stack, this.getServerWorld(), -1));
-                    }
-                }
+            if (this.getServerWorld().getDimensionKey().equals(DimensionTypes.THE_NETHER)) {
+                list.set(index, ShroomlightItem.addFuel(stack, this.getServerWorld(), 15));
+            } else if (((this.getServerWorld().getTimeOfDay() % 24000)< 13000)) {
+                list.set(index, ShroomlightItem.addFuel(stack, this.getServerWorld(), -1));
             }
+
+            return;
         }
 
         if (item instanceof GlowstoneItem) {
-            if (Mod.config.tickInInventory) {
-                if (this.getServerWorld().getDimensionKey().equals(DimensionTypes.THE_NETHER)) {
-                    list.set(index, GlowstoneItem.addFuel(stack, this.getServerWorld(), 15));
-                }
-                else
-                {
-                    list.set(index, ShroomlightItem.addFuel(stack, this.getServerWorld(), -1));
-                }
+            if (this.getServerWorld().getDimensionKey().equals(DimensionTypes.THE_NETHER)) {
+                list.set(index, GlowstoneItem.addFuel(stack, this.getServerWorld(), 15));
+            } else {
+                list.set(index, ShroomlightItem.addFuel(stack, this.getServerWorld(), -1));
             }
+
+            return;
         }
 
         if (item instanceof TorchItem) {
             ETorchState state = ((TorchItem) item).getTorchState();
 
             if (state == ETorchState.LIT) {
-                if (Mod.config.tickInInventory) list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
-            } else if (state == ETorchState.SMOLDERING) {
-                if (Mod.config.tickInInventory && random.nextInt(3) == 0) list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
+                list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
+            } else if (state == ETorchState.SMOLDERING && random.nextInt(3) == 0) {
+                list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
             }
+
+            return;
         }
     }
 
