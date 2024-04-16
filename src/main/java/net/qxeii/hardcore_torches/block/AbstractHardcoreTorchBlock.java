@@ -152,7 +152,6 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
 
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         ItemStack stack = player.getStackInHand(hand);
-        boolean success = false;
 
         if (burnState == ETorchState.LIT) {
             if (attemptUse(stack, player, hand, Mod.FREE_TORCH_EXTINGUISH_ITEMS, Mod.DAMAGE_TORCH_EXTINGUISH_ITEMS, Mod.CONSUME_TORCH_EXTINGUISH_ITEMS)) {
