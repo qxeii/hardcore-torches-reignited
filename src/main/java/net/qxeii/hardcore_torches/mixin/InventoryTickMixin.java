@@ -190,11 +190,16 @@ public abstract class InventoryTickMixin {
             ETorchState state = ((TorchItem) item).getTorchState();
 
             if (state == ETorchState.LIT) {
-                ItemStack modifiedItem = TorchItem.addFuel(stack, world, -itemFuelUse);
-                inventory.setStack(slot, modifiedItem);
-            } else if (state == ETorchState.SMOLDERING && random.nextInt(3) == 0) {
-                ItemStack modifiedItem = TorchItem.addFuel(stack, world, -itemFuelUse);
-                inventory.setStack(slot, modifiedItem);
+                ItemStack modifiedStack = TorchItem.addFuel(stack, world, -itemFuelUse);
+                inventory.setStack(slot, modifiedStack);
+            } else if (state == ETorchState.SMOLDERING) {
+                if(random.nextInt(3) == 0) {
+                    ItemStack modifiedStack = TorchItem.addFuel(stack, world, -itemFuelUse);
+                    inventory.setStack(slot, modifiedStack);
+                } else if (random.nextInt(20) == 0) {
+                    ItemStack modifiedStack = TorchItem.stateStack(stack, ETorchState.UNLIT);
+                    inventory.setStack(slot, modifiedStack);
+                }
             }
 
             return;
