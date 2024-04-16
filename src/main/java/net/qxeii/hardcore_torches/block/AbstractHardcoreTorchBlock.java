@@ -45,9 +45,9 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
         this.maxFuel = maxFuel;
     }
 
-    public void smother(World world, BlockPos pos, BlockState state) {
+    public void smother(World world, BlockPos pos, BlockState state, boolean playSound) {
         if (!world.isClient) {
-            world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
+            if (playSound) world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
             TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
             TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
             TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
@@ -56,9 +56,9 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
         }
     }
 
-    public void extinguish(World world, BlockPos pos, BlockState state) {
+    public void extinguish(World world, BlockPos pos, BlockState state, boolean playSound) {
         if (!world.isClient) {
-            world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
+            if (playSound) world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
             TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
             TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
             TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
@@ -156,13 +156,13 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
 
         if (burnState == ETorchState.LIT) {
             if (attemptUse(stack, player, hand, Mod.FREE_TORCH_EXTINGUISH_ITEMS, Mod.DAMAGE_TORCH_EXTINGUISH_ITEMS, Mod.CONSUME_TORCH_EXTINGUISH_ITEMS)) {
-                extinguish(world, pos, state);
+                extinguish(world, pos, state, true);
                 player.swingHand(hand);
                 return ActionResult.SUCCESS;
             }
 
             if (attemptUse(stack, player, hand, Mod.FREE_TORCH_SMOTHER_ITEMS, Mod.DAMAGE_TORCH_SMOTHER_ITEMS, Mod.CONSUME_TORCH_SMOTHER_ITEMS)) {
-                smother(world, pos, state);
+                smother(world, pos, state, true);
                 player.swingHand(hand);
                 return ActionResult.SUCCESS;
             }
@@ -194,7 +194,7 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
         // Hand extinguish
         if (Mod.config.handUnlightTorch && (burnState == ETorchState.LIT || burnState == ETorchState.SMOLDERING)) {
             if (!TorchUtils.canLight(stack.getItem(), state)) {
-                extinguish(world, pos, state);
+                extinguish(world, pos, state, true);
                 return ActionResult.SUCCESS;
             }
         }

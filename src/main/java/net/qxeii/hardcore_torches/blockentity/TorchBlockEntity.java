@@ -31,9 +31,9 @@ public class TorchBlockEntity extends FuelBlockEntity {
         if (Mod.config.torchesRain && world.hasRain(pos)) {
             if (random.nextInt(200) == 0) {
                 if (Mod.config.torchesSmolder) {
-                    ((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).smother(world, pos, state);
+                    ((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).smother(world, pos, state, true);
                 } else {
-                    ((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state);
+                    ((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state, true);
                 }
             }
         }
