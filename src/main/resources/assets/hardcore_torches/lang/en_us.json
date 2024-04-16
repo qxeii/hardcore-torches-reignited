@@ -2,8 +2,11 @@
   "item.hardcore_torches.oil_can": "Oil Canister",
   "item.hardcore_torches.animal_fat": "Animal Fat",
   "item.hardcore_torches.fire_starter": "Fire Starter",
+
   "block.hardcore_torches.lit_torch": "Lit Torch",
   "block.hardcore_torches.lit_wall_torch": "Lit Torch",
+  "block.hardcore_torches.unlit_wall_torch": "Torch",
+  "block.hardcore_torches.smoldering_wall_torch": "Smoldering Torch",
   "block.hardcore_torches.unlit_torch": "Torch",
   "block.hardcore_torches.smoldering_torch": "Smoldering Torch",
   "block.hardcore_torches.burnt_torch": "Burnt Torch",
