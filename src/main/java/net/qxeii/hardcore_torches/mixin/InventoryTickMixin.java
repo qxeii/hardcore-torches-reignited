@@ -10,6 +10,7 @@ import net.qxeii.hardcore_torches.item.LanternItem;
 import net.qxeii.hardcore_torches.item.ShroomlightItem;
 import net.qxeii.hardcore_torches.item.TorchItem;
 import net.qxeii.hardcore_torches.util.ETorchState;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -128,25 +129,26 @@ public abstract class InventoryTickMixin {
         ItemStack stack = inventory.getStack(index);
         Item item = stack.getItem();
 
-        boolean playerIsInNether = this.getServerWorld().getDimensionKey().equals(DimensionTypes.THE_NETHER);
-        boolean worldTimeIsDay = (this.getServerWorld().getTimeOfDay() % 24000) < 13000;
+        ServerWorld world = getServerWorld();
+        boolean worldIsNether = WorldUtils.worldIsNether(world);
+        boolean worldTimeIsDay = WorldUtils.worldIsDaytime(world);
 
         if (item instanceof LanternItem && ((LanternItem) item).isLit) {
-            ItemStack modifiedItem = LanternItem.addFuel(stack, this.getServerWorld(), -1);
+            ItemStack modifiedItem = LanternItem.addFuel(stack, world, -1);
             inventory.setStack(index, modifiedItem);
             return;
         }
 
         if (item instanceof ShroomlightItem) {
-            if (playerIsInNether) {
-                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, this.getServerWorld(), 15);
+            if (worldIsNether) {
+                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, 15);
                 inventory.setStack(index, modifiedItem);
 
                 return;
             }
             
             if (worldTimeIsDay) {
-                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, this.getServerWorld(), -1);
+                ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, -1);
                 inventory.setStack(index, modifiedItem);
 
                 return;
@@ -156,14 +158,14 @@ public abstract class InventoryTickMixin {
         }
 
         if (item instanceof GlowstoneItem) {
-            if (playerIsInNether) {
-                ItemStack modifiedItem = GlowstoneItem.addFuel(stack, this.getServerWorld(), 15);
+            if (worldIsNether) {
+                ItemStack modifiedItem = GlowstoneItem.addFuel(stack, world, 15);
                 inventory.setStack(index, modifiedItem);
 
                 return;
             }
 
-            ItemStack modifiedItem = ShroomlightItem.addFuel(stack, this.getServerWorld(), -1);
+            ItemStack modifiedItem = ShroomlightItem.addFuel(stack, world, -1);
             inventory.setStack(index, modifiedItem);
 
             return;
@@ -173,10 +175,10 @@ public abstract class InventoryTickMixin {
             ETorchState state = ((TorchItem) item).getTorchState();
 
             if (state == ETorchState.LIT) {
-                ItemStack modifiedItem = TorchItem.addFuel(stack, this.getServerWorld(),-1);
+                ItemStack modifiedItem = TorchItem.addFuel(stack, world,-1);
                 inventory.setStack(index, modifiedItem);
             } else if (state == ETorchState.SMOLDERING && random.nextInt(3) == 0) {
-                ItemStack modifiedItem = TorchItem.addFuel(stack, this.getServerWorld(),-1);
+                ItemStack modifiedItem = TorchItem.addFuel(stack, world,-1);
                 inventory.setStack(index, modifiedItem);
             }
 
