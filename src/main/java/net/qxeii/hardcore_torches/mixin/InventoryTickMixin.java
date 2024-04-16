@@ -1,5 +1,6 @@
 package net.qxeii.hardcore_torches.mixin;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.LightType;
 import net.minecraft.world.dimension.DimensionTypes;
@@ -12,6 +13,7 @@ import net.qxeii.hardcore_torches.util.ETorchState;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -37,20 +39,33 @@ public abstract class InventoryTickMixin {
 
     @Inject(at = @At("TAIL"), method = "tick")
     private void tick(CallbackInfo info) {
-        if (!this.getServerWorld().isClient) {
-            ServerPlayerEntity player = ((ServerPlayerEntity) (Object) this);
+        if (this.getServerWorld().isClient) {
+            return;
+        }
 
-            PlayerInventory inventory = player.getInventory(); //idek man, Commobile told me to do it
+        ServerPlayerEntity player = ((ServerPlayerEntity) (Object) this);
+        PlayerInventory inventory = player.getInventory();
 
-            for (int i = 0; i < inventory.offHand.size(); i++) {
-                tickTorch(inventory.offHand.get(i), inventory, i, inventory.offHand);
+        for (int i = 0; i < inventory.offHand.size(); i++) {
+            tickTorch(inventory.offHand.get(i), inventory, i, inventory.offHand);
+        }
+
+        for (int i = 0; i < inventory.main.size(); i++) {
+            tickTorch(inventory.main.get(i), inventory, i, inventory.main);
+        }
+
+        waterCheck(player, inventory);
+
+        if (Mod.config.convertVanillaTorches) {
+            for (int i = 0; i < inventory.size(); i++) {
+                ItemStack stack = inventory.getStack(i);
+             
+                if (stack.getItem() != Items.TORCH) {
+                    continue;
+                }
+
+                convertVanillaTorch(stack, inventory, i);
             }
-
-            for (int i = 0; i < inventory.main.size(); i++) {
-                tickTorch(inventory.main.get(i), inventory, i, inventory.main);
-            }
-
-            waterCheck(player, inventory);
         }
     }
 
@@ -125,7 +140,9 @@ public abstract class InventoryTickMixin {
         Item item = stack.getItem();
 
         if (item instanceof LanternItem && ((LanternItem) item).isLit) {
-            if (Mod.config.tickInInventory) list.set(index, LanternItem.addFuel(stack, this.getServerWorld(), -1));
+            if (Mod.config.tickInInventory) {
+                list.set(index, LanternItem.addFuel(stack, this.getServerWorld(), -1));
+            }
         }
 
         if (item instanceof ShroomlightItem) {
@@ -152,7 +169,6 @@ public abstract class InventoryTickMixin {
             }
         }
 
-
         if (item instanceof TorchItem) {
             ETorchState state = ((TorchItem) item).getTorchState();
 
@@ -162,5 +178,11 @@ public abstract class InventoryTickMixin {
                 if (Mod.config.tickInInventory && random.nextInt(3) == 0) list.set(index, TorchItem.addFuel(stack, this.getServerWorld(),-1));
             }
         }
+    }
+
+    private void convertVanillaTorch(ItemStack stack, PlayerInventory inventory, int index) {
+        // Remove currently held vanilla torch stack and give a stack of same quantity of mod torches.
+        Block torchItem = Mod.config.torchesBurnWhenConverted ? Mod.LIT_TORCH : Mod.UNLIT_TORCH;
+        inventory.setStack(index, new ItemStack(torchItem, stack.getCount()));
     }
 }

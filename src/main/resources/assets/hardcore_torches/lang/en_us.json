@@ -39,6 +39,8 @@
   "text.autoconfig.hardcore_torches.option.torchesRain": "Torches extinguish in rain",
   "text.autoconfig.hardcore_torches.option.torchesSmolder": "Torches can smolder",
   "text.autoconfig.hardcore_torches.option.burntStick": "Burnt torches drop sticks",
+  "text.autoconfig.hardcore_torches.option.convertVanillaTorches": "Convert vanilla torches",
+  "text.autoconfig.hardcore_torches.option.torchesBurnWhenConverted": "Torches burn when converted",
   "text.autoconfig.hardcore_torches.option.defaultTorchFuel": "Default torch fuel",
   "text.autoconfig.hardcore_torches.option.defaultLanternFuel": "Default lantern fuel",
   "text.autoconfig.hardcore_torches.option.defLanternFuelItem": "Default lantern fuel item",

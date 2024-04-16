@@ -21,6 +21,12 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("Burnt torches drop as vanilla stick when broken instead of a burnt torch. Default: false")
     public boolean burntStick = false;
 
+    @Comment("Picking up vanilla torches converts them to lit torches. Default: false")
+    public boolean convertVanillaTorches = false;
+
+    @Comment("Picked up vanilla torches will be converted as already lit. Default: false")
+    public boolean torchesBurnWhenConverted = false;
+
     @Comment("The amount of ticks the torch lasts. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
     public int defaultTorchFuel = 24000;
 
