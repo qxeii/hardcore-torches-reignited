@@ -30,17 +30,17 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("The amount of ticks the torch lasts. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
     public int defaultTorchFuel = 24000;
 
-    @Comment("The amount of ticks the lantern can last. Default: is 72000. 20 ticks per second, 72000 = 60 minutes")
-    public int defaultLanternFuel = 72000;
+    @Comment("The amount of ticks the lantern can last. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
+    public int defaultLanternFuel = 24000;
 
-    @Comment("The amount a fuel item adds to the lantern by default. Default: 72000")
-    public int defLanternFuelItem = 72000;
+    @Comment("The amount a fuel item adds to the lantern by default. Default: 12000")
+    public int defLanternFuelItem = 12000;
 
     @Comment("A lantern must have at least this much fuel (min 1) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 1")
     public int minLanternIgnitionFuel = 1;
 
-    @Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 400")
-    public int torchesExtinguishConditionLoss = 400;
+    @Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 800")
+    public int torchesExtinguishConditionLoss = 800;
 
     @Comment("Torches use up more fuel when held by a player vs. being placed (e.g. 2 means burn time is halved). Default: 2")
     public int torchFuelUseMultiplierWhenHeld = 2;
