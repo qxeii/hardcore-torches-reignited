@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class TorchTools {
+public class TorchUtils {
 
     public static boolean canLight(Item item, BlockState blockState) {
 

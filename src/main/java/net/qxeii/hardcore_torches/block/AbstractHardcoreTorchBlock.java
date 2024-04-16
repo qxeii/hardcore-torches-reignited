@@ -8,7 +8,7 @@ import net.qxeii.hardcore_torches.item.OilCanItem;
 import net.qxeii.hardcore_torches.item.TorchItem;
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
-import net.qxeii.hardcore_torches.util.TorchTools;
+import net.qxeii.hardcore_torches.util.TorchUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -48,10 +48,10 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
     public void smother(World world, BlockPos pos, BlockState state) {
         if (!world.isClient) {
             world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
-            TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
             changeTorch(world, pos, state, ETorchState.SMOLDERING);
         }
     }
@@ -59,10 +59,10 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
     public void extinguish(World world, BlockPos pos, BlockState state) {
         if (!world.isClient) {
             world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
-            TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
             changeTorch(world, pos, state, ETorchState.UNLIT);
         }
     }
@@ -70,10 +70,10 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
     public void burnOut(World world, BlockPos pos, BlockState state, boolean playSound) {
         if (!world.isClient) {
             if (playSound) world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
-            TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
             changeTorch(world, pos, state, ETorchState.BURNT);
         }
     }
@@ -84,8 +84,8 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
             world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
             world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 1f);
             world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
-            TorchTools.displayParticle(ParticleTypes.LAVA, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.FLAME, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.LAVA, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.FLAME, state, world, pos);
             changeTorch(world, pos, state, ETorchState.LIT);
         }
     }
@@ -142,11 +142,11 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
     @Override
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         if (burnState == ETorchState.LIT || burnState == ETorchState.SMOLDERING) {
-            TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
         }
 
         if (burnState == ETorchState.LIT) {
-            TorchTools.displayParticle(this.particle, state, world, pos);
+            TorchUtils.displayParticle(this.particle, state, world, pos);
         }
     }
 
@@ -193,7 +193,7 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
 
         // Hand extinguish
         if (Mod.config.handUnlightTorch && (burnState == ETorchState.LIT || burnState == ETorchState.SMOLDERING)) {
-            if (!TorchTools.canLight(stack.getItem(), state)) {
+            if (!TorchUtils.canLight(stack.getItem(), state)) {
                 extinguish(world, pos, state);
                 return ActionResult.SUCCESS;
             }
