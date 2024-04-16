@@ -80,31 +80,45 @@ public abstract class InventoryTickMixin {
     }
 
     private void waterTorch(int i, TorchItem torchItem, ItemStack stack, ServerPlayerEntity player, boolean mainOrOffhand, BlockPos pos) {
-        if (player.isSubmergedInWater()) {
-            if (torchItem.getTorchState() == ETorchState.LIT || torchItem.getTorchState() == ETorchState.SMOLDERING) {
-                if ((Mod.config.invExtinguishInWater == 1 && mainOrOffhand) || Mod.config.invExtinguishInWater == 2) {
-                    player.getInventory().setStack(i, TorchItem.stateStack(stack, ETorchState.UNLIT));
-                    player.getWorld().playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
-                }
-            }
+        if (!player.isSubmergedInWater()) {
+            return;
         }
+
+        if (!((Mod.config.invExtinguishInWater == 1 && mainOrOffhand) || Mod.config.invExtinguishInWater == 2)) {
+            return;
+        }
+
+        ETorchState torchState = torchItem.getTorchState();
+        int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishConditionLoss : 0;
+
+        if (torchState != ETorchState.LIT && torchState != ETorchState.SMOLDERING) {
+            return;
+        }
+
+        ItemStack torchStack = stack;
+        torchStack = TorchItem.stateStack(torchStack, ETorchState.UNLIT);
+        torchStack = TorchItem.addFuel(torchStack, player.getWorld(), torchConditionLoss);
+        player.getInventory().setStack(i, torchStack);
+        
+        player.getWorld().playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
     }
 
     private void rainTorch(int i, TorchItem torchItem, ItemStack stack, PlayerInventory inventory, World world, BlockPos pos) {
-        if (torchItem.getTorchState() == ETorchState.LIT) {
-            if (Mod.config.torchesSmolder) {
-                inventory.setStack(i, TorchItem.stateStack(stack, ETorchState.SMOLDERING));
-                world.playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
-            } else {
-                inventory.setStack(i, TorchItem.stateStack(stack, ETorchState.UNLIT));
-                world.playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
-            }
-        } else if (torchItem.getTorchState() == ETorchState.SMOLDERING) {
-            if (!Mod.config.torchesSmolder) {
-                inventory.setStack(i, TorchItem.stateStack(stack, ETorchState.UNLIT));
-                world.playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
-            }
+        ETorchState torchState = torchItem.getTorchState();
+
+        if (torchState == ETorchState.UNLIT) {
+            return;
         }
+
+        ETorchState targetTorchState = torchState == ETorchState.LIT && Mod.config.torchesSmolder ? ETorchState.SMOLDERING : ETorchState.UNLIT;
+        int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishConditionLoss : 0;
+
+        ItemStack torchStack = stack;
+        torchStack = TorchItem.stateStack(torchStack, targetTorchState);
+        torchStack = TorchItem.addFuel(torchStack, world, torchConditionLoss);
+        inventory.setStack(i, torchStack);
+
+        world.playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
     }
 
     private void tickTorch(ItemStack stack, PlayerInventory inventory, int index, DefaultedList<ItemStack> list) {

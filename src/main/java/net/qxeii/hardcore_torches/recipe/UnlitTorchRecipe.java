@@ -17,52 +17,46 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
-public class TorchRecipe extends ShapedRecipe {
+public class UnlitTorchRecipe extends ShapedRecipe {
 
-    public TorchRecipe(Identifier id, String group, int width, int height, DefaultedList<Ingredient> input, ItemStack output) {
+    public UnlitTorchRecipe(Identifier id, String group, int width, int height, DefaultedList<Ingredient> input, ItemStack output) {
         super(id, group, CraftingRecipeCategory.EQUIPMENT, width, height, input, output);
     }
 
     public RecipeSerializer<?> getSerializer() {
-        return Mod.TORCH_RECIPE_SERIALIZER;
+        return Mod.UNLIT_TORCH_RECIPE_SERIALIZER;
     }
 
     @Override
     public ItemStack craft(RecipeInputInventory recipeInputInventory, DynamicRegistryManager dynamicRegistryManager) {
         ItemStack stack = getOutput(DynamicRegistryManager.EMPTY);
-        Item stackItem;
-
-        if (stack.getItem() instanceof TorchItem && Mod.config.craftUnlit) {
-            stackItem = ((TorchItem) stack.getItem()).getTorchGroup().getStandingTorch(ETorchState.UNLIT).asItem();
-        } else {
-            stackItem = stack.getItem();
-        }
+        Item stackItem = stack.getItem();
 
         return new ItemStack(stackItem, Mod.config.craftAmount);
     }
 
-    public static class Serializer implements RecipeSerializer<TorchRecipe> {
+    public static class Serializer implements RecipeSerializer<UnlitTorchRecipe> {
         public Serializer() {
         }
 
-        private static final Identifier NAME = new Identifier("hardcore_torches", "torch");
+        private static final Identifier NAME = new Identifier("hardcore_torches", "unlit_torch");
 
         @Override
-        public TorchRecipe read(Identifier resourceLocation, JsonObject json) {
+        public UnlitTorchRecipe read(Identifier resourceLocation, JsonObject json) {
             ShapedRecipe recipe = ShapedRecipe.Serializer.SHAPED.read(resourceLocation, json);
 
-            return new TorchRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getOutput(DynamicRegistryManager.EMPTY));
+            return new UnlitTorchRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getOutput(DynamicRegistryManager.EMPTY));
         }
 
         @Override
-        public TorchRecipe read(Identifier resourceLocation, PacketByteBuf friendlyByteBuf) {
+        public UnlitTorchRecipe read(Identifier resourceLocation, PacketByteBuf friendlyByteBuf) {
             ShapedRecipe recipe = ShapedRecipe.Serializer.SHAPED.read(resourceLocation, friendlyByteBuf);
 
-            return new TorchRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getOutput(DynamicRegistryManager.EMPTY));
+            return new UnlitTorchRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getOutput(DynamicRegistryManager.EMPTY));
         }
 
         @Override
-        public void write(PacketByteBuf friendlyByteBuf, TorchRecipe torchRecipe) {
+        public void write(PacketByteBuf friendlyByteBuf, UnlitTorchRecipe torchRecipe) {
             ShapedRecipe rec = new ShapedRecipe(torchRecipe.getId(), torchRecipe.getGroup(), CraftingRecipeCategory.EQUIPMENT, torchRecipe.getWidth(), torchRecipe.getHeight(), torchRecipe.getIngredients(), torchRecipe.getOutput(DynamicRegistryManager.EMPTY));
 
             ShapedRecipe.Serializer.SHAPED.write(friendlyByteBuf, rec);

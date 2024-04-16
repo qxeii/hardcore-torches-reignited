@@ -31,7 +31,7 @@ import net.qxeii.hardcore_torches.loot.LanternLootFunction;
 import net.qxeii.hardcore_torches.loot.TorchLootFunction;
 import net.qxeii.hardcore_torches.recipe.CandleRecipe;
 import net.qxeii.hardcore_torches.recipe.OilCanRecipe;
-import net.qxeii.hardcore_torches.recipe.TorchRecipe;
+import net.qxeii.hardcore_torches.recipe.UnlitTorchRecipe;
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 import org.slf4j.Logger;
@@ -120,10 +120,10 @@ public class Mod implements ModInitializer {
 
 	// Recipe Types
 	public static final RecipeType<OilCanRecipe> OIL_CAN_RECIPE = RecipeType.register("hardcore_torches:oil_can");
-	public static final RecipeType<TorchRecipe> TORCH_RECIPE = RecipeType.register("hardcore_torches:torch");
-	public static final RecipeType<TorchRecipe> CANDLE_RECIPE = RecipeType.register("hardcore_torches:candle");
+	public static final RecipeType<UnlitTorchRecipe> TORCH_RECIPE = RecipeType.register("hardcore_torches:torch");
+	public static final RecipeType<CandleRecipe> CANDLE_RECIPE = RecipeType.register("hardcore_torches:candle");
 	public static RecipeSerializer<OilCanRecipe> OIL_RECIPE_SERIALIZER;
-	public static RecipeSerializer<TorchRecipe> TORCH_RECIPE_SERIALIZER;
+	public static RecipeSerializer<UnlitTorchRecipe> UNLIT_TORCH_RECIPE_SERIALIZER;
 	public static RecipeSerializer<CandleRecipe> CANDLE_RECIPE_SERIALIZER;
 
 	@Override
@@ -305,7 +305,7 @@ public class Mod implements ModInitializer {
 
 		// Recipe Types
 		OIL_RECIPE_SERIALIZER = Registry.register(Registries.RECIPE_SERIALIZER, new Identifier("hardcore_torches", "oil_can"), new OilCanRecipe.Serializer());
-		TORCH_RECIPE_SERIALIZER = Registry.register(Registries.RECIPE_SERIALIZER, new Identifier("hardcore_torches", "torch"), new TorchRecipe.Serializer());
+		UNLIT_TORCH_RECIPE_SERIALIZER = Registry.register(Registries.RECIPE_SERIALIZER, new Identifier("hardcore_torches", "unlit_torch"), new UnlitTorchRecipe.Serializer());
 		CANDLE_RECIPE_SERIALIZER = Registry.register(Registries.RECIPE_SERIALIZER, new Identifier("hardcore_torches", "candle"), new CandleRecipe.Serializer());
 
 	}
