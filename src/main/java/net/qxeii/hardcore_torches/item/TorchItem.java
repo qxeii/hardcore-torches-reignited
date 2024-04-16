@@ -2,14 +2,18 @@ package net.qxeii.hardcore_torches.item;
 
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
-
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -17,6 +21,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -237,9 +242,13 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
         ItemStack flintAndSteelItemStack = inventory.getStack(flintAndSteelItemSlot);
 
-        // Deduct one use from flint and steel item stack.
+        flintAndSteelItemStack.damage(1, player, (playerEntity) -> {
+            ItemStack actualHandStack = player.getMainHandStack();
+            player.equipStack(EquipmentSlot.MAINHAND, flintAndSteelItemStack);
+            player.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND);
+            player.equipStack(EquipmentSlot.MAINHAND, actualHandStack);
+        });
 
-        flintAndSteelItemStack.damage(1, player, null);
         return true;
     }
 
