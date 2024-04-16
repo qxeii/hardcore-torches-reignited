@@ -37,20 +37,22 @@ public abstract class InventoryTickMixin {
 
     @Inject(at = @At("TAIL"), method = "tick")
     private void tick(CallbackInfo info) {
-        if (!this.getServerWorld().isClient) {
-            ServerPlayerEntity player = ((ServerPlayerEntity) (Object) this);
+        if (this.getServerWorld().isClient) {
+            return;
+        }
 
-            PlayerInventory inventory = player.getInventory(); //idek man, Commobile told me to do it
+        ServerPlayerEntity player = ((ServerPlayerEntity) (Object) this);
+        PlayerInventory inventory = player.getInventory();
 
-            for (int i = 0; i < inventory.offHand.size(); i++) {
-                tickTorch(inventory.offHand.get(i), inventory, i, inventory.offHand);
-            }
+        for (int i = 0; i < inventory.offHand.size(); i++) {
+            tickTorch(inventory.offHand.get(i), inventory, i, inventory.offHand);
+        }
 
-            for (int i = 0; i < inventory.main.size(); i++) {
-                tickTorch(inventory.main.get(i), inventory, i, inventory.main);
-            }
+        for (int i = 0; i < inventory.main.size(); i++) {
+            tickTorch(inventory.main.get(i), inventory, i, inventory.main);
+        }
 
-            waterCheck(player, inventory);
+        waterCheck(player, inventory);
         }
     }
 
@@ -125,7 +127,9 @@ public abstract class InventoryTickMixin {
         Item item = stack.getItem();
 
         if (item instanceof LanternItem && ((LanternItem) item).isLit) {
-            if (Mod.config.tickInInventory) list.set(index, LanternItem.addFuel(stack, this.getServerWorld(), -1));
+            if (Mod.config.tickInInventory) {
+                list.set(index, LanternItem.addFuel(stack, this.getServerWorld(), -1));
+            }
         }
 
         if (item instanceof ShroomlightItem) {
@@ -151,7 +155,6 @@ public abstract class InventoryTickMixin {
                 }
             }
         }
-
 
         if (item instanceof TorchItem) {
             ETorchState state = ((TorchItem) item).getTorchState();
