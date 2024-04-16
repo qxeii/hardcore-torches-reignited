@@ -71,5 +71,7 @@
   "text.autoconfig.hardcore_torches.option.pickUpLanterns": "Pick up lanterns",
   "text.autoconfig.hardcore_torches.option.defaultCandleFuel": "Default candle fuel",
   "text.autoconfig.hardcore_torches.option.defaultGlowstoneFuel": "Default glowstone fuel",
-  "text.autoconfig.hardcore_torches.option.defaultShroomlightFuel": "Default shroomlight fuel"
+  "text.autoconfig.hardcore_torches.option.worldDaytimeDuration": "World daytime duration",
+  "text.autoconfig.hardcore_torches.option.worldNighttimeDuration": "World nighttime duration"
+
 }

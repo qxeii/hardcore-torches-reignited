@@ -119,4 +119,10 @@ public class HardcoreTorchesConfig implements ConfigData {
 
     @Comment("The fuel that shroomlights start with. Default: 10000")
     public int defaultShroomlightFuel = 10000;
+
+    @Comment("The length of daytime in ticks. May be adjusted if other mods alter the length of days. Default: 13000")
+    public int worldDaytimeDuration = 13000;
+
+    @Comment("The length of nighttime in ticks. May be adjusted if other mods alter the length of days. Default: 11000")
+    public int worldNighttimeDuration = 11000;
 }
