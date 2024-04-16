@@ -18,6 +18,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
@@ -108,14 +109,10 @@ public class TorchItem extends VerticallyAttachableBlockItem {
                 }
 
                 lightTorchInHand(world, player, hand);
-                world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
-
                 return super.use(world, player, hand);
             }
             case LIT: {
                 unlightTorchInHand(world, player, hand);
-                world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1.0f);
-
                 return super.use(world, player, hand);
             }
             default:
@@ -147,6 +144,8 @@ public class TorchItem extends VerticallyAttachableBlockItem {
         PlayerInventory inventory = player.getInventory();
         inventory.setStack(handStackTuple.slot, heldTorchStack);
         player.setStackInHand(handStackTuple.hand, heldTorchStack);
+
+        world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1.0f);
     }
 
     private void lightTorchInHand(World world, PlayerEntity player, Hand hand) {
@@ -165,7 +164,6 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
         if (handStackTuple.stack.getCount() > 1) {
             int emptySlot = inventory.getEmptySlot();
-            // ItemStack deductedTorchStack = new ItemStack(handStackTuple.stack.getItem(), handStackTuple.stack.getCount() - 1);
             ItemStack deductedTorchStack = handStackTuple.stack.copyWithCount(handStackTuple.stack.getCount() - 1);            
 
             if (emptySlot == -1) {
@@ -178,36 +176,30 @@ public class TorchItem extends VerticallyAttachableBlockItem {
             heldTorchStack.setCount(1);
 
             inventory.setStack(handStackTuple.slot, heldTorchStack);
-            player.setStackInHand(handStackTuple.hand, heldTorchStack);
         } else {
             ItemStack heldTorchStack = stateStack(handStackTuple.stack, ETorchState.LIT);
             inventory.setStack(handStackTuple.slot, heldTorchStack);
-            player.setStackInHand(handStackTuple.hand, heldTorchStack);
         }
+
+        world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
     }
 
     // Torch Inventory Utilities
 
     private HandStackTuple getTorchStackTupleInHandFromPlayer(PlayerEntity player, Hand hand) {
+        PlayerInventory inventory = player.getInventory();
+
         switch (hand) {
-            case MAIN_HAND:
-                ItemStack mainHandStack = player.getMainHandStack();
-                int mainHandSlot = player.getInventory().getSlotWithStack(mainHandStack);
-
-                if (mainHandSlot == -1) {
-                    return null;
-                }
-    
-                return new HandStackTuple(Hand.MAIN_HAND, mainHandSlot, mainHandStack);
-            case OFF_HAND:
-                ItemStack offHandStack = player.getOffHandStack();
-                int offHandSlot = player.getInventory().getSlotWithStack(offHandStack);
-
-                if (offHandSlot == -1) {
-                    return null;
-                }
-    
-                return new HandStackTuple(Hand.OFF_HAND, offHandSlot, offHandStack);
+            case MAIN_HAND: {
+                int selectedSlot = inventory.selectedSlot;
+                ItemStack mainHandStack = inventory.getStack(selectedSlot);
+                return new HandStackTuple(Hand.MAIN_HAND, selectedSlot, mainHandStack);
+            }
+            case OFF_HAND: {
+                int selectedSlot = PlayerInventory.OFF_HAND_SLOT;
+                ItemStack offHandStack = inventory.getStack(selectedSlot);
+                return new HandStackTuple(Hand.OFF_HAND, selectedSlot, offHandStack);
+            }
             default:
                 return null;
         }
