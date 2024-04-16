@@ -130,11 +130,7 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 
         HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
 
-        if (handStackTuple == null) {
-            return;
-        }
-
-        if (torchState != ETorchState.LIT) {
+        if (handStackTuple == null || torchState != ETorchState.LIT) {
             return;
         }
 
@@ -163,7 +159,7 @@ public class TorchItem extends VerticallyAttachableBlockItem {
         PlayerInventory inventory = player.getInventory();
         HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
 
-        if (handStackTuple == null) {
+        if (handStackTuple == null || torchState == ETorchState.LIT || torchState == ETorchState.BURNT) {
             return;
         }
 
