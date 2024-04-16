@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntSupplier;
 
-public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock implements BlockEntityProvider {
+public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock {
 
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
