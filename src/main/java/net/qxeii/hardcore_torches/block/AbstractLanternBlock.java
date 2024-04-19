@@ -82,20 +82,22 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 	}
 
 	public void light(World world, BlockPos pos, BlockState state) {
-		if (!world.isClient) {
-			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
-			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
-			world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 1f);
-			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
-			world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
-			world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
-			ServerWorld serverWorld = (ServerWorld) world;
-			serverWorld.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 10,
-					0.15, 0.15, 0.15, 0.001);
-			serverWorld.spawnParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 2,
-					0.15, 0.15, 0.15, 0.001);
-			setState(world, pos, true);
+		if (world.isClient) {
+			return;
 		}
+
+		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
+		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
+		world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 1f);
+		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
+		world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
+		world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
+		ServerWorld serverWorld = (ServerWorld) world;
+		serverWorld.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 10,
+				0.15, 0.15, 0.15, 0.001);
+		serverWorld.spawnParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 2,
+				0.15, 0.15, 0.15, 0.001);
+		setState(world, pos, true);
 	}
 
 	public void setState(World world, BlockPos pos, boolean lit) {
@@ -132,15 +134,19 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 			BlockHitResult hit) {
 		ItemStack stack = player.getStackInHand(hand);
 		BlockEntity be = world.getBlockEntity(pos);
-		boolean success = false;
 
 		// Pick up lantern
 		if (player.isSneaking() && Mod.config.pickUpLanterns) {
-			if (!world.isClient)
+			if (!world.isClient) {
 				player.giveItemStack(getStack(world, pos));
+			}
+
 			world.setBlockState(pos, Blocks.AIR.getDefaultState());
-			if (!world.isClient)
+
+			if (!world.isClient) {
 				world.playSound(null, pos, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1f, 1f);
+			}
+
 			player.swingHand(hand);
 			return ActionResult.SUCCESS;
 		}
@@ -152,9 +158,11 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 			// If not enough fuel to light
 			if (((FuelBlockEntity) world.getBlockEntity(pos)).getFuel() < Mod.config.minLanternIgnitionFuel) {
 				if (!world.isClient) {
-					world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 2, 2);
-					player.sendMessage(MutableText.of(new LiteralTextContent("Not enough fuel to ignite!")), true);
+					world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 1.0f, 2.0f);
+					// player.sendMessage(MutableText.of(new LiteralTextContent("Not enough fuel to
+					// light!")), true);
 				}
+
 				player.swingHand(hand);
 				return ActionResult.SUCCESS;
 			}
@@ -163,6 +171,9 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 					Mod.CONSUME_LANTERN_LIGHT_ITEMS)) {
 				light(world, pos, state);
 				player.swingHand(hand);
+
+				((FuelBlockEntity) be).changeFuel(-Mod.config.lanternLightFuelLoss);
+
 				return ActionResult.SUCCESS;
 			}
 		}
