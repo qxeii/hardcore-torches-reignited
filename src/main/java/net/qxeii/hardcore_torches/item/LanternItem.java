@@ -131,7 +131,7 @@ public class LanternItem extends BlockItem {
 
 		stack = addFuel(stack, world, -Mod.config.lanternLightFuelLoss);
 
-		if (getFuel(stack) == 0) {
+		if (getFuel(stack) < Mod.config.minLanternIgnitionFuel) {
 			// Lantern fuel is depleted, do not light and bail.
 			world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 1.0f, 2.0f);
 			return;
