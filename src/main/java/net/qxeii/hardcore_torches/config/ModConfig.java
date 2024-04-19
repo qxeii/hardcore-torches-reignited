@@ -42,14 +42,14 @@ public class ModConfig implements ConfigData {
 	@Comment("The amount a fuel item adds to the lantern by default. Default: 12000")
 	public int defLanternFuelItem = 12000;
 
-	@Comment("A lantern must have at least this much fuel (min 1) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 1")
-	public int minLanternIgnitionFuel = 1;
+	@Comment("A lantern must have at least this much fuel (min 600) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 400")
+	public int minLanternIgnitionFuel = 400;
 
 	@Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 800")
 	public int torchesExtinguishFuelLoss = 800;
 
-	@Comment("The amount of fuel wasted in a lantern when it is lit. Used to balance durable lanterns. Default: 800")
-	public int lanternLightFuelLoss = 800;
+	@Comment("The amount of fuel wasted in a lantern when it is lit. Used to balance durable lanterns. Default: 200")
+	public int lanternLightFuelLoss = 200;
 
 	@Comment("Torches use up more fuel when held by a player vs. being placed (e.g. 2 means burn time is halved). Default: 2")
 	public int torchFuelUseMultiplierWhenHeld = 2;
