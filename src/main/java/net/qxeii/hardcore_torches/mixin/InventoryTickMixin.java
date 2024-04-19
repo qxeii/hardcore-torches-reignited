@@ -94,7 +94,7 @@ public abstract class InventoryTickMixin {
 		}
 
 		ETorchState torchState = torchItem.getTorchState();
-		int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishConditionLoss : 0;
+		int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishFuelLoss : 0;
 
 		if (torchState != ETorchState.LIT && torchState != ETorchState.SMOLDERING) {
 			return;
@@ -119,7 +119,7 @@ public abstract class InventoryTickMixin {
 		ETorchState targetTorchState = torchState == ETorchState.LIT && Mod.config.torchesSmolder
 				? ETorchState.SMOLDERING
 				: ETorchState.UNLIT;
-		int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishConditionLoss : 0;
+		int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishFuelLoss : 0;
 
 		ItemStack torchStack = stack;
 		torchStack = TorchItem.stateStack(torchStack, targetTorchState);
