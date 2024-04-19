@@ -1,25 +1,16 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern":
-    [
-        "###",
-        "#|#",
-        "###"
-    ],
-    "key":
-    {
-        "#":
-        {
-            "item": "minecraft:copper_ingot"
-        },
-        "|":
-        {
-            "tag": "hardcore_torches:torches"
-        }
-    },
-    "result":
-    {
-        "item": "hardcore_torches:unlit_lantern",
-        "count": 1
-    }
+	"type": "minecraft:crafting_shaped",
+	"pattern": ["###", "#|#", "###"],
+	"key": {
+		"#": {
+			"item": "minecraft:copper_ingot"
+		},
+		"|": {
+			"tag": "hardcore_torches:torches"
+		}
+	},
+	"result": {
+		"item": "hardcore_torches:unlit_lantern",
+		"count": 1
+	}
 }

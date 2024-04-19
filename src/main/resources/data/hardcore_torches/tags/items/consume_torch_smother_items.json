@@ -1,7 +1,4 @@
 {
-    "replace": false,
-    "values": [
-        "#minecraft:wool_carpets",
-        "#minecraft:wool"
-    ]
+	"replace": false,
+	"values": ["#minecraft:wool_carpets", "#minecraft:wool"]
 }

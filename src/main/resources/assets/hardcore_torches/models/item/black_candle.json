@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "hardcore_torches:item/black_candle"
-  }
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "hardcore_torches:item/black_candle"
+	}
 }

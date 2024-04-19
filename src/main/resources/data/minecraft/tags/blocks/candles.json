@@ -1,22 +1,22 @@
 {
-  "replace": false,
-  "values": [
-    "hardcore_torches:candle",
-    "hardcore_torches:blue_candle",
-    "hardcore_torches:black_candle",
-    "hardcore_torches:brown_candle",
-    "hardcore_torches:cyan_candle",
-    "hardcore_torches:gray_candle",
-    "hardcore_torches:green_candle",
-    "hardcore_torches:light_blue_candle",
-    "hardcore_torches:light_gray_candle",
-    "hardcore_torches:lime_candle",
-    "hardcore_torches:magenta_candle",
-    "hardcore_torches:orange_candle",
-    "hardcore_torches:pink_candle",
-    "hardcore_torches:purple_candle",
-    "hardcore_torches:red_candle",
-    "hardcore_torches:white_candle",
-    "hardcore_torches:yellow_candle"
-  ]
+	"replace": false,
+	"values": [
+		"hardcore_torches:candle",
+		"hardcore_torches:blue_candle",
+		"hardcore_torches:black_candle",
+		"hardcore_torches:brown_candle",
+		"hardcore_torches:cyan_candle",
+		"hardcore_torches:gray_candle",
+		"hardcore_torches:green_candle",
+		"hardcore_torches:light_blue_candle",
+		"hardcore_torches:light_gray_candle",
+		"hardcore_torches:lime_candle",
+		"hardcore_torches:magenta_candle",
+		"hardcore_torches:orange_candle",
+		"hardcore_torches:pink_candle",
+		"hardcore_torches:purple_candle",
+		"hardcore_torches:red_candle",
+		"hardcore_torches:white_candle",
+		"hardcore_torches:yellow_candle"
+	]
 }

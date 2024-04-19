@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "hardcore_torches:block/glowstone"
-  }
+	"parent": "minecraft:block/cube_all",
+	"textures": {
+		"all": "hardcore_torches:block/glowstone"
+	}
 }
