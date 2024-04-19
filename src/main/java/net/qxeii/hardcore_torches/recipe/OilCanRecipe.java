@@ -33,7 +33,7 @@ public class OilCanRecipe extends ShapelessRecipe {
 
     @Override
     public boolean matches(RecipeInputInventory recipeInputInventory, World world) {
-        if (configType == 0 && !Mod.config.enableFatOil) return false;
+        if (configType == 0 && !Mod.config.enableFuelOil) return false;
         if (configType == 1 && !Mod.config.enableCoalOil) return false;
         return super.matches(recipeInputInventory, world);
     }

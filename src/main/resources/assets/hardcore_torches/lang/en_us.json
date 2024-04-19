@@ -1,6 +1,6 @@
 {
-  "item.hardcore_torches.oil_can": "Oil Canister",
-  "item.hardcore_torches.animal_fat": "Animal Fat",
+  "item.hardcore_torches.oil_can": "Oil Can",
+  "item.hardcore_torches.fuel": "Fuel",
   "item.hardcore_torches.fire_starter": "Fire Starter",
 
   "block.hardcore_torches.lit_torch": "Lit Torch",
@@ -40,7 +40,9 @@
   "text.autoconfig.hardcore_torches.option.torchesSmolder": "Torches can smolder",
   "text.autoconfig.hardcore_torches.option.burntStick": "Burnt torches drop sticks",
   "text.autoconfig.hardcore_torches.option.convertVanillaTorches": "Convert vanilla torches",
+  "text.autoconfig.hardcore_torches.option.convertVanillaLanterns": "Convert vanilla lanterns",
   "text.autoconfig.hardcore_torches.option.torchesBurnWhenConverted": "Torches burn when converted",
+  "text.autoconfig.hardcore_torches.option.lanternsBurnWhenConverted": "Lanterns burn when converted",
   "text.autoconfig.hardcore_torches.option.defaultTorchFuel": "Default torch fuel",
   "text.autoconfig.hardcore_torches.option.defaultLanternFuel": "Default lantern fuel",
   "text.autoconfig.hardcore_torches.option.defLanternFuelItem": "Default lantern fuel item",
@@ -60,7 +62,7 @@
   "text.autoconfig.hardcore_torches.option.torchesUseCan": "Torches use can",
   "text.autoconfig.hardcore_torches.option.oilRecipeMultiplier": "Oil recipe multiplier",
   "text.autoconfig.hardcore_torches.option.oilRecipeOverride": "Oil recipe override",
-  "text.autoconfig.hardcore_torches.option.enableFatOil": "Enable fat oil",
+  "text.autoconfig.hardcore_torches.option.enableFuelOil": "Enable fuel oil",
   "text.autoconfig.hardcore_torches.option.enableCoalOil": "Enable coal oil",
   "text.autoconfig.hardcore_torches.option.handUnlightTorch": "Hand unlight torch",
   "text.autoconfig.hardcore_torches.option.handUnlightLantern": "Hand unlight lantern",
@@ -75,6 +77,7 @@
   "text.autoconfig.hardcore_torches.option.pickUpLanterns": "Pick up lanterns",
   "text.autoconfig.hardcore_torches.option.defaultCandleFuel": "Default candle fuel",
   "text.autoconfig.hardcore_torches.option.defaultGlowstoneFuel": "Default glowstone fuel",
+  "text.autoconfig.hardcore_torches.option.defaultShroomlightFuel": "Default shroomlight fuel",
   "text.autoconfig.hardcore_torches.option.worldDaytimeDuration": "World daytime duration",
   "text.autoconfig.hardcore_torches.option.worldNighttimeDuration": "World nighttime duration"
 

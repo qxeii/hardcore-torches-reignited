@@ -12,11 +12,11 @@ import net.minecraft.util.JsonSerializer;
 
 import java.util.Random;
 
-public class FatLootNumberProvider implements LootNumberProvider {
+public class FuelLootNumberProvider implements LootNumberProvider {
     int[] choices;
     Random random = new Random();
 
-    public FatLootNumberProvider(int[] choices) {
+    public FuelLootNumberProvider(int[] choices) {
         this.choices = choices;
     }
 
@@ -32,14 +32,14 @@ public class FatLootNumberProvider implements LootNumberProvider {
 
     @Override
     public LootNumberProviderType getType() {
-        return HCTLootNumberProviderTypes.FAT;
+        return HCTLootNumberProviderTypes.FUEL;
     }
 
-    public static class Serializer implements JsonSerializer<FatLootNumberProvider> {
+    public static class Serializer implements JsonSerializer<FuelLootNumberProvider> {
         public Serializer() {
         }
 
-        public void toJson(JsonObject object, FatLootNumberProvider instance, JsonSerializationContext jsonSerializationContext) {
+        public void toJson(JsonObject object, FuelLootNumberProvider instance, JsonSerializationContext jsonSerializationContext) {
             JsonArray choices = new JsonArray();
 
             for (int i = 0; i < instance.choices.length; i++) {
@@ -49,7 +49,7 @@ public class FatLootNumberProvider implements LootNumberProvider {
             object.add("choices", choices);
         }
 
-        public FatLootNumberProvider fromJson(JsonObject object, JsonDeserializationContext jsonDeserializationContext) {
+        public FuelLootNumberProvider fromJson(JsonObject object, JsonDeserializationContext jsonDeserializationContext) {
             JsonArray array = JsonHelper.asArray(object, "choices");
             int[] choices = new int[array.size()];
 
@@ -57,7 +57,7 @@ public class FatLootNumberProvider implements LootNumberProvider {
                 choices[i] = array.get(i).getAsInt();
             }
 
-            return new FatLootNumberProvider(choices);
+            return new FuelLootNumberProvider(choices);
         }
     }
 }
