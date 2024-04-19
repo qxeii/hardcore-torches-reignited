@@ -49,7 +49,7 @@ public abstract class InventoryTickMixin {
 		PlayerInventory inventory = player.getInventory();
 
 		for (int i = 0; i < inventory.size(); i++) {
-			tickTorch(inventory, i);
+			tickItem(inventory, i);
 		}
 
 		waterCheck(player, inventory);
@@ -129,7 +129,7 @@ public abstract class InventoryTickMixin {
 		world.playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
 	}
 
-	private void tickTorch(PlayerInventory inventory, int slot) {
+	private void tickItem(PlayerInventory inventory, int slot) {
 		if (!Mod.config.tickInInventory) {
 			return;
 		}
