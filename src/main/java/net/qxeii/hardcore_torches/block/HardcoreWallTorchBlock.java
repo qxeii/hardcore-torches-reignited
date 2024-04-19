@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntSupplier;
 
-public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock implements BlockEntityProvider {
+public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock {
 
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
@@ -80,8 +80,8 @@ public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock implement
 
     // region IHardcoreTorch
     @Override
-    public void smother(World world, BlockPos pos, BlockState state) {
-        super.smother(world, pos, state);
+    public void smother(World world, BlockPos pos, BlockState state, boolean playSound) {
+        super.smother(world, pos, state, playSound);
 
         HardcoreWallTorchBlock newTorch;
         newTorch = group.getWallTorch(ETorchState.SMOLDERING);

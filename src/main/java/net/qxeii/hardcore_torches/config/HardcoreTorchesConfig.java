@@ -30,23 +30,35 @@ public class HardcoreTorchesConfig implements ConfigData {
     @Comment("The amount of ticks the torch lasts. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
     public int defaultTorchFuel = 24000;
 
-    @Comment("The amount of ticks the lantern can last. Default: is 72000. 20 ticks per second, 72000 = 60 minutes")
-    public int defaultLanternFuel = 72000;
+    @Comment("The amount of ticks the lantern can last. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
+    public int defaultLanternFuel = 24000;
 
-    @Comment("The amount a fuel item adds to the lantern by default. Default: 72000")
-    public int defLanternFuelItem = 72000;
+    @Comment("The amount a fuel item adds to the lantern by default. Default: 12000")
+    public int defLanternFuelItem = 12000;
 
     @Comment("A lantern must have at least this much fuel (min 1) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 1")
     public int minLanternIgnitionFuel = 1;
 
-    @Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 400")
-    public int torchesExtinguishConditionLoss = 400;
+    @Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 800")
+    public int torchesExtinguishConditionLoss = 800;
+
+    @Comment("Torches use up more fuel when held by a player vs. being placed (e.g. 2 means burn time is halved). Default: 2")
+    public int torchFuelUseMultiplierWhenHeld = 2;
 
     @Comment("Do torches become unlit when placed in storage. Default: false")
     public boolean unlightInChest = false;
 
     @Comment("Do torches lose fuel while the player has then in their inventory. Default: true")
     public boolean tickInInventory = true;
+
+    @Comment("Chance value for a burning torch to extinguish per tick (1/x). Default: 200 (1/200)")
+    public int torchesRainAffectTickChance = 200;
+
+    @Comment("Chance value for a smoldering torch to consume fuel per tick (1/x). Default: 5 (1/5)")
+    public int torchesSmolderFuelUseTickChance = 5;
+
+    @Comment("Chance value for a smoldering torch to extinguish and become unlit per tick (1/x). Default: 1000 (1/1000)")
+    public int torchesSmolderExtinguishTickChance = 1000;
 
     @Comment("How many torches are crafted. Default: 2")
     public int craftAmount = 2;
@@ -119,4 +131,10 @@ public class HardcoreTorchesConfig implements ConfigData {
 
     @Comment("The fuel that shroomlights start with. Default: 10000")
     public int defaultShroomlightFuel = 10000;
+
+    @Comment("The length of daytime in ticks. May be adjusted if other mods alter the length of days. Default: 13000")
+    public int worldDaytimeDuration = 13000;
+
+    @Comment("The length of nighttime in ticks. May be adjusted if other mods alter the length of days. Default: 11000")
+    public int worldNighttimeDuration = 11000;
 }

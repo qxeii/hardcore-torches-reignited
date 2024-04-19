@@ -6,7 +6,7 @@ import net.qxeii.hardcore_torches.blockentity.IFuelBlock;
 import net.qxeii.hardcore_torches.blockentity.LanternBlockEntity;
 import net.qxeii.hardcore_torches.item.LanternItem;
 import net.qxeii.hardcore_torches.item.OilCanItem;
-import net.qxeii.hardcore_torches.util.TorchTools;
+import net.qxeii.hardcore_torches.util.TorchUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -64,10 +64,10 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
     public void extinguish(World world, BlockPos pos, BlockState state, boolean playSound) {
         if (!world.isClient) {
             if (playSound) world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
-            TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-            TorchTools.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+            TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
             setState(world, pos, false);
         }
     }
@@ -197,7 +197,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 
         // Hand extinguish
         if (Mod.config.handUnlightLantern && isLit) {
-            if (!TorchTools.canLight(stack.getItem(), state)) {
+            if (!TorchUtils.canLight(stack.getItem(), state)) {
                 extinguish(world, pos, state, true);
                 return ActionResult.SUCCESS;
             }

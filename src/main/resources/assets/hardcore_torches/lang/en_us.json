@@ -46,8 +46,12 @@
   "text.autoconfig.hardcore_torches.option.defLanternFuelItem": "Default lantern fuel item",
   "text.autoconfig.hardcore_torches.option.minLanternIgnitionFuel": "Minimum lantern ignition fuel",
   "text.autoconfig.hardcore_torches.option.torchesExtinguishConditionLoss": "Torch extinguish condition loss",
+  "text.autoconfig.hardcore_torches.option.torchFuelUseMultiplierWhenHeld": "Torch fuel use multiplier when held",
   "text.autoconfig.hardcore_torches.option.unlightInChest": "Torches unlight in chest",
   "text.autoconfig.hardcore_torches.option.tickInInventory": "Torches tick in inventory",
+  "text.autoconfig.hardcore_torches.option.torchesRainAffectTickChance": "Torches rain affect tick chance",
+  "text.autoconfig.hardcore_torches.option.torchesSmolderFuelUseTickChance": "Torches smolder fuel use tick chance",
+  "text.autoconfig.hardcore_torches.option.torchesSmolderExtinguishTickChance": "Torches smolder extinguish tick chance",
   "text.autoconfig.hardcore_torches.option.craftAmount": "Torch craft amount",
   "text.autoconfig.hardcore_torches.option.candleCraftAmount": "Candle craft amount",
   "text.autoconfig.hardcore_torches.option.fuelMessage": "Fuel message",
@@ -71,5 +75,7 @@
   "text.autoconfig.hardcore_torches.option.pickUpLanterns": "Pick up lanterns",
   "text.autoconfig.hardcore_torches.option.defaultCandleFuel": "Default candle fuel",
   "text.autoconfig.hardcore_torches.option.defaultGlowstoneFuel": "Default glowstone fuel",
-  "text.autoconfig.hardcore_torches.option.defaultShroomlightFuel": "Default shroomlight fuel"
+  "text.autoconfig.hardcore_torches.option.worldDaytimeDuration": "World daytime duration",
+  "text.autoconfig.hardcore_torches.option.worldNighttimeDuration": "World nighttime duration"
+
 }
