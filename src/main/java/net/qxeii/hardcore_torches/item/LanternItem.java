@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 
 public class LanternItem extends BlockItem {
-	int maxFuel;
+	public int maxFuel;
 	public boolean isLit;
 
 	public LanternItem(Block block, Settings settings, int maxFuel, boolean isLit) {
