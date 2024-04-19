@@ -12,83 +12,91 @@ import net.minecraft.item.ItemStack;
 
 public class GlowstoneItem extends BlockItem implements FabricItem {
 
-    int maxFuel;
-    boolean isLit;
-    public GlowstoneItem(Block block, Settings settings, int maxFuel, boolean isLit) {
-        super(block, settings);
-        this.maxFuel = maxFuel;
-        this.isLit = isLit;
-    }
-    public static ItemStack stateStack(ItemStack inputStack, boolean isLit) {
-        ItemStack outputStack = ItemStack.EMPTY;
+	int maxFuel;
+	boolean isLit;
 
-        if (inputStack.getItem() instanceof BlockItem && inputStack.getItem() instanceof GlowstoneItem) {
-            GlowstoneItem newItem = (GlowstoneItem) Mod.GLOWSTONE.asItem();
+	public GlowstoneItem(Block block, Settings settings, int maxFuel, boolean isLit) {
+		super(block, settings);
+		this.maxFuel = maxFuel;
+		this.isLit = isLit;
+	}
 
-            outputStack = new ItemStack(newItem, inputStack.getCount());
+	public static ItemStack stateStack(ItemStack inputStack, boolean isLit) {
+		ItemStack outputStack = ItemStack.EMPTY;
 
-            if (inputStack.getNbt() != null) {
-                outputStack.setNbt(inputStack.getNbt().copy());
-            }
-        }
+		if (inputStack.getItem() instanceof BlockItem && inputStack.getItem() instanceof GlowstoneItem) {
+			GlowstoneItem newItem = (GlowstoneItem) Mod.GLOWSTONE.asItem();
 
-        return outputStack;
-    }
-    public static ItemStack addFuel(ItemStack stack, World world, int amount) {
+			outputStack = new ItemStack(newItem, inputStack.getCount());
 
-        if (stack.getItem() instanceof GlowstoneItem && !world.isClient) {
-            GlowstoneItem item = (GlowstoneItem) stack.getItem();
+			if (inputStack.getNbt() != null) {
+				outputStack.setNbt(inputStack.getNbt().copy());
+			}
+		}
 
-            NbtCompound nbt = stack.getNbt();
-            int fuel = item.isLit ? item.maxFuel : 0;
+		return outputStack;
+	}
 
-            if (nbt != null) {
-                fuel = nbt.getInt("Fuel");
-            } else {
-                nbt = new NbtCompound();
-            }
+	public static ItemStack addFuel(ItemStack stack, World world, int amount) {
 
-            fuel += amount;
+		if (stack.getItem() instanceof GlowstoneItem && !world.isClient) {
+			GlowstoneItem item = (GlowstoneItem) stack.getItem();
 
-            // If burn out
-            if (fuel > Mod.config.defaultGlowstoneFuel) {
-                fuel = Mod.config.defaultGlowstoneFuel;
-            }
+			NbtCompound nbt = stack.getNbt();
+			int fuel = item.isLit ? item.maxFuel : 0;
 
-            nbt.putInt("Fuel", fuel);
-            stack.setNbt(nbt);
-        }
+			if (nbt != null) {
+				fuel = nbt.getInt("Fuel");
+			} else {
+				nbt = new NbtCompound();
+			}
 
-        return stack;
-    }
-    @Override
-    public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
-        NbtCompound oldNbt = null;
-        NbtCompound newNbt = null;
+			fuel += amount;
 
-        if (oldStack.getNbt() != null) {
-            oldNbt = oldStack.getNbt().copy();
-            oldNbt.remove("Fuel");
-        }
+			// If burn out
+			if (fuel > Mod.config.defaultGlowstoneFuel) {
+				fuel = Mod.config.defaultGlowstoneFuel;
+			}
 
-        if (newStack.getNbt() != null) {
-            newNbt = newStack.getNbt().copy();
-            newNbt.remove("Fuel");
-        }
+			nbt.putInt("Fuel", fuel);
+			stack.setNbt(nbt);
+		}
 
-        if (oldNbt == null && newNbt != null) return true;
-        if (oldNbt != null && newNbt == null) return true;
-        if (oldNbt == null && newNbt == null) return false;
+		return stack;
+	}
 
-        return oldNbt.equals(null);
-    }
-    public static int getFuel(ItemStack stack) {
-        NbtCompound nbt = stack.getNbt();
+	@Override
+	public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+		NbtCompound oldNbt = null;
+		NbtCompound newNbt = null;
 
-        if (nbt != null) {
-            return nbt.getInt("Fuel");
-        } else {
-            return Mod.config.defaultGlowstoneFuel;
-        }
-    }
+		if (oldStack.getNbt() != null) {
+			oldNbt = oldStack.getNbt().copy();
+			oldNbt.remove("Fuel");
+		}
+
+		if (newStack.getNbt() != null) {
+			newNbt = newStack.getNbt().copy();
+			newNbt.remove("Fuel");
+		}
+
+		if (oldNbt == null && newNbt != null)
+			return true;
+		if (oldNbt != null && newNbt == null)
+			return true;
+		if (oldNbt == null && newNbt == null)
+			return false;
+
+		return oldNbt.equals(null);
+	}
+
+	public static int getFuel(ItemStack stack) {
+		NbtCompound nbt = stack.getNbt();
+
+		if (nbt != null) {
+			return nbt.getInt("Fuel");
+		} else {
+			return Mod.config.defaultGlowstoneFuel;
+		}
+	}
 }
