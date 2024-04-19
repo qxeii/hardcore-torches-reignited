@@ -1,42 +1,32 @@
 {
-  "schemaVersion": 1,
-  "id": "hardcore_torches",
-  "version": "${version}",
+	"schemaVersion": 1,
+	"id": "hardcore_torches",
+	"version": "${version}",
 
-  "name": "Hardcore Torches",
-  "description": "Makes light sources burn out over time and adds lanterns with fuel.",
-  "authors": [
-    "qxeii"
-  ],
-  "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/hardcore-torches-reignited",
-    "sources": "https://github.com/qxeii/hardcore-torches-reignited",
-    "issues": "https://github.com/qxeii/hardcore-torches-reignited/issues"
-  },
+	"name": "Hardcore Torches",
+	"description": "Makes light sources burn out over time and adds lanterns with fuel.",
+	"authors": ["qxeii"],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/hardcore-torches-reignited",
+		"sources": "https://github.com/qxeii/hardcore-torches-reignited",
+		"issues": "https://github.com/qxeii/hardcore-torches-reignited/issues"
+	},
 
-  "license": "CC0-1.0",
-  "icon": "assets/hardcore_torches/icon.png",
+	"license": "CC0-1.0",
+	"icon": "assets/hardcore_torches/icon.png",
 
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "net.qxeii.hardcore_torches.Mod"
-    ],
-    "client": [
-      "net.qxeii.hardcore_torches.ClientMod"
-    ],
-    "modmenu": [
-      "net.qxeii.hardcore_torches.ModMenuIntegration"
-    ]
-  },
-  "mixins": [
-    "hardcore_torches.mixins.json"
-  ],
+	"environment": "*",
+	"entrypoints": {
+		"main": ["net.qxeii.hardcore_torches.Mod"],
+		"client": ["net.qxeii.hardcore_torches.ClientMod"],
+		"modmenu": ["net.qxeii.hardcore_torches.ModMenuIntegration"]
+	},
+	"mixins": ["hardcore_torches.mixins.json"],
 
-  "depends": {
-    "fabricloader": ">=0.14.21",
-    "fabric": "*",
-    "minecraft": ">=1.20",
-    "java": ">=17"
-  }
+	"depends": {
+		"fabricloader": ">=0.14.21",
+		"fabric": "*",
+		"minecraft": ">=1.20",
+		"java": ">=17"
+	}
 }

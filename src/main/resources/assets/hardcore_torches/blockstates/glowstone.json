@@ -1,5 +1,5 @@
 {
-  "variants": {
-    "": { "model": "hardcore_torches:block/glowstone" }
-  }
+	"variants": {
+		"": { "model": "hardcore_torches:block/glowstone" }
+	}
 }

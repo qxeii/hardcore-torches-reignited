@@ -6,32 +6,32 @@ import net.qxeii.hardcore_torches.Mod;
 
 public class WorldUtils {
 
-    // Time
+	// Time
 
-    public static int getWorldDaytimeLength() {
-        return Mod.config.worldDaytimeDuration;
-    }
+	public static int getWorldDaytimeLength() {
+		return Mod.config.worldDaytimeDuration;
+	}
 
-    public static int getWorldNighttimeLength() {
-        return Mod.config.worldNighttimeDuration;
-    }
+	public static int getWorldNighttimeLength() {
+		return Mod.config.worldNighttimeDuration;
+	}
 
-    public static int getWorldDayLength() {
-        return getWorldDaytimeLength() + getWorldNighttimeLength();
-    }
+	public static int getWorldDayLength() {
+		return getWorldDaytimeLength() + getWorldNighttimeLength();
+	}
 
-    public static boolean worldIsDaytime(ServerWorld world) {
-        return (world.getTimeOfDay() % getWorldDayLength()) < getWorldDaytimeLength();
-    }
+	public static boolean worldIsDaytime(ServerWorld world) {
+		return (world.getTimeOfDay() % getWorldDayLength()) < getWorldDaytimeLength();
+	}
 
-    public static boolean worldIsNighttime(ServerWorld world) {
-        return !worldIsDaytime(world);
-    }
+	public static boolean worldIsNighttime(ServerWorld world) {
+		return !worldIsDaytime(world);
+	}
 
-    // Environment
+	// Environment
 
-    public static boolean worldIsNether(ServerWorld world) {
-        return world.getDimensionKey().equals(DimensionTypes.THE_NETHER);
-    }
+	public static boolean worldIsNether(ServerWorld world) {
+		return world.getDimensionKey().equals(DimensionTypes.THE_NETHER);
+	}
 
 }

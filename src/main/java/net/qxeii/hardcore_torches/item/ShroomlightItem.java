@@ -12,68 +12,75 @@ import net.qxeii.hardcore_torches.Mod;
 
 public class ShroomlightItem extends BlockItem implements FabricItem {
 
-    int maxFuel;
-    boolean isLit;
-    public ShroomlightItem(Block block, Settings settings, int maxFuel, boolean isLit) {
-        super(block, settings);
-        this.maxFuel = maxFuel;
-        this.isLit = isLit;
-    }
-    public static ItemStack addFuel(ItemStack stack, World world, int amount) {
+	int maxFuel;
+	boolean isLit;
 
-        if (stack.getItem() instanceof ShroomlightItem && !world.isClient) {
-            ShroomlightItem item = (ShroomlightItem) stack.getItem();
+	public ShroomlightItem(Block block, Settings settings, int maxFuel, boolean isLit) {
+		super(block, settings);
+		this.maxFuel = maxFuel;
+		this.isLit = isLit;
+	}
 
-            NbtCompound nbt = stack.getNbt();
-            int fuel = item.isLit ? item.maxFuel : 0;
+	public static ItemStack addFuel(ItemStack stack, World world, int amount) {
 
-            if (nbt != null) {
-                fuel = nbt.getInt("Fuel");
-            } else {
-                nbt = new NbtCompound();
-            }
+		if (stack.getItem() instanceof ShroomlightItem && !world.isClient) {
+			ShroomlightItem item = (ShroomlightItem) stack.getItem();
 
-            fuel += amount;
+			NbtCompound nbt = stack.getNbt();
+			int fuel = item.isLit ? item.maxFuel : 0;
 
-            // If burn out
-                if (fuel > Mod.config.defaultShroomlightFuel) {
-                    fuel = Mod.config.defaultShroomlightFuel;
-                }
+			if (nbt != null) {
+				fuel = nbt.getInt("Fuel");
+			} else {
+				nbt = new NbtCompound();
+			}
 
-                nbt.putInt("Fuel", fuel);
-                stack.setNbt(nbt);
-            }
+			fuel += amount;
 
-        return stack;
-    }
-    @Override
-    public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
-        NbtCompound oldNbt = null;
-        NbtCompound newNbt = null;
+			// If burn out
+			if (fuel > Mod.config.defaultShroomlightFuel) {
+				fuel = Mod.config.defaultShroomlightFuel;
+			}
 
-        if (oldStack.getNbt() != null) {
-            oldNbt = oldStack.getNbt().copy();
-            oldNbt.remove("Fuel");
-        }
+			nbt.putInt("Fuel", fuel);
+			stack.setNbt(nbt);
+		}
 
-        if (newStack.getNbt() != null) {
-            newNbt = newStack.getNbt().copy();
-            newNbt.remove("Fuel");
-        }
+		return stack;
+	}
 
-        if (oldNbt == null && newNbt != null) return true;
-        if (oldNbt != null && newNbt == null) return true;
-        if (oldNbt == null && newNbt == null) return false;
+	@Override
+	public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+		NbtCompound oldNbt = null;
+		NbtCompound newNbt = null;
 
-        return oldNbt.equals(null);
-    }
-    public static int getFuel(ItemStack stack) {
-        NbtCompound nbt = stack.getNbt();
+		if (oldStack.getNbt() != null) {
+			oldNbt = oldStack.getNbt().copy();
+			oldNbt.remove("Fuel");
+		}
 
-        if (nbt != null) {
-            return nbt.getInt("Fuel");
-        } else {
-            return Mod.config.defaultShroomlightFuel;
-        }
-    }
+		if (newStack.getNbt() != null) {
+			newNbt = newStack.getNbt().copy();
+			newNbt.remove("Fuel");
+		}
+
+		if (oldNbt == null && newNbt != null)
+			return true;
+		if (oldNbt != null && newNbt == null)
+			return true;
+		if (oldNbt == null && newNbt == null)
+			return false;
+
+		return oldNbt.equals(null);
+	}
+
+	public static int getFuel(ItemStack stack) {
+		NbtCompound nbt = stack.getNbt();
+
+		if (nbt != null) {
+			return nbt.getInt("Fuel");
+		} else {
+			return Mod.config.defaultShroomlightFuel;
+		}
+	}
 }

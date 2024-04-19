@@ -1,5 +1,5 @@
 {
-  "variants": {
-    "": { "model": "hardcore_torches:block/smoldering_torch" }
-  }
+	"variants": {
+		"": { "model": "hardcore_torches:block/smoldering_torch" }
+	}
 }
