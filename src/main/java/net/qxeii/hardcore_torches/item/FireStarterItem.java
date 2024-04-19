@@ -1,20 +1,15 @@
 package net.qxeii.hardcore_torches.item;
 
-import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
-import net.qxeii.hardcore_torches.block.AbstractLanternBlock;
-import net.qxeii.hardcore_torches.util.ETorchState;
-import net.fabricmc.fabric.impl.client.particle.ParticleFactoryRegistryImpl;
-import net.fabricmc.fabric.mixin.client.particle.ParticleManagerAccessor;
+import java.util.List;
+import java.util.Random;
+
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.sound.Sound;
-import net.minecraft.client.sound.SoundEntry;
-import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -24,21 +19,24 @@ import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Random;
+import net.qxeii.hardcore_torches.Mod;
+import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
+import net.qxeii.hardcore_torches.block.AbstractLanternBlock;
+import net.qxeii.hardcore_torches.util.ETorchState;
 
 public class FireStarterItem extends Item {
 	private static final int USE_DURATION = 72000;

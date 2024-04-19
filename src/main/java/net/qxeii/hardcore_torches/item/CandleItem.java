@@ -1,10 +1,10 @@
 package net.qxeii.hardcore_torches.item;
 
-import net.qxeii.hardcore_torches.Mod;
 import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.qxeii.hardcore_torches.Mod;
 
 public class CandleItem extends BlockItem implements FabricItem {
 

@@ -1,7 +1,5 @@
 package net.qxeii.hardcore_torches.item;
 
-import net.qxeii.hardcore_torches.util.ETorchState;
-import net.qxeii.hardcore_torches.util.TorchGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -9,7 +7,12 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.StackReference;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.Items;
+import net.minecraft.item.VerticallyAttachableBlockItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
@@ -27,6 +30,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
+import net.qxeii.hardcore_torches.util.ETorchState;
+import net.qxeii.hardcore_torches.util.TorchGroup;
 
 public class TorchItem extends VerticallyAttachableBlockItem {
 	ETorchState torchState;
