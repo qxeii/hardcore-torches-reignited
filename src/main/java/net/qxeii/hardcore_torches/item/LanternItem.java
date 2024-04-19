@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItem;
@@ -128,6 +129,17 @@ public class LanternItem extends BlockItem {
 	private void lightLanternInHand(World world, PlayerEntity player, Hand hand) {
 		int slot = hand == Hand.MAIN_HAND ? player.getInventory().selectedSlot : PlayerInventory.OFF_HAND_SLOT;
 		ItemStack stack = player.getInventory().getStack(slot);
+
+		stack = addFuel(stack, world, -Mod.config.lanternLightFuelLoss);
+
+		if (getFuel(stack) <= 0) {
+			// Lantern is expended, break and remove.
+			EquipmentSlot equipmentSlot = hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+			player.sendEquipmentBreakStatus(equipmentSlot);
+			player.getInventory().setStack(slot, ItemStack.EMPTY);
+
+			return;
+		}
 
 		if (stack.getItem() instanceof LanternItem) {
 			stack = stateStack(stack, true);
