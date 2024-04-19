@@ -24,7 +24,7 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.qxeii.hardcore_torches.block.*;
 import net.qxeii.hardcore_torches.blockentity.*;
-import net.qxeii.hardcore_torches.config.HardcoreTorchesConfig;
+import net.qxeii.hardcore_torches.config.ModConfig;
 import net.qxeii.hardcore_torches.item.*;
 import net.qxeii.hardcore_torches.loot.HCTLootNumberProviderTypes;
 import net.qxeii.hardcore_torches.loot.LanternLootFunction;
@@ -47,7 +47,7 @@ public class Mod implements ModInitializer {
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
 
-	public static HardcoreTorchesConfig config;
+	public static ModConfig config;
 
 	// Tags
 	public static final TagKey<Item> CANDLES = TagKey.of(RegistryKeys.ITEM, new Identifier("minecraft", "candles"));
@@ -186,8 +186,8 @@ public class Mod implements ModInitializer {
 				SHROOMLIGHT
 		};
 
-		AutoConfig.register(HardcoreTorchesConfig.class, JanksonConfigSerializer::new);
-		config = AutoConfig.getConfigHolder(HardcoreTorchesConfig.class).getConfig();
+		AutoConfig.register(ModConfig.class, JanksonConfigSerializer::new);
+		config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
 
 		Registry.register(Registries.LOOT_FUNCTION_TYPE, "hardcore_torches:torch", HARDCORE_TORCH_LOOT_FUNCTION);
 		Registry.register(Registries.LOOT_FUNCTION_TYPE, "hardcore_torches:set_damage", FUEL_LOOT_FUNCTION);
