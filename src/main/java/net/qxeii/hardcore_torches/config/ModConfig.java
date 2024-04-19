@@ -51,8 +51,8 @@ public class ModConfig implements ConfigData {
 	@Comment("The amount of fuel wasted in a lantern when it is lit. Used to balance durable lanterns. Default: 200")
 	public int lanternLightFuelLoss = 200;
 
-	@Comment("Torches use up more fuel when held by a player vs. being placed (e.g. 2 means burn time is halved). Default: 2")
-	public int torchFuelUseMultiplierWhenHeld = 2;
+	@Comment("Items use up more fuel when held by a player vs. being placed (e.g. 2 means burn time is halved). Default: 2")
+	public int itemUseMultiplierWhenHeld = 2;
 
 	@Comment("Do torches become unlit when placed in storage. Default: false")
 	public boolean unlightInChest = false;

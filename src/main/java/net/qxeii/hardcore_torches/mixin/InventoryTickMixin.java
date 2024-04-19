@@ -157,9 +157,9 @@ public abstract class InventoryTickMixin {
 
 		int itemFuelUse = 1;
 
-		// If player actively holds torch (as dynamic light), multiply fuel use
+		// If player actively holds item, multiply fuel use
 		if (slot == inventory.selectedSlot || slot == PlayerInventory.OFF_HAND_SLOT) {
-			itemFuelUse = itemFuelUse * Mod.config.torchFuelUseMultiplierWhenHeld;
+			itemFuelUse = itemFuelUse * Mod.config.itemUseMultiplierWhenHeld;
 		}
 
 		if (item instanceof LanternItem && ((LanternItem) item).isLit) {
