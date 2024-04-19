@@ -59,7 +59,7 @@ public class FuelBlockEntity extends BlockEntity {
 	}
 
 	public void setFuel(int newValue) {
-		fuel = newValue;
+		fuel = Math.max(0, newValue);
 	}
 
 	public void changeFuel(int increment) {
