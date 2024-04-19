@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItem;
@@ -132,12 +131,8 @@ public class LanternItem extends BlockItem {
 
 		stack = addFuel(stack, world, -Mod.config.lanternLightFuelLoss);
 
-		if (getFuel(stack) <= 0) {
-			// Lantern is expended, break and remove.
-			EquipmentSlot equipmentSlot = hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-			player.sendEquipmentBreakStatus(equipmentSlot);
-			player.getInventory().setStack(slot, ItemStack.EMPTY);
-
+		if (getFuel(stack) == 0) {
+			// Lantern fuel is depleted, do not light and bail.
 			return;
 		}
 
@@ -166,6 +161,7 @@ public class LanternItem extends BlockItem {
 			fuel += amount;
 
 			if (fuel <= 0) {
+				fuel = 0;
 				stack = stateStack(stack, false);
 			} else {
 				if (fuel > Mod.config.defaultLanternFuel) {
