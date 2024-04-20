@@ -20,7 +20,6 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -133,113 +132,92 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
 			BlockHitResult hit) {
 		ItemStack stack = player.getStackInHand(hand);
-		BlockEntity be = world.getBlockEntity(pos);
 
 		// Pick up lantern
 		if (player.isSneaking() && Mod.config.pickUpLanterns) {
-			if (!world.isClient) {
-				player.giveItemStack(getStack(world, pos));
-			}
-
-			world.setBlockState(pos, Blocks.AIR.getDefaultState());
-
-			if (!world.isClient) {
-				world.playSound(null, pos, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1.0f, 1.0f);
-			}
-
-			player.swingHand(hand);
+			pickUpLantern(world, pos, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		// Igniting
-		if (!this.isLit && stack == ItemStack.EMPTY) {
-			// If not enough fuel to light
-			if (((FuelBlockEntity) world.getBlockEntity(pos)).getFuel() < Mod.config.minLanternIgnitionFuel) {
-				if (!world.isClient) {
-					world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 1.0f, 2.0f);
-					// player.sendMessage(MutableText.of(new LiteralTextContent("Not enough fuel to
-					// light!")), true);
-				}
-
-				player.swingHand(hand);
-				return ActionResult.SUCCESS;
-			}
-
-			light(world, pos, state);
-			player.swingHand(hand);
-
-			((FuelBlockEntity) be).changeFuel(-Mod.config.lanternLightFuelLoss);
-
+		if (!this.isLit && stack.isEmpty()) {
+			lightLantern(state, world, pos, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
-		if (this.isLit && stack == ItemStack.EMPTY) {
-			if (!world.isClient) {
-				world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 1.0f);
-			}
-
-			extinguish(world, pos, state, true);
-			player.swingHand(hand);
+		if (this.isLit && stack.isEmpty()) {
+			extinguishLantern(world, pos, state, player, hand);
 			return ActionResult.SUCCESS;
-		}
-
-		// Adding fuel
-		if (stack.isIn(ItemTags.COALS) && !Mod.config.lanternsNeedCan) {
-			if (be instanceof FuelBlockEntity) {
-				int oldFuel = ((FuelBlockEntity) be).getFuel();
-
-				if (oldFuel < Mod.config.defaultLanternFuel) {
-					if (oldFuel + Mod.config.defLanternFuelItem < Mod.config.defaultLanternFuel) {
-						world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
-								SoundCategory.BLOCKS, 1f, 0f);
-						world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
-								SoundCategory.BLOCKS, 1f, 2f);
-					} else {
-						if (!world.isClient)
-							world.playSound(null, pos, SoundEvents.BLOCK_HONEY_BLOCK_STEP, SoundCategory.BLOCKS, 1f,
-									0f);
-					}
-
-					stack.decrement(1);
-					((FuelBlockEntity) be)
-							.setFuel(Math.min(oldFuel + Mod.config.defLanternFuelItem, Mod.config.defaultLanternFuel));
-					player.swingHand(hand);
-					return ActionResult.SUCCESS;
-				}
-			}
 		}
 
 		// Adding fuel with can
-		if (stack.getItem() instanceof OilCanItem && Mod.config.lanternsNeedCan) {
-			if (be instanceof FuelBlockEntity && !world.isClient) {
-				if (OilCanItem.fuelBlock((FuelBlockEntity) be, world, stack)) {
-					world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
-							SoundCategory.BLOCKS, 1f, 0f);
-					world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
-							SoundCategory.BLOCKS, 1f, 2f);
-					world.playSound(null, pos, SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.BLOCKS, 0.3f, 0f);
-				}
-			}
-			player.swingHand(hand);
+		if (stack.getItem() instanceof OilCanItem) {
+			refuelLantern(world, pos, state, player, stack, hand);
 			return ActionResult.SUCCESS;
 		}
 
-		boolean showFuel = (stack.isEmpty() || stack.getItem() == Mod.OIL_CAN) && Mod.config.fuelMessage;
-
-		// Fuel message
-		if (be.getType() == Mod.LANTERN_BLOCK_ENTITY && !world.isClient && hand == Hand.MAIN_HAND
-				&& Mod.config.fuelMessage && showFuel) {
-			player.sendMessage(MutableText.of(new LiteralTextContent("Fuel: " + ((FuelBlockEntity) be).getFuel())),
-					true);
-		}
-
-		if (Mod.config.lanternsNeedCan && !stack.isEmpty() && hand == Hand.MAIN_HAND && stack.getItem() != Mod.OIL_CAN
-				&& !world.isClient) {
-			player.sendMessage(MutableText.of(new LiteralTextContent("Requires an Oil Canister to fuel!")), true);
-			world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 2, 2);
-		}
-
 		return ActionResult.PASS;
+	}
+
+	private void pickUpLantern(World world, BlockPos pos, PlayerEntity player, Hand hand) {
+		if (!world.isClient) {
+			player.giveItemStack(getStack(world, pos));
+		}
+
+		world.setBlockState(pos, Blocks.AIR.getDefaultState());
+
+		if (!world.isClient) {
+			world.playSound(null, pos, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1.0f, 1.0f);
+		}
+
+		player.swingHand(hand);
+	}
+
+	private void lightLantern(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand) {
+		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(pos);
+
+		// If not enough fuel to light
+		if (blockEntity.getFuel() < Mod.config.minLanternIgnitionFuel) {
+			if (!world.isClient) {
+				world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 1.0f, 2.0f);
+			}
+
+			player.swingHand(hand);
+			return;
+		}
+
+		light(world, pos, state);
+		player.swingHand(hand);
+
+		blockEntity.changeFuel(-Mod.config.lanternLightFuelLoss);
+
+		if (Mod.config.fuelMessage && !world.isClient && hand == Hand.MAIN_HAND) {
+			player.sendMessage(MutableText.of(new LiteralTextContent("Fuel: " + blockEntity.getFuel())), true);
+		}
+	}
+
+	private void extinguishLantern(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand) {
+		if (!world.isClient) {
+			world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 1.0f);
+		}
+
+		extinguish(world, pos, state, true);
+		player.swingHand(hand);
+	}
+
+	private void refuelLantern(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack stack,
+			Hand hand) {
+		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(pos);
+
+		if (OilCanItem.fuelBlock((FuelBlockEntity) blockEntity, world, stack)) {
+			world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
+					SoundCategory.BLOCKS, 1f, 0f);
+			world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
+					SoundCategory.BLOCKS, 1f, 2f);
+			world.playSound(null, pos, SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.BLOCKS, 0.3f, 0f);
+		}
+
+		player.swingHand(hand);
 	}
 
 	@Override
@@ -249,7 +227,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 
 		BlockEntity be = world.getBlockEntity(pos);
 
-		((FuelBlockEntity) be).setFuel(0);
+		// ((FuelBlockEntity) be).setFuel(0);
 
 		if (be != null && be instanceof FuelBlockEntity && itemStack.getItem() instanceof LanternItem) {
 			int fuel = LanternItem.getFuel(itemStack);
