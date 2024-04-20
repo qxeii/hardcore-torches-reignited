@@ -9,8 +9,8 @@ public class ModConfig implements ConfigData {
 	@Comment("Torches will extinguish if broken. Default: false")
 	public boolean torchesExtinguishWhenBroken = false;
 
-	@Comment("Torches are fully expended when broken. Overrides torchesExtinguishWhenBroken. Default: false")
-	public boolean torchesBurnWhenDropped = false;
+	@Comment("Torches are fully depleted when broken. Overrides torchesExtinguishWhenBroken. Default: false")
+	public boolean torchesDepleteWhenDropped = false;
 
 	@Comment("Torches become unlit in rain. If torchesSmolder is true, they will instead smolder in rain. Default: true")
 	public boolean torchesRain = true;
