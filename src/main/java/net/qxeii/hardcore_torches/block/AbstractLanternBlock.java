@@ -64,9 +64,36 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 		this.maxFuel = maxFuel;
 	}
 
-	public boolean canLight(World world, BlockPos pos) {
-		return ((LanternBlockEntity) world.getBlockEntity(pos)).getFuel() > 0 && !isLit;
+	public void setState(World world, BlockPos pos, boolean lit) {
+		BlockState oldState = world.getBlockState(pos);
+		BlockState newState = lit ? Mod.LIT_LANTERN.getDefaultState() : Mod.UNLIT_LANTERN.getDefaultState();
+		newState = newState.with(HANGING, oldState.get(HANGING)).with(WATERLOGGED, oldState.get(WATERLOGGED));
+		int newFuel = Mod.config.startingLanternFuel;
+
+		if (world.getBlockEntity(pos) != null)
+			newFuel = ((FuelBlockEntity) world.getBlockEntity(pos)).getFuel();
+		world.setBlockState(pos, newState);
+		if (world.getBlockEntity(pos) != null)
+			((FuelBlockEntity) world.getBlockEntity(pos)).setFuel(newFuel);
 	}
+
+	protected ItemStack getStack(World world, BlockPos pos) {
+		ItemStack stack = new ItemStack(world.getBlockState(pos).getBlock().asItem());
+		BlockEntity blockEntity = world.getBlockEntity(pos);
+		int remainingFuel;
+
+		// Set fuel
+		if (blockEntity != null && blockEntity instanceof FuelBlockEntity) {
+			remainingFuel = ((FuelBlockEntity) blockEntity).getFuel();
+			NbtCompound nbt = new NbtCompound();
+			nbt.putInt("Fuel", (remainingFuel));
+			stack.setNbt(nbt);
+		}
+
+		return stack;
+	}
+
+	// Actions
 
 	public void extinguish(World world, BlockPos pos, BlockState state, boolean playSound) {
 		if (!world.isClient) {
@@ -99,34 +126,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 		setState(world, pos, true);
 	}
 
-	public void setState(World world, BlockPos pos, boolean lit) {
-		BlockState oldState = world.getBlockState(pos);
-		BlockState newState = lit ? Mod.LIT_LANTERN.getDefaultState() : Mod.UNLIT_LANTERN.getDefaultState();
-		newState = newState.with(HANGING, oldState.get(HANGING)).with(WATERLOGGED, oldState.get(WATERLOGGED));
-		int newFuel = Mod.config.startingLanternFuel;
-
-		if (world.getBlockEntity(pos) != null)
-			newFuel = ((FuelBlockEntity) world.getBlockEntity(pos)).getFuel();
-		world.setBlockState(pos, newState);
-		if (world.getBlockEntity(pos) != null)
-			((FuelBlockEntity) world.getBlockEntity(pos)).setFuel(newFuel);
-	}
-
-	protected ItemStack getStack(World world, BlockPos pos) {
-		ItemStack stack = new ItemStack(world.getBlockState(pos).getBlock().asItem());
-		BlockEntity blockEntity = world.getBlockEntity(pos);
-		int remainingFuel;
-
-		// Set fuel
-		if (blockEntity != null && blockEntity instanceof FuelBlockEntity) {
-			remainingFuel = ((FuelBlockEntity) blockEntity).getFuel();
-			NbtCompound nbt = new NbtCompound();
-			nbt.putInt("Fuel", (remainingFuel));
-			stack.setNbt(nbt);
-		}
-
-		return stack;
-	}
+	// Interaction
 
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
@@ -135,31 +135,31 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 
 		// Pick up lantern
 		if (player.isSneaking() && Mod.config.pickUpLanterns) {
-			pickUpLantern(world, pos, player, hand);
+			pickUp(world, pos, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		// Igniting
 		if (!this.isLit && stack.isEmpty()) {
-			lightLantern(state, world, pos, player, hand);
+			useFuelAndLightWithInteraction(state, world, pos, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		if (this.isLit && stack.isEmpty()) {
-			extinguishLantern(world, pos, state, player, hand);
+			extinguishWithInteraction(world, pos, state, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		// Adding fuel with can
 		if (stack.getItem() instanceof OilCanItem) {
-			refuelLantern(world, pos, state, player, stack, hand);
+			refuelWithInteraction(world, pos, state, player, stack, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		return ActionResult.PASS;
 	}
 
-	private void pickUpLantern(World world, BlockPos pos, PlayerEntity player, Hand hand) {
+	private void pickUp(World world, BlockPos pos, PlayerEntity player, Hand hand) {
 		if (!world.isClient) {
 			player.giveItemStack(getStack(world, pos));
 		}
@@ -173,7 +173,8 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 		player.swingHand(hand);
 	}
 
-	private void lightLantern(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand) {
+	public void useFuelAndLightWithInteraction(BlockState state, World world, BlockPos pos, PlayerEntity player,
+			Hand hand) {
 		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(pos);
 
 		// If not enough fuel to light
@@ -196,7 +197,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 		}
 	}
 
-	private void extinguishLantern(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand) {
+	public void extinguishWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand) {
 		if (!world.isClient) {
 			world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 1.0f);
 		}
@@ -205,7 +206,8 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 		player.swingHand(hand);
 	}
 
-	private void refuelLantern(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack stack,
+	public void refuelWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player,
+			ItemStack stack,
 			Hand hand) {
 		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(pos);
 
@@ -220,6 +222,8 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 		player.swingHand(hand);
 	}
 
+	// Events
+
 	@Override
 	public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
 			ItemStack itemStack) {
@@ -227,6 +231,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 
 		BlockEntity be = world.getBlockEntity(pos);
 
+		// Temporarily disabled for testing, placed lanterns should not have zero fuel.
 		// ((FuelBlockEntity) be).setFuel(0);
 
 		if (be != null && be instanceof FuelBlockEntity && itemStack.getItem() instanceof LanternItem) {
@@ -235,6 +240,8 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 			((FuelBlockEntity) be).setFuel(fuel);
 		}
 	}
+
+	// Utility
 
 	public static boolean isLightItem(ItemStack stack) {
 		if (stack.isIn(Mod.FREE_LANTERN_LIGHT_ITEMS))
@@ -246,14 +253,15 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 		return false;
 	}
 
-	// region IFuelBlock
+	public boolean canLight(World world, BlockPos pos) {
+		return ((LanternBlockEntity) world.getBlockEntity(pos)).getFuel() > 0 && !isLit;
+	}
+
 	@Override
 	public void outOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
 		((AbstractLanternBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state, playSound);
 	}
-	// endregion
 
-	// region Overridden methods for LanternBlock since I can't extend 2 classes
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
 		return this.getOutlineShape(state, world, pos, context);
@@ -271,38 +279,35 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
 		BlockState state = Blocks.LANTERN.getPlacementState(ctx);
 		BlockState newState = null;
-		if (state != null)
+
+		if (state != null) {
 			newState = getDefaultState().with(HANGING, state.get(HANGING)).with(WATERLOGGED, state.get(WATERLOGGED));
+		}
+
 		return newState;
 	}
 
 	@Override
 	public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState,
 			WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-		// Lantern uses a hanging property we don't have.
-		// return getDefaultState();
 		return Blocks.LANTERN.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
 	}
 
 	@Override
 	public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
 		return Blocks.LANTERN.canPlaceAt(state, world, pos);
-		// return true;
 	}
 
 	@Override
 	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
 		builder.add(new Property[] { HANGING, WATERLOGGED });
 	}
-	// endregion
 
-	// region BlockEntity code
 	@Override
 	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
 		return new LanternBlockEntity(pos, state);
 	}
 
-	// Is invisible without this
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
 		// With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need
@@ -310,12 +315,11 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 		return BlockRenderType.MODEL;
 	}
 
-	// Needed for ticking, idk what it means
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
 			BlockEntityType<T> type) {
 		return checkType(type, Mod.LANTERN_BLOCK_ENTITY,
 				(world1, pos, state1, be) -> LanternBlockEntity.tick(world1, pos, state1, be));
 	}
-	// endregion
+
 }
