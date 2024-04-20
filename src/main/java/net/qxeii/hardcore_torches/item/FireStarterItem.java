@@ -68,9 +68,9 @@ public class FireStarterItem extends Item {
 
 	@Override
 	public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-		if (world.isClient)
+		if (world.isClient) {
 			return;
-		// if (!(user instanceof PlayerEntity)) return;
+		}
 
 		BlockHitResult hit = world.raycast(
 				new RaycastContext(user.getEyePos(), user.getEyePos().add(user.getRotationVecClient().multiply(4)),
