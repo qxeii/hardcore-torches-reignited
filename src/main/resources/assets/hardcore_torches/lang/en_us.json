@@ -48,7 +48,7 @@
 	"text.autoconfig.hardcore_torches.option.defLanternFuelItem": "Default lantern fuel item",
 	"text.autoconfig.hardcore_torches.option.minLanternIgnitionFuel": "Minimum lantern ignition fuel",
 	"text.autoconfig.hardcore_torches.option.torchesExtinguishFuelLoss": "Torches extinguish fuel loss",
-	"text.autoconfig.hardcore_torches.option.lanternLightFuelLoss": "Lantern smolder fuel loss",
+	"text.autoconfig.hardcore_torches.option.lanternLightFuelLoss": "Lantern light fuel loss",
 	"text.autoconfig.hardcore_torches.option.itemUseMultiplierWhenHeld": "Item fuel use multiplier when held",
 	"text.autoconfig.hardcore_torches.option.unlightInChest": "Torches unlight in chest",
 	"text.autoconfig.hardcore_torches.option.tickInInventory": "Torches tick in inventory",
