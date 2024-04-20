@@ -1,7 +1,5 @@
 package net.qxeii.hardcore_torches.item;
 
-import net.qxeii.hardcore_torches.util.ETorchState;
-import net.qxeii.hardcore_torches.util.TorchGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -9,7 +7,12 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.StackReference;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.Items;
+import net.minecraft.item.VerticallyAttachableBlockItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
@@ -27,6 +30,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
+import net.qxeii.hardcore_torches.util.ETorchState;
+import net.qxeii.hardcore_torches.util.TorchGroup;
 
 public class TorchItem extends VerticallyAttachableBlockItem {
 	ETorchState torchState;
@@ -123,51 +128,42 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 	// Torch Lighting in Hand Mechanics
 
 	private void unlightTorchInHand(World world, PlayerEntity player, Hand hand) {
-		// Get lit torch in either hand.
-
-		HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
-
-		if (handStackTuple == null || torchState != ETorchState.LIT) {
-			return;
-		}
-
-		ItemStack heldTorchStack = handStackTuple.stack;
-
-		if (Mod.config.torchesSmolder) {
-			heldTorchStack = stateStack(heldTorchStack, ETorchState.SMOLDERING);
-		} else {
-			heldTorchStack = stateStack(heldTorchStack, ETorchState.UNLIT);
-		}
-
-		heldTorchStack = addFuel(heldTorchStack, world, -Mod.config.torchesExtinguishConditionLoss);
-
 		PlayerInventory inventory = player.getInventory();
-		inventory.setStack(handStackTuple.slot, heldTorchStack);
-		player.setStackInHand(handStackTuple.hand, heldTorchStack);
+		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
+		ItemStack stack = inventory.getStack(slot);
+
+		stack = addFuel(stack, world, -Mod.config.torchesExtinguishFuelLoss);
+
+		if (getFuel(stack) <= 0) {
+			// Torch is expended, break and remove.
+			stack = stateStack(stack, ETorchState.BURNT);
+			player.getInventory().setStack(slot, stack);
+		} else {
+			if (Mod.config.torchesSmolder) {
+				stack = stateStack(stack, ETorchState.SMOLDERING);
+			} else {
+				stack = stateStack(stack, ETorchState.UNLIT);
+			}
+			inventory.setStack(slot, stack);
+			player.setStackInHand(hand, stack);
+		}
 
 		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f,
 				1.0f);
 	}
 
 	private void lightTorchInHand(World world, PlayerEntity player, Hand hand) {
-		// Get unlit torch in either hand.
-		// (Branch A) If held stack contains a stack of items, remove one, move
-		// remaining stack to inventory,
-		// and replace held stack with new stack of one lit torch.
-		// (Branch B) If held stack contains only a single item, read torch damage
-		// value, and replace held stack
-		// with new stack of one lit torch with same torch damage value.
-
 		PlayerInventory inventory = player.getInventory();
-		HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
+		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
+		ItemStack stack = inventory.getStack(slot);
 
-		if (handStackTuple == null || torchState == ETorchState.LIT || torchState == ETorchState.BURNT) {
+		if (torchState == ETorchState.LIT || torchState == ETorchState.BURNT) {
 			return;
 		}
 
-		if (handStackTuple.stack.getCount() > 1) {
+		if (stack.getCount() > 1) {
 			int emptySlot = inventory.getEmptySlot();
-			ItemStack deductedTorchStack = handStackTuple.stack.copyWithCount(handStackTuple.stack.getCount() - 1);
+			ItemStack deductedTorchStack = stack.copyWithCount(stack.getCount() - 1);
 
 			if (emptySlot == -1) {
 				player.dropItem(deductedTorchStack, true);
@@ -175,49 +171,16 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 				inventory.setStack(emptySlot, deductedTorchStack);
 			}
 
-			ItemStack heldTorchStack = stateStack(handStackTuple.stack, ETorchState.LIT);
+			ItemStack heldTorchStack = stateStack(stack, ETorchState.LIT);
 			heldTorchStack.setCount(1);
 
-			inventory.setStack(handStackTuple.slot, heldTorchStack);
+			inventory.setStack(slot, heldTorchStack);
 		} else {
-			ItemStack heldTorchStack = stateStack(handStackTuple.stack, ETorchState.LIT);
-			inventory.setStack(handStackTuple.slot, heldTorchStack);
+			ItemStack heldTorchStack = stateStack(stack, ETorchState.LIT);
+			inventory.setStack(slot, heldTorchStack);
 		}
 
 		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
-	}
-
-	// Torch Inventory Utilities
-
-	private HandStackTuple getTorchStackTupleInHandFromPlayer(PlayerEntity player, Hand hand) {
-		PlayerInventory inventory = player.getInventory();
-
-		switch (hand) {
-			case MAIN_HAND: {
-				int selectedSlot = inventory.selectedSlot;
-				ItemStack mainHandStack = inventory.getStack(selectedSlot);
-				return new HandStackTuple(Hand.MAIN_HAND, selectedSlot, mainHandStack);
-			}
-			case OFF_HAND: {
-				int selectedSlot = PlayerInventory.OFF_HAND_SLOT;
-				ItemStack offHandStack = inventory.getStack(selectedSlot);
-				return new HandStackTuple(Hand.OFF_HAND, selectedSlot, offHandStack);
-			}
-			default:
-				return null;
-		}
-	}
-
-	private static class HandStackTuple {
-		public Hand hand;
-		public int slot;
-		public ItemStack stack;
-
-		public HandStackTuple(Hand hand, int slot, ItemStack stack) {
-			this.hand = hand;
-			this.slot = slot;
-			this.stack = stack;
-		}
 	}
 
 	// Flint and Steel Inventory Utilities
@@ -352,7 +315,6 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		if (!otherStack.isEmpty()) {
 			int max = stack.getMaxCount();
 			int usedCount = clickType != ClickType.RIGHT ? otherStack.getCount() : 1;
-			int otherMax = otherStack.getMaxCount();
 
 			int remainder = Math.max(0, usedCount - (max - stack.getCount()));
 			int addedNew = usedCount - remainder;

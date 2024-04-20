@@ -49,7 +49,7 @@ public abstract class InventoryTickMixin {
 		PlayerInventory inventory = player.getInventory();
 
 		for (int i = 0; i < inventory.size(); i++) {
-			tickTorch(inventory, i);
+			tickItem(inventory, i);
 		}
 
 		waterCheck(player, inventory);
@@ -94,7 +94,7 @@ public abstract class InventoryTickMixin {
 		}
 
 		ETorchState torchState = torchItem.getTorchState();
-		int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishConditionLoss : 0;
+		int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishFuelLoss : 0;
 
 		if (torchState != ETorchState.LIT && torchState != ETorchState.SMOLDERING) {
 			return;
@@ -119,7 +119,7 @@ public abstract class InventoryTickMixin {
 		ETorchState targetTorchState = torchState == ETorchState.LIT && Mod.config.torchesSmolder
 				? ETorchState.SMOLDERING
 				: ETorchState.UNLIT;
-		int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishConditionLoss : 0;
+		int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishFuelLoss : 0;
 
 		ItemStack torchStack = stack;
 		torchStack = TorchItem.stateStack(torchStack, targetTorchState);
@@ -129,7 +129,7 @@ public abstract class InventoryTickMixin {
 		world.playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
 	}
 
-	private void tickTorch(PlayerInventory inventory, int slot) {
+	private void tickItem(PlayerInventory inventory, int slot) {
 		if (!Mod.config.tickInInventory) {
 			return;
 		}
@@ -157,9 +157,9 @@ public abstract class InventoryTickMixin {
 
 		int itemFuelUse = 1;
 
-		// If player actively holds torch (as dynamic light), multiply fuel use
+		// If player actively holds item, multiply fuel use
 		if (slot == inventory.selectedSlot || slot == PlayerInventory.OFF_HAND_SLOT) {
-			itemFuelUse = itemFuelUse * Mod.config.torchFuelUseMultiplierWhenHeld;
+			itemFuelUse = itemFuelUse * Mod.config.itemUseMultiplierWhenHeld;
 		}
 
 		if (item instanceof LanternItem && ((LanternItem) item).isLit) {

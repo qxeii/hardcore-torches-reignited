@@ -27,26 +27,26 @@ public class TorchBlockEntity extends FuelBlockEntity {
 	}
 
 	private static void tickLit(World world, BlockPos pos, BlockState state, TorchBlockEntity be) {
+		AbstractHardcoreTorchBlock torchBlock = (AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock();
 
 		// Extinguish
 		if (Mod.config.torchesRain && world.hasRain(pos)) {
 			if (random.nextInt(Mod.config.torchesRainAffectTickChance) == 0) {
 				if (Mod.config.torchesSmolder) {
-					((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).smother(world, pos, state, true);
+					torchBlock.smother(world, pos, state, true);
 				} else {
-					((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state,
+					torchBlock.extinguish(world, pos, state,
 							true);
 				}
 			}
+
+			be.fuel -= Mod.config.torchesExtinguishFuelLoss;
+		} else {
+			be.fuel--;
 		}
 
-		// Burn out
-		if (be.fuel > 0) {
-			be.fuel--;
-
-			if (be.fuel <= 0) {
-				((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).outOfFuel(world, pos, state, false);
-			}
+		if (be.fuel == 0) {
+			((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).outOfFuel(world, pos, state, false);
 		}
 
 		be.markDirty();
@@ -56,13 +56,11 @@ public class TorchBlockEntity extends FuelBlockEntity {
 
 		// Burn out
 		if (random.nextInt(Mod.config.torchesSmolderFuelUseTickChance) == 0) {
-			if (be.fuel > 0) {
-				be.fuel--;
+			be.fuel--;
 
-				if (be.fuel <= 0) {
-					((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).burnOut(world, pos, state,
-							false);
-				}
+			if (be.fuel == 0) {
+				((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).burnOut(world, pos, state,
+						false);
 			}
 		} else if (random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
 			((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state, false);

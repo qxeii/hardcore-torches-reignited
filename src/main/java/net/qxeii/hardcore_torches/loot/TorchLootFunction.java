@@ -39,7 +39,7 @@ public class TorchLootFunction extends ConditionalLootFunction {
 			dropTorchState = torchState;
 
 			// If torches burn out when dropped
-			if (Mod.config.torchesBurnWhenDropped) {
+			if (Mod.config.torchesDepleteWhenDropped) {
 				if (dropTorchState != ETorchState.BURNT) {
 					dropTorchState = ETorchState.BURNT;
 				}

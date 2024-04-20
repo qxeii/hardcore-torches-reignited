@@ -1,14 +1,14 @@
 package net.qxeii.hardcore_torches.item;
 
+import net.fabricmc.fabric.api.item.v1.FabricItem;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
-import net.fabricmc.fabric.api.item.v1.FabricItem;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
 
 public class GlowstoneItem extends BlockItem implements FabricItem {
 
