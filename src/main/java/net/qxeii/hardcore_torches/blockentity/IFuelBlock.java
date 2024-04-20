@@ -3,56 +3,50 @@ package net.qxeii.hardcore_torches.blockentity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.qxeii.hardcore_torches.Mod;
+import net.qxeii.hardcore_torches.util.InventoryUtils;
 
 public interface IFuelBlock {
 
 	void outOfFuel(World world, BlockPos pos, BlockState state, boolean playSound);
 
-	default boolean itemValid(ItemStack stack, TagKey free, TagKey damage, TagKey consume) {
+	default boolean findAndUseLighterItem(PlayerEntity player, ItemStack stack, Hand hand) {
+		// Check if player holds a compatible item, use held item first.
 
-		// Infinite items
-		if (stack.isIn(free)) {
-			return true;
+		if (InventoryUtils.canUseAsFireStarter(stack)) {
+			return useLighterItem(player, stack);
 		}
 
-		// Durability items
-		if (stack.isIn(damage)) {
-			return true;
+		// Check if player has a compatible item in inventory.
+
+		var lighterItem = InventoryUtils.getFirstUsableFireStarterItemFromInventory(player.getInventory());
+
+		if (lighterItem == null) {
+			return false;
 		}
 
-		// Consume items
-		if (stack.isIn(consume)) {
-			return true;
-		}
-
-		return false;
+		return useLighterItem(player, lighterItem);
 	}
 
-	default boolean attemptUse(ItemStack stack, PlayerEntity player, Hand hand, TagKey free, TagKey damage,
-			TagKey consume) {
-
-		// Infinite items
-		if (stack.isIn(free)) {
+	default boolean useLighterItem(PlayerEntity player, ItemStack stack) {
+		if (player.isCreative()) {
 			return true;
 		}
 
-		// Durability items
-		if (stack.isIn(damage)) {
-			if (stack.isDamageable()) {
-				stack.damage(1, player, p -> p.sendToolBreakStatus(hand));
-			}
+		if (stack.isIn(Mod.UNBREAKING_LIGHTER_ITEMS)) {
 			return true;
 		}
 
-		// Consume items
-		if (stack.isIn(consume)) {
-			if (!player.isCreative()) {
-				stack.decrement(1);
-			}
+		if (stack.isIn(Mod.MULTI_USE_LIGHTER_ITEMS)) {
+			stack.damage(1, player, p -> p.sendToolBreakStatus(Hand.MAIN_HAND));
+			return true;
+		}
+
+		if (stack.isIn(Mod.SINGLE_USE_LIGHTER_ITEMS)) {
+			stack.decrement(1);
 			return true;
 		}
 
