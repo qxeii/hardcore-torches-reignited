@@ -144,7 +144,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 			world.setBlockState(pos, Blocks.AIR.getDefaultState());
 
 			if (!world.isClient) {
-				world.playSound(null, pos, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1f, 1f);
+				world.playSound(null, pos, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1.0f, 1.0f);
 			}
 
 			player.swingHand(hand);
