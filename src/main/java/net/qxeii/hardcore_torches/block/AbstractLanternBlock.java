@@ -152,9 +152,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 		}
 
 		// Igniting
-		if (!this.isLit && itemValid(stack, Mod.FREE_LANTERN_LIGHT_ITEMS, Mod.DAMAGE_LANTERN_LIGHT_ITEMS,
-				Mod.CONSUME_LANTERN_LIGHT_ITEMS)) {
-
+		if (!this.isLit && stack == ItemStack.EMPTY) {
 			// If not enough fuel to light
 			if (((FuelBlockEntity) world.getBlockEntity(pos)).getFuel() < Mod.config.minLanternIgnitionFuel) {
 				if (!world.isClient) {
@@ -167,15 +165,22 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 				return ActionResult.SUCCESS;
 			}
 
-			if (attemptUse(stack, player, hand, Mod.FREE_LANTERN_LIGHT_ITEMS, Mod.DAMAGE_LANTERN_LIGHT_ITEMS,
-					Mod.CONSUME_LANTERN_LIGHT_ITEMS)) {
-				light(world, pos, state);
-				player.swingHand(hand);
+			light(world, pos, state);
+			player.swingHand(hand);
 
-				((FuelBlockEntity) be).changeFuel(-Mod.config.lanternLightFuelLoss);
+			((FuelBlockEntity) be).changeFuel(-Mod.config.lanternLightFuelLoss);
 
-				return ActionResult.SUCCESS;
+			return ActionResult.SUCCESS;
+		}
+
+		if (this.isLit && stack == ItemStack.EMPTY) {
+			if (!world.isClient) {
+				world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 1.0f);
 			}
+
+			extinguish(world, pos, state, true);
+			player.swingHand(hand);
+			return ActionResult.SUCCESS;
 		}
 
 		// Adding fuel
@@ -232,14 +237,6 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 				&& !world.isClient) {
 			player.sendMessage(MutableText.of(new LiteralTextContent("Requires an Oil Canister to fuel!")), true);
 			world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 2, 2);
-		}
-
-		// Hand extinguish
-		if (Mod.config.handUnlightLantern && isLit) {
-			if (!TorchUtils.canLight(stack.getItem(), state)) {
-				extinguish(world, pos, state, true);
-				return ActionResult.SUCCESS;
-			}
 		}
 
 		return ActionResult.PASS;
