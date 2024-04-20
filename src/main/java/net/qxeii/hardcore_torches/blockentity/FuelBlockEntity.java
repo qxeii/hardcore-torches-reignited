@@ -13,8 +13,10 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.qxeii.hardcore_torches.item.LightableItem;
 
 public class FuelBlockEntity extends BlockEntity {
+
 	protected int fuel;
 	protected static Random random = new Random();
 
@@ -71,9 +73,9 @@ public class FuelBlockEntity extends BlockEntity {
 		if (fuel <= 0) {
 			fuel = 0;
 
-			if (world.getBlockState(pos).getBlock() instanceof IFuelBlock) {
-				IFuelBlock block = (IFuelBlock) world.getBlockState(pos).getBlock();
-				block.outOfFuel(world, pos, world.getBlockState(pos), false);
+			if (world.getBlockState(pos).getBlock() instanceof LightableItem) {
+				var block = (LightableBlock) world.getBlockState(pos).getBlock();
+				block.onOutOfFuel(world, pos, world.getBlockState(pos), false);
 			}
 		}
 	}

@@ -33,7 +33,7 @@ import net.qxeii.hardcore_torches.block.AbstractTorchBlock;
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 
-public class TorchItem extends VerticallyAttachableBlockItem {
+public class TorchItem extends VerticallyAttachableBlockItem implements LightableItem {
 	ETorchState torchState;
 	TorchGroup torchGroup;
 	int maxFuel;
@@ -98,6 +98,8 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		return oldNbt.equals(null);
 	}
 
+	// Interaction
+
 	@Override
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		// If torch is unlit and player has `minecraft:flint_and_steel` in inventory,
@@ -124,8 +126,6 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 				return super.use(world, player, hand);
 		}
 	}
-
-	// Torch Lighting in Hand Mechanics
 
 	private void unlightTorchInHand(World world, PlayerEntity player, Hand hand) {
 		PlayerInventory inventory = player.getInventory();

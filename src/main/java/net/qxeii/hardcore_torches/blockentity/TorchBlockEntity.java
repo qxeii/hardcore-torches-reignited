@@ -46,7 +46,7 @@ public class TorchBlockEntity extends FuelBlockEntity {
 		}
 
 		if (be.fuel == 0) {
-			((AbstractTorchBlock) world.getBlockState(pos).getBlock()).outOfFuel(world, pos, state, false);
+			((AbstractTorchBlock) world.getBlockState(pos).getBlock()).onOutOfFuel(world, pos, state, false);
 		}
 
 		be.markDirty();

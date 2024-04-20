@@ -33,9 +33,9 @@ import net.minecraft.world.event.GameEvent;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.blockentity.CandleBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
-import net.qxeii.hardcore_torches.blockentity.IFuelBlock;
+import net.qxeii.hardcore_torches.blockentity.LightableBlock;
 
-public abstract class AbstractCandleBlock extends BlockWithEntity implements IFuelBlock {
+public abstract class AbstractCandleBlock extends BlockWithEntity implements LightableBlock {
 	public static final BooleanProperty LIT;
 	public IntSupplier maxFuel;
 	public boolean isLit;
@@ -150,7 +150,7 @@ public abstract class AbstractCandleBlock extends BlockWithEntity implements IFu
 	}
 
 	@Override
-	public void outOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
+	public void onOutOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
 		((AbstractCandleBlock) world.getBlockState(pos).getBlock()).melt(state, world, pos);
 	}
 

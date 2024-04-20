@@ -28,15 +28,15 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
-import net.qxeii.hardcore_torches.blockentity.IFuelBlock;
+import net.qxeii.hardcore_torches.blockentity.LightableBlock;
 import net.qxeii.hardcore_torches.blockentity.TorchBlockEntity;
-import net.qxeii.hardcore_torches.item.OilCanItem;
 import net.qxeii.hardcore_torches.item.TorchItem;
 import net.qxeii.hardcore_torches.util.ETorchState;
+import net.qxeii.hardcore_torches.util.InventoryUtils;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 import net.qxeii.hardcore_torches.util.TorchUtils;
 
-public abstract class AbstractTorchBlock extends BlockWithEntity implements IFuelBlock {
+public abstract class AbstractTorchBlock extends BlockWithEntity implements LightableBlock {
 
 	public ParticleEffect particle;
 	public ETorchState burnState;
@@ -141,7 +141,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements IFue
 	}
 
 	@Override
-	public void outOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
+	public void onOutOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
 		burnOut(world, pos, state, playSound);
 	}
 
@@ -151,57 +151,46 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements IFue
 			BlockHitResult hit) {
 		ItemStack stack = player.getStackInHand(hand);
 
-		if (burnState == ETorchState.LIT) {
-			if (attemptUse(stack, player, hand, Mod.FREE_TORCH_EXTINGUISH_ITEMS, Mod.DAMAGE_TORCH_EXTINGUISH_ITEMS,
-					Mod.CONSUME_TORCH_EXTINGUISH_ITEMS)) {
-				extinguish(world, pos, state, true);
-				player.swingHand(hand);
-				return ActionResult.SUCCESS;
-			}
+		// Extinguishing
 
-			if (attemptUse(stack, player, hand, Mod.FREE_TORCH_SMOTHER_ITEMS, Mod.DAMAGE_TORCH_SMOTHER_ITEMS,
-					Mod.CONSUME_TORCH_SMOTHER_ITEMS)) {
-				smother(world, pos, state, true);
-				player.swingHand(hand);
-				return ActionResult.SUCCESS;
-			}
+		if (burnState == ETorchState.LIT && stack.isEmpty()) {
+			extinguishWithInteraction(world, pos, state, player, stack, hand);
+			return ActionResult.SUCCESS;
 		}
 
-		if (burnState == ETorchState.SMOLDERING || burnState == ETorchState.UNLIT) {
-			if (attemptUse(stack, player, hand, Mod.FREE_TORCH_LIGHT_ITEMS, Mod.DAMAGE_TORCH_LIGHT_ITEMS,
-					Mod.CONSUME_TORCH_LIGHT_ITEMS)) {
-				light(world, pos, state);
-				player.swingHand(hand);
-				return ActionResult.SUCCESS;
-			}
-		}
+		// Lighting
 
-		// Fuel message
-		BlockEntity be = world.getBlockEntity(pos);
-		if (be.getType() == Mod.TORCH_BLOCK_ENTITY && !world.isClient && Mod.config.fuelMessage && stack.isEmpty()) {
-			player.sendMessage(Text.of("Fuel: " + ((TorchBlockEntity) be).getFuel()), true);
-		}
+		if ((burnState == ETorchState.SMOLDERING || burnState == ETorchState.UNLIT)
+				&& InventoryUtils.canUseAsFireStarter(stack)) {
+			useFuelAndLightWithInteraction(world, pos, state, player, stack, hand);
 
-		// Oil Can
-		if (Mod.config.torchesUseCan && burnState != ETorchState.BURNT && !world.isClient) {
-			if (OilCanItem.fuelBlock((FuelBlockEntity) be, world, stack)) {
-				world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
-						SoundCategory.BLOCKS, 1f, 0f);
-				world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
-						SoundCategory.BLOCKS, 1f, 2f);
-				world.playSound(null, pos, SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.BLOCKS, 0.3f, 0f);
-			}
-		}
+			BlockEntity blockEntity = world.getBlockEntity(pos);
 
-		// Hand extinguish
-		if (Mod.config.handUnlightTorch && (burnState == ETorchState.LIT || burnState == ETorchState.SMOLDERING)) {
-			if (!TorchUtils.canLight(stack.getItem(), state)) {
-				extinguish(world, pos, state, true);
-				return ActionResult.SUCCESS;
+			if (blockEntity.getType() == Mod.TORCH_BLOCK_ENTITY && !world.isClient && Mod.config.fuelMessage
+					&& stack.isEmpty()) {
+				player.sendMessage(Text.of("Fuel: " + ((TorchBlockEntity) blockEntity).getFuel()), true);
 			}
+
+			return ActionResult.SUCCESS;
 		}
 
 		return ActionResult.PASS;
+	}
+
+	private void extinguishWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player,
+			ItemStack stack, Hand hand) {
+		smother(world, pos, state, true);
+		player.swingHand(hand);
+	}
+
+	private void useFuelAndLightWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player,
+			ItemStack stack, Hand hand) {
+		if (!findAndUseLighterItem(player, stack, hand)) {
+			return;
+		}
+
+		light(world, pos, state);
+		player.swingHand(hand);
 	}
 
 	// Events
@@ -262,18 +251,6 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements IFue
 			((FuelBlockEntity) world.getBlockEntity(pos)).setFuel(newFuel);
 		}
 
-	}
-
-	// Utility
-
-	public static boolean isLightItem(ItemStack stack) {
-		if (stack.isIn(Mod.FREE_TORCH_LIGHT_ITEMS))
-			return true;
-		if (stack.isIn(Mod.DAMAGE_TORCH_LIGHT_ITEMS))
-			return true;
-		if (stack.isIn(Mod.CONSUME_TORCH_LIGHT_ITEMS))
-			return true;
-		return false;
 	}
 
 }

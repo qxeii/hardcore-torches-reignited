@@ -21,7 +21,7 @@ public class CandleBlockEntity extends FuelBlockEntity {
 					be.fuel--;
 
 					if (be.fuel <= 0) {
-						((AbstractCandleBlock) world.getBlockState(pos).getBlock()).outOfFuel(world, pos, state,
+						((AbstractCandleBlock) world.getBlockState(pos).getBlock()).onOutOfFuel(world, pos, state,
 								false);
 					}
 				}

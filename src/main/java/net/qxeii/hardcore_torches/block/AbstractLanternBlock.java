@@ -5,7 +5,6 @@ import java.util.function.IntSupplier;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -41,13 +40,13 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
-import net.qxeii.hardcore_torches.blockentity.IFuelBlock;
 import net.qxeii.hardcore_torches.blockentity.LanternBlockEntity;
+import net.qxeii.hardcore_torches.blockentity.LightableBlock;
 import net.qxeii.hardcore_torches.item.LanternItem;
 import net.qxeii.hardcore_torches.item.OilCanItem;
 import net.qxeii.hardcore_torches.util.TorchUtils;
 
-public abstract class AbstractLanternBlock extends BlockWithEntity implements BlockEntityProvider, IFuelBlock {
+public abstract class AbstractLanternBlock extends BlockWithEntity implements LightableBlock {
 	public static final BooleanProperty HANGING;
 	public static final BooleanProperty WATERLOGGED;
 	public boolean isLit;
@@ -243,22 +242,12 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Bl
 
 	// Utility
 
-	public static boolean isLightItem(ItemStack stack) {
-		if (stack.isIn(Mod.FREE_LANTERN_LIGHT_ITEMS))
-			return true;
-		if (stack.isIn(Mod.DAMAGE_LANTERN_LIGHT_ITEMS))
-			return true;
-		if (stack.isIn(Mod.CONSUME_LANTERN_LIGHT_ITEMS))
-			return true;
-		return false;
-	}
-
 	public boolean canLight(World world, BlockPos pos) {
 		return ((LanternBlockEntity) world.getBlockEntity(pos)).getFuel() > 0 && !isLit;
 	}
 
 	@Override
-	public void outOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
+	public void onOutOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
 		((AbstractLanternBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state, playSound);
 	}
 

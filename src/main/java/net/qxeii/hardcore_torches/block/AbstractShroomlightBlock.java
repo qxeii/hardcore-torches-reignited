@@ -4,7 +4,6 @@ import java.util.function.IntSupplier;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -17,11 +16,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
-import net.qxeii.hardcore_torches.blockentity.IFuelBlock;
+import net.qxeii.hardcore_torches.blockentity.LightableBlock;
 import net.qxeii.hardcore_torches.blockentity.ShroomlightBlockEntity;
 import net.qxeii.hardcore_torches.item.ShroomlightItem;
 
-public abstract class AbstractShroomlightBlock extends BlockWithEntity implements BlockEntityProvider, IFuelBlock {
+public abstract class AbstractShroomlightBlock extends BlockWithEntity implements LightableBlock {
 	public IntSupplier maxFuel;
 	public boolean isLit;
 
