@@ -81,9 +81,6 @@ public class ModConfig implements ConfigData {
 	@Comment("Max fuel an oil can holds. Default: 576000")
 	public int maxCanFuel = 576000;
 
-	@Comment("Do lanterns have to be filled using an oil can. Default: true")
-	public boolean lanternsNeedCan = true;
-
 	@Comment("Can you refuel a torch using an oil can. Default: false")
 	public boolean torchesUseCan = false;
 
