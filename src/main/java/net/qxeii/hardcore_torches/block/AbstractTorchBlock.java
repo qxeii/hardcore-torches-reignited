@@ -36,14 +36,14 @@ import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 import net.qxeii.hardcore_torches.util.TorchUtils;
 
-public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity implements IFuelBlock {
+public abstract class AbstractTorchBlock extends BlockWithEntity implements IFuelBlock {
 
 	public ParticleEffect particle;
 	public ETorchState burnState;
 	public TorchGroup group;
 	public IntSupplier maxFuel;
 
-	public AbstractHardcoreTorchBlock(AbstractBlock.Settings settings, ParticleEffect particle, ETorchState type,
+	public AbstractTorchBlock(AbstractBlock.Settings settings, ParticleEffect particle, ETorchState type,
 			IntSupplier maxFuel) {
 		super(settings);
 		this.particle = particle;
@@ -245,7 +245,7 @@ public abstract class AbstractHardcoreTorchBlock extends BlockWithEntity impleme
 		if (isWall()) {
 			newState = group.getWallTorch(newType).getDefaultState().with(
 					HorizontalFacingBlock.FACING,
-					curState.get(HardcoreWallTorchBlock.FACING));
+					curState.get(WallTorchBlock.FACING));
 		} else {
 			newState = group.getStandingTorch(newType).getDefaultState();
 		}

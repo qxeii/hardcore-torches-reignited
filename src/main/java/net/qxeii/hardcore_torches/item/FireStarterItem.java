@@ -34,8 +34,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
 import net.qxeii.hardcore_torches.block.AbstractLanternBlock;
+import net.qxeii.hardcore_torches.block.AbstractTorchBlock;
 import net.qxeii.hardcore_torches.util.ETorchState;
 
 public class FireStarterItem extends Item {
@@ -94,11 +94,11 @@ public class FireStarterItem extends Item {
 				attempt = true;
 				if (success)
 					simulateFlintAndSteel = true;
-			} else if (block instanceof AbstractHardcoreTorchBlock && Mod.config.starterLightTorches) {
-				if (((AbstractHardcoreTorchBlock) block).burnState != ETorchState.LIT) {
+			} else if (block instanceof AbstractTorchBlock && Mod.config.starterLightTorches) {
+				if (((AbstractTorchBlock) block).burnState != ETorchState.LIT) {
 					attempt = true;
 					if (success)
-						((AbstractHardcoreTorchBlock) block).light(world, pos, world.getBlockState(pos));
+						((AbstractTorchBlock) block).light(world, pos, world.getBlockState(pos));
 				}
 			} else if (block instanceof AbstractLanternBlock && Mod.config.starterLightLanterns) {
 				if (((AbstractLanternBlock) block).canLight(world, pos)) {
@@ -115,6 +115,7 @@ public class FireStarterItem extends Item {
 			if (simulateFlintAndSteel)
 				Items.FLINT_AND_STEEL.useOnBlock(new ItemUsageContext((PlayerEntity) user, user.getActiveHand(), hit));
 		}
+
 		if (attempt) {
 			stack.increment(-1);
 			if (simulateFlintAndSteel) {

@@ -15,9 +15,9 @@ import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.nbt.NbtCompound;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.block.AbstractGlowstoneBlock;
-import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
 import net.qxeii.hardcore_torches.block.AbstractLanternBlock;
 import net.qxeii.hardcore_torches.block.AbstractShroomlightBlock;
+import net.qxeii.hardcore_torches.block.AbstractTorchBlock;
 import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
 import net.qxeii.hardcore_torches.util.ETorchState;
 
@@ -40,7 +40,7 @@ public class LanternLootFunction extends ConditionalLootFunction {
 		BlockEntity blockEntity = context.get(LootContextParameters.BLOCK_ENTITY);
 		Block block = ((BlockItem) stack.getItem()).getBlock();
 
-		if (block instanceof AbstractHardcoreTorchBlock || block instanceof AbstractLanternBlock
+		if (block instanceof AbstractTorchBlock || block instanceof AbstractLanternBlock
 				|| block instanceof AbstractGlowstoneBlock || block instanceof AbstractShroomlightBlock) {
 
 			// Set fuel
@@ -54,8 +54,8 @@ public class LanternLootFunction extends ConditionalLootFunction {
 				}
 			}
 
-			if (block instanceof AbstractHardcoreTorchBlock
-					&& ((AbstractHardcoreTorchBlock) ((BlockItem) stack.getItem())
+			if (block instanceof AbstractTorchBlock
+					&& ((AbstractTorchBlock) ((BlockItem) stack.getItem())
 							.getBlock()).burnState == ETorchState.BURNT) {
 				stack.removeSubNbt("Fuel");
 			}

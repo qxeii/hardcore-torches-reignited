@@ -9,7 +9,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.block.WallTorchBlock;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.state.StateManager;
@@ -25,11 +24,11 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.qxeii.hardcore_torches.util.ETorchState;
 
-public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock {
+public class WallTorchBlock extends AbstractTorchBlock {
 
 	public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
-	public HardcoreWallTorchBlock(Settings settings, ParticleEffect particle, ETorchState type, IntSupplier maxFuel) {
+	public WallTorchBlock(Settings settings, ParticleEffect particle, ETorchState type, IntSupplier maxFuel) {
 		super(settings, particle, type, maxFuel);
 		setDefaultState(getStateManager().getDefaultState().with(FACING, Direction.NORTH));
 	}
@@ -90,7 +89,7 @@ public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock {
 	public void smother(World world, BlockPos pos, BlockState state, boolean playSound) {
 		super.smother(world, pos, state, playSound);
 
-		HardcoreWallTorchBlock newTorch;
+		WallTorchBlock newTorch;
 		newTorch = group.getWallTorch(ETorchState.SMOLDERING);
 
 		world.setBlockState(pos, newTorch.getDefaultState().with(HorizontalFacingBlock.FACING, state.get(FACING)));
@@ -100,7 +99,7 @@ public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock {
 	public void burnOut(World world, BlockPos pos, BlockState state, boolean playSound) {
 		super.burnOut(world, pos, state, playSound);
 
-		HardcoreWallTorchBlock newTorch;
+		WallTorchBlock newTorch;
 		newTorch = group.getWallTorch(ETorchState.BURNT);
 
 		world.setBlockState(pos, newTorch.getDefaultState().with(HorizontalFacingBlock.FACING, state.get(FACING)));
@@ -110,7 +109,7 @@ public class HardcoreWallTorchBlock extends AbstractHardcoreTorchBlock {
 	public void light(World world, BlockPos pos, BlockState state) {
 		super.light(world, pos, state);
 
-		HardcoreWallTorchBlock newTorch;
+		WallTorchBlock newTorch;
 		newTorch = group.getWallTorch(ETorchState.LIT);
 
 		world.setBlockState(pos, newTorch.getDefaultState().with(HorizontalFacingBlock.FACING, state.get(FACING)));

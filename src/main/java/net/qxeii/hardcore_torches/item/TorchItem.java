@@ -29,7 +29,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
+import net.qxeii.hardcore_torches.block.AbstractTorchBlock;
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 
@@ -349,7 +349,7 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		Item outputItem = Items.AIR;
 
 		if (inputItem instanceof BlockItem && inputItem instanceof TorchItem) {
-			AbstractHardcoreTorchBlock newBlock = (AbstractHardcoreTorchBlock) ((BlockItem) inputItem).getBlock();
+			AbstractTorchBlock newBlock = (AbstractTorchBlock) ((BlockItem) inputItem).getBlock();
 			TorchItem newItem = (TorchItem) newBlock.group.getStandingTorch(newState).asItem();
 
 			outputItem = newItem;
@@ -362,7 +362,7 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		ItemStack outputStack = ItemStack.EMPTY;
 
 		if (inputStack.getItem() instanceof BlockItem && inputStack.getItem() instanceof TorchItem) {
-			AbstractHardcoreTorchBlock newBlock = (AbstractHardcoreTorchBlock) ((BlockItem) inputStack.getItem())
+			AbstractTorchBlock newBlock = (AbstractTorchBlock) ((BlockItem) inputStack.getItem())
 					.getBlock();
 			TorchItem newItem = (TorchItem) newBlock.group.getStandingTorch(newState).asItem();
 

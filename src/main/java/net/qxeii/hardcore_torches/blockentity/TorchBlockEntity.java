@@ -4,7 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
+import net.qxeii.hardcore_torches.block.AbstractTorchBlock;
 import net.qxeii.hardcore_torches.util.ETorchState;
 
 public class TorchBlockEntity extends FuelBlockEntity {
@@ -16,18 +16,18 @@ public class TorchBlockEntity extends FuelBlockEntity {
 
 	public static void tick(World world, BlockPos pos, BlockState state, TorchBlockEntity be) {
 		if (!world.isClient) {
-			if (!(state.getBlock() instanceof AbstractHardcoreTorchBlock))
+			if (!(state.getBlock() instanceof AbstractTorchBlock))
 				return;
-			if (((AbstractHardcoreTorchBlock) state.getBlock()).getBurnState() == ETorchState.LIT) {
+			if (((AbstractTorchBlock) state.getBlock()).getBurnState() == ETorchState.LIT) {
 				tickLit(world, pos, state, be);
-			} else if (((AbstractHardcoreTorchBlock) state.getBlock()).getBurnState() == ETorchState.SMOLDERING) {
+			} else if (((AbstractTorchBlock) state.getBlock()).getBurnState() == ETorchState.SMOLDERING) {
 				tickSmoldering(world, pos, state, be);
 			}
 		}
 	}
 
 	private static void tickLit(World world, BlockPos pos, BlockState state, TorchBlockEntity be) {
-		AbstractHardcoreTorchBlock torchBlock = (AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock();
+		AbstractTorchBlock torchBlock = (AbstractTorchBlock) world.getBlockState(pos).getBlock();
 
 		// Extinguish
 		if (Mod.config.torchesRain && world.hasRain(pos)) {
@@ -46,7 +46,7 @@ public class TorchBlockEntity extends FuelBlockEntity {
 		}
 
 		if (be.fuel == 0) {
-			((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).outOfFuel(world, pos, state, false);
+			((AbstractTorchBlock) world.getBlockState(pos).getBlock()).outOfFuel(world, pos, state, false);
 		}
 
 		be.markDirty();
@@ -59,11 +59,11 @@ public class TorchBlockEntity extends FuelBlockEntity {
 			be.fuel--;
 
 			if (be.fuel == 0) {
-				((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).burnOut(world, pos, state,
+				((AbstractTorchBlock) world.getBlockState(pos).getBlock()).burnOut(world, pos, state,
 						false);
 			}
 		} else if (random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
-			((AbstractHardcoreTorchBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state, false);
+			((AbstractTorchBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state, false);
 		}
 
 		be.markDirty();

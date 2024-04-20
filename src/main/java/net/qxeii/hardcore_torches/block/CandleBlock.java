@@ -37,7 +37,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
-public class CandleBlock extends AbstractHardcoreCandleBlock implements BlockEntityProvider, Waterloggable {
+public class CandleBlock extends AbstractCandleBlock implements BlockEntityProvider, Waterloggable {
 	public static final int field_31050 = 1;
 	public static final int MAX_CANDLE_AMOUNT = 4;
 	public static final IntProperty CANDLES;
@@ -151,7 +151,7 @@ public class CandleBlock extends AbstractHardcoreCandleBlock implements BlockEnt
 
 	static {
 		CANDLES = Properties.CANDLES;
-		LIT = AbstractHardcoreCandleBlock.LIT;
+		LIT = AbstractCandleBlock.LIT;
 		WATERLOGGED = Properties.WATERLOGGED;
 		STATE_TO_LUMINANCE = (state) -> {
 			return (Boolean) state.get(LIT) ? 3 * (Integer) state.get(CANDLES) : 0;

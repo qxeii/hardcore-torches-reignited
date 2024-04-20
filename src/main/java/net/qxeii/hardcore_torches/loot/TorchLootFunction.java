@@ -12,7 +12,7 @@ import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunctionType;
 import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
+import net.qxeii.hardcore_torches.block.AbstractTorchBlock;
 import net.qxeii.hardcore_torches.util.ETorchState;
 
 public class TorchLootFunction extends ConditionalLootFunction {
@@ -34,8 +34,8 @@ public class TorchLootFunction extends ConditionalLootFunction {
 		ETorchState dropTorchState;
 
 		// Non-fuel modifications
-		if (state.getBlock() instanceof AbstractHardcoreTorchBlock) {
-			torchState = ((AbstractHardcoreTorchBlock) state.getBlock()).burnState;
+		if (state.getBlock() instanceof AbstractTorchBlock) {
+			torchState = ((AbstractTorchBlock) state.getBlock()).burnState;
 			dropTorchState = torchState;
 
 			// If torches burn out when dropped
@@ -71,7 +71,7 @@ public class TorchLootFunction extends ConditionalLootFunction {
 
 	private ItemStack getChangedStack(BlockState state, ETorchState torchState) {
 		return new ItemStack(
-				((AbstractHardcoreTorchBlock) state.getBlock()).group.getStandingTorch(torchState).asItem());
+				((AbstractTorchBlock) state.getBlock()).group.getStandingTorch(torchState).asItem());
 	}
 
 	public static class Serializer extends ConditionalLootFunction.Serializer<TorchLootFunction> {
