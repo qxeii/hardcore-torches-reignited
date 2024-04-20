@@ -1,0 +1,7 @@
+{
+	"replace": false,
+	"values": [
+		"minecraft:fire_charge", 
+		"hardcore_torches:fire_starter"
+	]
+}

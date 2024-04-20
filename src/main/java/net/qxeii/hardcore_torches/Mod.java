@@ -59,48 +59,19 @@ public class Mod implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("hardcore_torches");
 
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
-
 	public static ModConfig config;
 
 	// Tags
+
 	public static final TagKey<Item> CANDLES = TagKey.of(RegistryKeys.ITEM, new Identifier("minecraft", "candles"));
 	public static final TagKey<Item> ALL_TORCH_ITEMS = TagKey.of(RegistryKeys.ITEM,
 			new Identifier("hardcore_torches", "torches"));
-	public static final TagKey<Block> FREE_TORCH_LIGHT_BLOCKS = TagKey.of(RegistryKeys.BLOCK,
-			new Identifier("hardcore_torches", "free_torch_light_blocks"));
-	public static final TagKey<Item> FREE_TORCH_LIGHT_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "free_torch_light_items"));
-	public static final TagKey<Item> DAMAGE_TORCH_LIGHT_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "damage_torch_light_items"));
-	public static final TagKey<Item> CONSUME_TORCH_LIGHT_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "consume_torch_light_items"));
-	public static final TagKey<Item> FREE_TORCH_EXTINGUISH_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "free_torch_extinguish_items"));
-	public static final TagKey<Item> DAMAGE_TORCH_EXTINGUISH_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "damage_torch_extinguish_items"));
-	public static final TagKey<Item> CONSUME_TORCH_EXTINGUISH_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "consume_torch_smother_items"));
-	public static final TagKey<Item> FREE_TORCH_SMOTHER_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "free_torch_smother_items"));
-	public static final TagKey<Item> DAMAGE_TORCH_SMOTHER_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "damage_torch_smother_items"));
-	public static final TagKey<Item> CONSUME_TORCH_SMOTHER_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "consume_torch_smother_items"));
-	public static final TagKey<Item> FREE_LANTERN_LIGHT_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "free_lantern_light_items"));
-	public static final TagKey<Item> DAMAGE_LANTERN_LIGHT_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "damage_lantern_light_items"));
-	public static final TagKey<Item> CONSUME_LANTERN_LIGHT_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "consume_lantern_light_items"));
-	public static final TagKey<Item> FREE_CANDLE_LIGHT_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "free_candle_light_items"));
-	public static final TagKey<Item> DAMAGE_CANDLE_LIGHT_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "damage_candle_light_items"));
-	public static final TagKey<Item> CONSUME_CANDLE_LIGHT_ITEMS = TagKey.of(RegistryKeys.ITEM,
-			new Identifier("hardcore_torches", "consume_candle_light_items"));
+	public static final TagKey<Item> UNBREAKING_LIGHTER_ITEMS = TagKey.of(RegistryKeys.ITEM,
+			new Identifier("hardcore_torches", "unbreaking_lighter_items"));
+	public static final TagKey<Item> MULTI_USE_LIGHTER_ITEMS = TagKey.of(RegistryKeys.ITEM,
+			new Identifier("hardcore_torches", "multi_use_lighter_items"));
+	public static final TagKey<Item> SINGLE_USE_LIGHTER_ITEMS = TagKey.of(RegistryKeys.ITEM,
+			new Identifier("hardcore_torches", "single_use_lighter_items"));
 
 	public static final LootFunctionType HARDCORE_TORCH_LOOT_FUNCTION = new LootFunctionType(
 			new TorchLootFunction.Serializer());
@@ -204,6 +175,8 @@ public class Mod implements ModInitializer {
 
 	public static TorchGroup basicTorches = new TorchGroup("basic");
 
+	// Block Entities
+
 	public static BlockEntityType<TorchBlockEntity> TORCH_BLOCK_ENTITY;
 	public static BlockEntityType<LanternBlockEntity> LANTERN_BLOCK_ENTITY;
 	public static BlockEntityType<CandleBlockEntity> CANDLE_BLOCK_ENTITY;
@@ -211,6 +184,7 @@ public class Mod implements ModInitializer {
 	public static BlockEntityType<ShroomlightBlockEntity> SHROOMLIGHT_BLOCK_ENTITY;
 
 	// Recipe Types
+
 	public static final RecipeType<OilCanRecipe> OIL_CAN_RECIPE = RecipeType.register("hardcore_torches:oil_can");
 	public static final RecipeType<UnlitTorchRecipe> TORCH_RECIPE = RecipeType.register("hardcore_torches:torch");
 	public static final RecipeType<CandleRecipe> CANDLE_RECIPE = RecipeType.register("hardcore_torches:candle");
@@ -222,9 +196,6 @@ public class Mod implements ModInitializer {
 	public void onInitialize() {
 		HCTLootNumberProviderTypes.loadThisClass();
 
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
 		basicTorches.add(LIT_TORCH);
 		basicTorches.add(UNLIT_TORCH);
 		basicTorches.add(SMOLDERING_TORCH);
