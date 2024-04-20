@@ -59,7 +59,6 @@
 	"text.autoconfig.hardcore_torches.option.candleCraftAmount": "Candle craft amount",
 	"text.autoconfig.hardcore_torches.option.fuelMessage": "Fuel message",
 	"text.autoconfig.hardcore_torches.option.maxCanFuel": "Max can fuel",
-	"text.autoconfig.hardcore_torches.option.lanternsNeedCan": "Lanterns need can",
 	"text.autoconfig.hardcore_torches.option.torchesUseCan": "Torches use can",
 	"text.autoconfig.hardcore_torches.option.oilRecipeMultiplier": "Oil recipe multiplier",
 	"text.autoconfig.hardcore_torches.option.oilRecipeOverride": "Oil recipe override",
