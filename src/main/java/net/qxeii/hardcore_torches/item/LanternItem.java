@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 
 public class LanternItem extends BlockItem {
+
 	public int maxFuel;
 	public boolean isLit;
 
@@ -29,6 +30,8 @@ public class LanternItem extends BlockItem {
 		this.maxFuel = maxFuel;
 		this.isLit = isLit;
 	}
+
+	// Properties
 
 	@Override
 	public boolean isItemBarVisible(ItemStack stack) {
@@ -93,6 +96,8 @@ public class LanternItem extends BlockItem {
 		return oldNbt.equals(null);
 	}
 
+	// Interaction
+
 	@Override
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
 		if (world.isClient) {
@@ -100,21 +105,21 @@ public class LanternItem extends BlockItem {
 		}
 
 		if (isLit) {
-			unlightLanternInHand(world, user, hand);
+			extinguishLanternWithInteraction(world, user, hand);
 		} else {
-			lightLanternInHand(world, user, hand);
+			lightLanternWithInteraction(world, user, hand);
 		}
 
 		return super.use(world, user, hand);
 	}
 
-	private void unlightLanternInHand(World world, PlayerEntity player, Hand hand) {
+	private void extinguishLanternWithInteraction(World world, PlayerEntity player, Hand hand) {
 		PlayerInventory inventory = player.getInventory();
 		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
 		ItemStack stack = inventory.getStack(slot);
 
 		if (stack.getItem() instanceof LanternItem) {
-			stack = stateStack(stack, false);
+			stack = modifiedStackWithState(stack, false);
 			player.getInventory().setStack(slot, stack);
 		}
 
@@ -122,7 +127,7 @@ public class LanternItem extends BlockItem {
 				1.0f);
 	}
 
-	private void lightLanternInHand(World world, PlayerEntity player, Hand hand) {
+	private void lightLanternWithInteraction(World world, PlayerEntity player, Hand hand) {
 		int slot = hand == Hand.MAIN_HAND ? player.getInventory().selectedSlot : PlayerInventory.OFF_HAND_SLOT;
 		ItemStack stack = player.getInventory().getStack(slot);
 
@@ -135,13 +140,15 @@ public class LanternItem extends BlockItem {
 		}
 
 		if (stack.getItem() instanceof LanternItem) {
-			stack = stateStack(stack, true);
+			stack = modifiedStackWithState(stack, true);
 			player.getInventory().setStack(slot, stack);
 		}
 
 		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 0.5f,
 				1.0f);
 	}
+
+	// Fuel
 
 	public static ItemStack addFuel(ItemStack stack, World world, int amount) {
 		if (stack.getItem() instanceof LanternItem && !world.isClient) {
@@ -160,7 +167,7 @@ public class LanternItem extends BlockItem {
 
 			if (fuel <= 0) {
 				fuel = 0;
-				stack = stateStack(stack, false);
+				stack = modifiedStackWithState(stack, false);
 			} else {
 				if (fuel > Mod.config.defaultLanternFuel) {
 					fuel = Mod.config.defaultLanternFuel;
@@ -174,7 +181,9 @@ public class LanternItem extends BlockItem {
 		return stack;
 	}
 
-	public static ItemStack stateStack(ItemStack inputStack, boolean isLit) {
+	// Modification
+
+	public static ItemStack modifiedStackWithState(ItemStack inputStack, boolean isLit) {
 		ItemStack outputStack = ItemStack.EMPTY;
 
 		if (inputStack.getItem() instanceof BlockItem && inputStack.getItem() instanceof LanternItem) {
@@ -190,10 +199,13 @@ public class LanternItem extends BlockItem {
 		return outputStack;
 	}
 
+	// Tooltips
+
 	@Override
 	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
 		// tooltip.add(MutableText.of(new LiteralTextContent("Light with Flint and
 		// Steel")).formatted(Formatting.GRAY));
 		super.appendTooltip(stack, world, tooltip, context);
 	}
+
 }
