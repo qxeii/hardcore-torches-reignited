@@ -134,8 +134,9 @@ public abstract class InventoryTickMixin {
 			return;
 		}
 
-		ItemStack stack = inventory.getStack(slot);
-		Item item = stack.getItem();
+		var world = getServerWorld();
+		var stack = inventory.getStack(slot);
+		var item = stack.getItem();
 
 		// Pre-Pass: Convert vanilla items
 
@@ -149,76 +150,106 @@ public abstract class InventoryTickMixin {
 			return;
 		}
 
-		// Main Pass: Check torch type, burn fuel
-
-		ServerWorld world = getServerWorld();
-		boolean worldIsNether = WorldUtils.worldIsNether(world);
-		boolean worldTimeIsDay = WorldUtils.worldIsDaytime(world);
-
-		int itemFuelUse = 1;
-
-		// If player actively holds item, multiply fuel use
-		if (slot == inventory.selectedSlot || slot == PlayerInventory.OFF_HAND_SLOT) {
-			itemFuelUse = itemFuelUse * Mod.config.itemUseMultiplierWhenHeld;
+		if (item instanceof TorchItem) {
+			tickTorchItem(world, inventory, stack, slot);
+			return;
 		}
 
-		if (item instanceof LanternItem && ((LanternItem) item).isLit) {
-			ItemStack modifiedStack = LanternItem.addFuel(stack, world, -itemFuelUse);
-			inventory.setStack(slot, modifiedStack);
+		if (item instanceof LanternItem) {
+			tickLanternItem(inventory, stack, slot);
 			return;
 		}
 
 		if (item instanceof ShroomlightItem) {
-			if (worldIsNether) {
-				ItemStack modifiedStack = ShroomlightItem.addFuel(stack, world, 15);
-				inventory.setStack(slot, modifiedStack);
-
-				return;
-			}
-
-			if (worldTimeIsDay) {
-				ItemStack modifiedStack = ShroomlightItem.addFuel(stack, world, -itemFuelUse);
-				inventory.setStack(slot, modifiedStack);
-
-				return;
-			}
-
+			tickShroomlightItem(world, inventory, stack, slot);
 			return;
 		}
 
 		if (item instanceof GlowstoneItem) {
-			if (worldIsNether) {
-				ItemStack modifiedStack = GlowstoneItem.addFuel(stack, world, 15);
-				inventory.setStack(slot, modifiedStack);
+			tickGlowstoneItem(world, inventory, stack, slot);
+			return;
+		}
+	}
 
-				return;
-			}
+	private int getFuelUse(PlayerInventory inventory, int slot) {
+		int baseFuelUse = 1;
 
-			ItemStack modifiedStack = ShroomlightItem.addFuel(stack, world, -itemFuelUse);
+		if (slot == inventory.selectedSlot || slot == PlayerInventory.OFF_HAND_SLOT) {
+			return baseFuelUse * Mod.config.itemUseMultiplierWhenHeld;
+		}
+
+		return baseFuelUse;
+	}
+
+	private void tickLanternItem(PlayerInventory inventory, ItemStack stack, int slot) {
+		var lanternItem = (LanternItem) stack.getItem();
+		var fuelUse = getFuelUse(inventory, slot);
+
+		if (!lanternItem.isLit) {
+			return;
+		}
+
+		ItemStack modifiedStack = LanternItem.addFuel(stack, getServerWorld(), -fuelUse);
+		inventory.setStack(slot, modifiedStack);
+	}
+
+	private void tickTorchItem(ServerWorld world, PlayerInventory inventory, ItemStack stack, int slot) {
+		var state = ((TorchItem) stack.getItem()).getTorchState();
+		var fuelUse = getFuelUse(inventory, slot);
+
+		if (state == ETorchState.LIT) {
+			ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -fuelUse);
 			inventory.setStack(slot, modifiedStack);
 
 			return;
 		}
 
-		if (item instanceof TorchItem) {
-			ETorchState state = ((TorchItem) item).getTorchState();
-
-			if (state == ETorchState.LIT) {
-				ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -itemFuelUse);
+		if (state == ETorchState.SMOLDERING) {
+			if (random.nextInt(Mod.config.torchesSmolderFuelUseTickChance) == 0) {
+				ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -fuelUse);
 				inventory.setStack(slot, modifiedStack);
-			} else if (state == ETorchState.SMOLDERING) {
-				if (random.nextInt(Mod.config.torchesSmolderFuelUseTickChance) == 0) {
-					ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -itemFuelUse);
-					inventory.setStack(slot, modifiedStack);
-				} else if (random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
-					ItemStack modifiedStack = TorchItem.modifiedStackWithState(stack, ETorchState.UNLIT);
-					inventory.setStack(slot, modifiedStack);
-				}
+			} else if (random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
+				ItemStack modifiedStack = TorchItem.modifiedStackWithState(stack, ETorchState.UNLIT);
+				inventory.setStack(slot, modifiedStack);
 			}
 
 			return;
 		}
 	}
+
+	private void tickShroomlightItem(ServerWorld world, PlayerInventory inventory, ItemStack stack, int slot) {
+		if (WorldUtils.worldIsNether(world)) {
+			ItemStack modifiedStack = ShroomlightItem.modifiedStackWithAddedFuel(stack, world, 15);
+			inventory.setStack(slot, modifiedStack);
+
+			return;
+		}
+
+		if (WorldUtils.worldIsDaytime(world)) {
+			var fuelUse = getFuelUse(inventory, slot);
+
+			ItemStack modifiedStack = ShroomlightItem.modifiedStackWithAddedFuel(stack, world, -fuelUse);
+			inventory.setStack(slot, modifiedStack);
+
+			return;
+		}
+	}
+
+	private void tickGlowstoneItem(ServerWorld world, PlayerInventory inventory, ItemStack stack, int slot) {
+		if (WorldUtils.worldIsNether(world)) {
+			ItemStack modifiedStack = GlowstoneItem.modifiedStackWithAddedFuel(stack, world, 15);
+			inventory.setStack(slot, modifiedStack);
+
+			return;
+		}
+
+		var fuelUse = getFuelUse(inventory, slot);
+
+		ItemStack modifiedStack = GlowstoneItem.modifiedStackWithAddedFuel(stack, world, -fuelUse);
+		inventory.setStack(slot, modifiedStack);
+	}
+
+	// Item Conversion
 
 	private void convertVanillaTorch(ItemStack stack, PlayerInventory inventory, int index) {
 		// Remove currently held vanilla torch stack and give a stack of same quantity
