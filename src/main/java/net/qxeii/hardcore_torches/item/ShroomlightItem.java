@@ -21,7 +21,7 @@ public class ShroomlightItem extends BlockItem implements FabricItem {
 		this.isLit = isLit;
 	}
 
-	public static ItemStack addFuel(ItemStack stack, World world, int amount) {
+	public static ItemStack modifiedStackWithAddedFuel(ItemStack stack, World world, int amount) {
 
 		if (stack.getItem() instanceof ShroomlightItem && !world.isClient) {
 			ShroomlightItem item = (ShroomlightItem) stack.getItem();

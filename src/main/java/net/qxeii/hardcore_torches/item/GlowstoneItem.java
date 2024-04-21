@@ -37,7 +37,7 @@ public class GlowstoneItem extends BlockItem implements FabricItem {
 		return outputStack;
 	}
 
-	public static ItemStack addFuel(ItemStack stack, World world, int amount) {
+	public static ItemStack modifiedStackWithAddedFuel(ItemStack stack, World world, int amount) {
 
 		if (stack.getItem() instanceof GlowstoneItem && !world.isClient) {
 			GlowstoneItem item = (GlowstoneItem) stack.getItem();
