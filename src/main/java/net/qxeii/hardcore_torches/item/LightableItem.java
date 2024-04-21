@@ -29,6 +29,7 @@ public interface LightableItem {
 		var lighterItem = InventoryUtils.getFirstUsableFireStarterItemFromInventory(player.getInventory());
 
 		if (lighterItem == null) {
+			Mod.LOGGER.debug("No usable lighter item found in inventory.");
 			return false;
 		}
 
@@ -37,6 +38,7 @@ public interface LightableItem {
 
 	default boolean useLighterItem(PlayerEntity player, ItemStack stack, Hand hand) {
 		if (player.isCreative()) {
+			Mod.LOGGER.debug("Player is in creative mode, lighter item will not be used.");
 			return true;
 		}
 
@@ -45,6 +47,7 @@ public interface LightableItem {
 
 	private boolean damageLighterItemStack(PlayerEntity player, ItemStack stack, Hand hand) {
 		if (stack.isIn(Mod.UNBREAKING_LIGHTER_ITEMS)) {
+			Mod.LOGGER.debug("Unbreaking lighter item used, no damage applied.");
 			return true;
 		}
 
@@ -53,14 +56,18 @@ public interface LightableItem {
 				breakLighterItemStack(player, stack, hand);
 			});
 
+			Mod.LOGGER.debug("Multi-use lighter item used, damage applied.");
 			return true;
 		}
 
 		if (stack.isIn(Mod.SINGLE_USE_LIGHTER_ITEMS)) {
 			stack.decrement(1);
+
+			Mod.LOGGER.debug("Single-use lighter item used, item consumed in stack.");
 			return true;
 		}
 
+		Mod.LOGGER.debug("Lighter item is not supported, no damage applied.");
 		return false;
 	}
 
