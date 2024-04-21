@@ -148,7 +148,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
 		ItemStack stack = inventory.getStack(slot);
 
-		stack = addFuel(stack, world, -Mod.config.torchesExtinguishFuelLoss);
+		stack = modifiedStackWithAddedFuel(stack, world, -Mod.config.torchesExtinguishFuelLoss);
 
 		if (getFuel(stack) <= 0) {
 			// Torch is expended, break and remove.
@@ -337,7 +337,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		return itemStack;
 	}
 
-	public static ItemStack addFuel(ItemStack stack, World world, int amount) {
+	public static ItemStack modifiedStackWithAddedFuel(ItemStack stack, World world, int amount) {
 		if (stack.getItem() instanceof TorchItem && !world.isClient) {
 			NbtCompound nbt = stack.getNbt();
 			int fuel = Mod.config.defaultTorchFuel;

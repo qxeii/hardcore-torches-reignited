@@ -102,7 +102,7 @@ public abstract class InventoryTickMixin {
 
 		ItemStack torchStack = stack;
 		torchStack = TorchItem.modifiedStackWithState(torchStack, ETorchState.UNLIT);
-		torchStack = TorchItem.addFuel(torchStack, player.getWorld(), torchConditionLoss);
+		torchStack = TorchItem.modifiedStackWithAddedFuel(torchStack, player.getWorld(), torchConditionLoss);
 		player.getInventory().setStack(i, torchStack);
 
 		player.getWorld().playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
@@ -123,7 +123,7 @@ public abstract class InventoryTickMixin {
 
 		ItemStack torchStack = stack;
 		torchStack = TorchItem.modifiedStackWithState(torchStack, targetTorchState);
-		torchStack = TorchItem.addFuel(torchStack, world, torchConditionLoss);
+		torchStack = TorchItem.modifiedStackWithAddedFuel(torchStack, world, torchConditionLoss);
 		inventory.setStack(i, torchStack);
 
 		world.playSound(null, pos.up(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f, 1f);
@@ -204,11 +204,11 @@ public abstract class InventoryTickMixin {
 			ETorchState state = ((TorchItem) item).getTorchState();
 
 			if (state == ETorchState.LIT) {
-				ItemStack modifiedStack = TorchItem.addFuel(stack, world, -itemFuelUse);
+				ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -itemFuelUse);
 				inventory.setStack(slot, modifiedStack);
 			} else if (state == ETorchState.SMOLDERING) {
 				if (random.nextInt(Mod.config.torchesSmolderFuelUseTickChance) == 0) {
-					ItemStack modifiedStack = TorchItem.addFuel(stack, world, -itemFuelUse);
+					ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -itemFuelUse);
 					inventory.setStack(slot, modifiedStack);
 				} else if (random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
 					ItemStack modifiedStack = TorchItem.modifiedStackWithState(stack, ETorchState.UNLIT);
