@@ -74,13 +74,13 @@ public interface LightableItem {
 
 		if (player.getMainHandStack() == lighterStack) {
 			player.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND);
-			addRuinedLighterItemToPlayerInventory(player, lighterSlot);
+			breakLighterItemInPlayerInventory(player, lighterSlot);
 			return;
 		}
 
 		if (player.getOffHandStack() == lighterStack) {
 			player.sendEquipmentBreakStatus(EquipmentSlot.OFFHAND);
-			addRuinedLighterItemToPlayerInventory(player, lighterSlot);
+			breakLighterItemInPlayerInventory(player, lighterSlot);
 			return;
 		}
 
@@ -94,11 +94,13 @@ public interface LightableItem {
 		player.sendEquipmentBreakStatus(torchHandSlot);
 		player.equipStack(torchHandSlot, torchStack);
 
-		addRuinedLighterItemToPlayerInventory(player, lighterSlot);
+		breakLighterItemInPlayerInventory(player, lighterSlot);
 	}
 
-	private void addRuinedLighterItemToPlayerInventory(PlayerEntity player, int slot) {
+	private void breakLighterItemInPlayerInventory(PlayerEntity player, int slot) {
 		if (!FabricLoader.getInstance().isModLoaded("ruined_equipment")) {
+			// If equipment mod is not loaded, item can be removed directly.
+			player.getInventory().removeStack(slot);
 			return;
 		}
 
