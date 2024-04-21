@@ -2,7 +2,6 @@ package net.qxeii.hardcore_torches.item;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -18,13 +17,11 @@ import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -34,6 +31,7 @@ import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 
 public class TorchItem extends VerticallyAttachableBlockItem implements LightableItem {
+
 	ETorchState torchState;
 	TorchGroup torchGroup;
 	int maxFuel;
@@ -44,6 +42,26 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		this.torchState = torchState;
 		this.maxFuel = maxFuel;
 		this.torchGroup = group;
+	}
+
+	// State & Properties
+
+	public ETorchState getTorchState() {
+		return torchState;
+	}
+
+	public TorchGroup getTorchGroup() {
+		return torchGroup;
+	}
+
+	public static int getFuel(ItemStack stack) {
+		NbtCompound nbt = stack.getNbt();
+
+		if (nbt != null) {
+			return nbt.getInt("Fuel");
+		}
+
+		return Mod.config.defaultTorchFuel;
 	}
 
 	@Override
@@ -88,14 +106,19 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			newNbt.remove("Fuel");
 		}
 
-		if (oldNbt == null && newNbt != null)
+		if (oldNbt == null && newNbt != null) {
 			return true;
-		if (oldNbt != null && newNbt == null)
-			return true;
-		if (oldNbt == null && newNbt == null)
-			return false;
+		}
 
-		return oldNbt.equals(null);
+		if (oldNbt != null && newNbt == null) {
+			return true;
+		}
+
+		if (oldNbt == null && newNbt == null) {
+			return false;
+		}
+
+		return oldNbt == null || oldNbt.equals(null);
 	}
 
 	// Interaction
@@ -247,6 +270,8 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		return highestDamageItemSlot;
 	}
 
+	// Events
+
 	@Override
 	public ActionResult useOnBlock(ItemUsageContext context) {
 		ItemStack stack = context.getStack();
@@ -296,7 +321,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		}
 
 		// Ensure torches are in same group
-		if (!sameTorchGroup((TorchItem) stack.getItem(), (TorchItem) otherStack.getItem())) {
+		if (!equalTorchGroup((TorchItem) stack.getItem(), (TorchItem) otherStack.getItem())) {
 			return false;
 		}
 
@@ -338,12 +363,14 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
 	}
 
-	public boolean sameTorchGroup(TorchItem item1, TorchItem item2) {
+	public boolean equalTorchGroup(TorchItem item1, TorchItem item2) {
 		if (item1.torchGroup == item2.torchGroup) {
 			return true;
 		}
 		return false;
 	}
+
+	// Modification
 
 	public static Item stateItem(Item inputItem, ETorchState newState) {
 		Item outputItem = Items.AIR;
@@ -374,14 +401,6 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		return outputStack;
 	}
 
-	public ETorchState getTorchState() {
-		return torchState;
-	}
-
-	public TorchGroup getTorchGroup() {
-		return torchGroup;
-	}
-
 	public static ItemStack modifiedItemForReplacement(ItemStack stack, Item replacementItem) {
 		if (stack.isEmpty()) {
 			return ItemStack.EMPTY;
@@ -394,17 +413,6 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		}
 
 		return itemStack;
-	}
-
-	public static int getFuel(ItemStack stack) {
-		NbtCompound nbt = stack.getNbt();
-		int fuel;
-
-		if (nbt != null) {
-			return nbt.getInt("Fuel");
-		}
-
-		return Mod.config.defaultTorchFuel;
 	}
 
 	public static ItemStack addFuel(ItemStack stack, World world, int amount) {
@@ -440,5 +448,4 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		return stack;
 	}
 
-	// Private Utilties
 }
