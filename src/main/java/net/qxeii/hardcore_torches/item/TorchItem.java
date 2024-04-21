@@ -128,6 +128,8 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			return super.use(world, player, hand);
 		}
 
+		ItemStack stack = player.getStackInHand(hand);
+		ETorchState torchState = ((TorchItem) stack.getItem()).getTorchState();
 		switch (torchState) {
 			case UNLIT, SMOLDERING: {
 				useLighterAndLightWithInteraction(world, player, hand);
