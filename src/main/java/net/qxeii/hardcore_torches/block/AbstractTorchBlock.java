@@ -185,7 +185,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 	private void useFuelAndLightWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player,
 			ItemStack stack, Hand hand) {
-		if (!findAndUseLighterItem(player, stack, hand)) {
+		if (!findAndUseLighterItem(player, hand)) {
 			return;
 		}
 
