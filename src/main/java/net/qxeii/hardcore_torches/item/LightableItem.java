@@ -72,13 +72,13 @@ public interface LightableItem {
 
 		if (player.getMainHandStack() == lighterStack) {
 			player.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND);
-			addRuinedFlintAndSteelToPlayerInventory(player, lighterSlot);
+			addRuinedLighterItemToPlayerInventory(player, lighterSlot);
 			return;
 		}
 
 		if (player.getOffHandStack() == lighterStack) {
 			player.sendEquipmentBreakStatus(EquipmentSlot.OFFHAND);
-			addRuinedFlintAndSteelToPlayerInventory(player, lighterSlot);
+			addRuinedLighterItemToPlayerInventory(player, lighterSlot);
 			return;
 		}
 
@@ -92,11 +92,17 @@ public interface LightableItem {
 		player.sendEquipmentBreakStatus(torchHandSlot);
 		player.equipStack(torchHandSlot, torchStack);
 
-		addRuinedFlintAndSteelToPlayerInventory(player, lighterSlot);
+		addRuinedLighterItemToPlayerInventory(player, lighterSlot);
 	}
 
-	private void addRuinedFlintAndSteelToPlayerInventory(PlayerEntity player, int slot) {
+	private void addRuinedLighterItemToPlayerInventory(PlayerEntity player, int slot) {
 		if (!FabricLoader.getInstance().isModLoaded("ruined_equipment")) {
+			return;
+		}
+
+		if (player.getInventory().getStack(slot).getItem() != Items.FLINT_AND_STEEL) {
+			// Only flint and steel are supported to get auto-replaced
+			// with ruined item equivalent.
 			return;
 		}
 
