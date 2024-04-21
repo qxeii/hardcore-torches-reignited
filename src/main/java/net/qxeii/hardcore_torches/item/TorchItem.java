@@ -169,8 +169,8 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			player.setStackInHand(hand, stack);
 		}
 
-		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f,
-				1.0f);
+		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 1f,
+				1f);
 	}
 
 	private boolean useLighterAndLightWithInteraction(World world, PlayerEntity player, Hand hand) {
