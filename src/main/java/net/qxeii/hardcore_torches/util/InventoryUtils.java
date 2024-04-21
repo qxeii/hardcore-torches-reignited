@@ -1,5 +1,6 @@
 package net.qxeii.hardcore_torches.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.player.PlayerInventory;
@@ -70,10 +71,17 @@ public class InventoryUtils {
 		}
 
 		public static FireStarterItemMap of() {
-			return new FireStarterItemMap(List.of(), List.of(), List.of());
+			return new FireStarterItemMap(
+					new ArrayList<ItemStack>(),
+					new ArrayList<ItemStack>(),
+					new ArrayList<ItemStack>());
 		}
 
 		public void addStackIfMatching(ItemStack stack) {
+			if (stack.isEmpty()) {
+				return;
+			}
+
 			if (stack.isIn(Mod.UNBREAKING_LIGHTER_ITEMS)) {
 				unbreaking.add(stack);
 			} else if (stack.isIn(Mod.SINGLE_USE_LIGHTER_ITEMS)) {
