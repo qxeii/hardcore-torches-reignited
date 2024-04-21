@@ -96,12 +96,16 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 
 	public void extinguish(World world, BlockPos pos, BlockState state, boolean playSound) {
 		if (!world.isClient) {
-			if (playSound)
-				world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
+			if (playSound) {
+				world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 0.5f);
+				world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 0.5f);
+			}
+
 			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
 			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
 			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
 			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+
 			setState(world, pos, false);
 		}
 	}
@@ -113,15 +117,18 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 
 		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
 		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
-		world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 1f);
+		world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 0.5f);
 		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
 		world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
 		world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
+
 		ServerWorld serverWorld = (ServerWorld) world;
+
 		serverWorld.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 10,
 				0.15, 0.15, 0.15, 0.001);
 		serverWorld.spawnParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 2,
 				0.15, 0.15, 0.15, 0.001);
+
 		setState(world, pos, true);
 	}
 
@@ -138,20 +145,21 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 			return ActionResult.SUCCESS;
 		}
 
+		// Adding fuel with can
+		if (stack.getItem() instanceof OilCanItem) {
+			refuelWithInteraction(world, pos, state, player, stack, hand);
+			return ActionResult.SUCCESS;
+		}
+
 		// Igniting
 		if (!this.isLit && stack.isEmpty()) {
 			useFuelAndLightWithInteraction(state, world, pos, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
+		// Extinguishing
 		if (this.isLit && stack.isEmpty()) {
 			extinguishWithInteraction(world, pos, state, player, hand);
-			return ActionResult.SUCCESS;
-		}
-
-		// Adding fuel with can
-		if (stack.getItem() instanceof OilCanItem) {
-			refuelWithInteraction(world, pos, state, player, stack, hand);
 			return ActionResult.SUCCESS;
 		}
 
@@ -197,10 +205,6 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 	}
 
 	public void extinguishWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand) {
-		if (!world.isClient) {
-			world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 1.0f);
-		}
-
 		extinguish(world, pos, state, true);
 		player.swingHand(hand);
 	}
