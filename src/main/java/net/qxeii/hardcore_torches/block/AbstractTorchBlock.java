@@ -32,7 +32,6 @@ import net.qxeii.hardcore_torches.blockentity.LightableBlock;
 import net.qxeii.hardcore_torches.blockentity.TorchBlockEntity;
 import net.qxeii.hardcore_torches.item.TorchItem;
 import net.qxeii.hardcore_torches.util.ETorchState;
-import net.qxeii.hardcore_torches.util.InventoryUtils;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 import net.qxeii.hardcore_torches.util.TorchUtils;
 
@@ -153,20 +152,21 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 		// Extinguishing
 
-		if (burnState == ETorchState.LIT && stack.isEmpty()) {
+		if (stack.isEmpty() && burnState == ETorchState.LIT) {
 			extinguishWithInteraction(world, pos, state, player, stack, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		// Lighting
 
-		if ((burnState == ETorchState.SMOLDERING || burnState == ETorchState.UNLIT)
-				&& InventoryUtils.canUseAsFireStarter(stack)) {
-			useFuelAndLightWithInteraction(world, pos, state, player, stack, hand);
+		if (burnState == ETorchState.SMOLDERING || burnState == ETorchState.UNLIT) {
+			if (!useFuelAndLightWithInteraction(world, pos, state, player, stack, hand)) {
+				return ActionResult.PASS;
+			}
 
 			BlockEntity blockEntity = world.getBlockEntity(pos);
 
-			if (blockEntity.getType() == Mod.TORCH_BLOCK_ENTITY && !world.isClient && Mod.config.fuelMessage
+			if (!world.isClient && blockEntity.getType() == Mod.TORCH_BLOCK_ENTITY && Mod.config.fuelMessage
 					&& stack.isEmpty()) {
 				player.sendMessage(Text.of("Fuel: " + ((TorchBlockEntity) blockEntity).getFuel()), true);
 			}
@@ -183,14 +183,16 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 		player.swingHand(hand);
 	}
 
-	private void useFuelAndLightWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player,
+	private boolean useFuelAndLightWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player,
 			ItemStack stack, Hand hand) {
 		if (!findAndUseLighterItem(player, hand)) {
-			return;
+			return false;
 		}
 
 		light(world, pos, state);
 		player.swingHand(hand);
+
+		return true;
 	}
 
 	// Events
