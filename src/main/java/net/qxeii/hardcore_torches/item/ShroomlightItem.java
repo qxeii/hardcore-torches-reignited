@@ -42,6 +42,10 @@ public class ShroomlightItem extends BlockItem implements FabricItem {
 				fuel = Mod.config.defaultShroomlightFuel;
 			}
 
+			if (fuel < 0) {
+				fuel = 0;
+			}
+
 			nbt.putInt("Fuel", fuel);
 			stack.setNbt(nbt);
 		}
