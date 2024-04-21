@@ -159,13 +159,13 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 
 		if (getFuel(stack) <= 0) {
 			// Torch is expended, break and remove.
-			stack = stateStack(stack, ETorchState.BURNT);
+			stack = modifiedStackWithState(stack, ETorchState.BURNT);
 			player.getInventory().setStack(slot, stack);
 		} else {
 			if (Mod.config.torchesSmolder) {
-				stack = stateStack(stack, ETorchState.SMOLDERING);
+				stack = modifiedStackWithState(stack, ETorchState.SMOLDERING);
 			} else {
-				stack = stateStack(stack, ETorchState.UNLIT);
+				stack = modifiedStackWithState(stack, ETorchState.UNLIT);
 			}
 			inventory.setStack(slot, stack);
 			player.setStackInHand(hand, stack);
@@ -199,8 +199,8 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 
 			inventory.setStack(slot, heldTorchStack);
 		} else {
-			ItemStack heldTorchStack = stateStack(stack, ETorchState.LIT);
 			inventory.setStack(slot, heldTorchStack);
+			ItemStack heldTorchStack = modifiedStackWithState(torchStack, ETorchState.LIT);
 		}
 
 		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
@@ -308,8 +308,8 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	@Override
 	public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player,
 			StackReference cursorStackReference) {
-		// If you are clicking on it with a non HCTorch item or with empty, use vanilla
-		// behavior
+		// If you are clicking on it with a non HCTorch item or with empty,
+		// use vanilla behavior.
 		if (!slot.canTakePartial(player) || !(otherStack.getItem() instanceof TorchItem) || otherStack.isEmpty()) {
 			return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
 		}
@@ -372,7 +372,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 
 	// Modification
 
-	public static Item stateItem(Item inputItem, ETorchState newState) {
+	public static Item modifiedItemWithState(Item inputItem, ETorchState newState) {
 		Item outputItem = Items.AIR;
 
 		if (inputItem instanceof BlockItem && inputItem instanceof TorchItem) {
@@ -385,7 +385,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		return outputItem;
 	}
 
-	public static ItemStack stateStack(ItemStack inputStack, ETorchState newState) {
+	public static ItemStack modifiedStackWithState(ItemStack inputStack, ETorchState newState) {
 		ItemStack outputStack = ItemStack.EMPTY;
 
 		if (inputStack.getItem() instanceof BlockItem && inputStack.getItem() instanceof TorchItem) {
@@ -433,7 +433,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 				if (Mod.config.burntStick) {
 					stack = new ItemStack(Items.STICK, stack.getCount());
 				} else {
-					stack = stateStack(stack, ETorchState.BURNT);
+					stack = modifiedStackWithState(stack, ETorchState.BURNT);
 				}
 			} else {
 				if (fuel > Mod.config.defaultTorchFuel) {

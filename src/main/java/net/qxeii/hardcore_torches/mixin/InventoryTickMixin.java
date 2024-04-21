@@ -101,7 +101,7 @@ public abstract class InventoryTickMixin {
 		}
 
 		ItemStack torchStack = stack;
-		torchStack = TorchItem.stateStack(torchStack, ETorchState.UNLIT);
+		torchStack = TorchItem.modifiedStackWithState(torchStack, ETorchState.UNLIT);
 		torchStack = TorchItem.addFuel(torchStack, player.getWorld(), torchConditionLoss);
 		player.getInventory().setStack(i, torchStack);
 
@@ -122,7 +122,7 @@ public abstract class InventoryTickMixin {
 		int torchConditionLoss = torchState == ETorchState.LIT ? -Mod.config.torchesExtinguishFuelLoss : 0;
 
 		ItemStack torchStack = stack;
-		torchStack = TorchItem.stateStack(torchStack, targetTorchState);
+		torchStack = TorchItem.modifiedStackWithState(torchStack, targetTorchState);
 		torchStack = TorchItem.addFuel(torchStack, world, torchConditionLoss);
 		inventory.setStack(i, torchStack);
 
@@ -211,7 +211,7 @@ public abstract class InventoryTickMixin {
 					ItemStack modifiedStack = TorchItem.addFuel(stack, world, -itemFuelUse);
 					inventory.setStack(slot, modifiedStack);
 				} else if (random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
-					ItemStack modifiedStack = TorchItem.stateStack(stack, ETorchState.UNLIT);
+					ItemStack modifiedStack = TorchItem.modifiedStackWithState(stack, ETorchState.UNLIT);
 					inventory.setStack(slot, modifiedStack);
 				}
 			}
