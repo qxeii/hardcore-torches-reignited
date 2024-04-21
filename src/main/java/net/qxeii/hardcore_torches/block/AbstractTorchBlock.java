@@ -81,62 +81,69 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 	// Actions
 
 	public void smother(World world, BlockPos pos, BlockState state, boolean playSound) {
-		if (!world.isClient) {
-			if (playSound) {
-				world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
-			}
-
-			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-
-			modifyTorch(world, pos, state, ETorchState.SMOLDERING);
+		if (world.isClient) {
+			return;
 		}
+		if (playSound) {
+			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
+		}
+
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+
+		modifyTorch(world, pos, state, ETorchState.SMOLDERING);
 	}
 
 	public void extinguish(World world, BlockPos pos, BlockState state, boolean playSound) {
 		if (!world.isClient) {
-			if (playSound) {
-				world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
-			}
-
-			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-
-			modifyTorch(world, pos, state, ETorchState.UNLIT);
+			return;
 		}
+
+		if (playSound) {
+			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
+		}
+
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+
+		modifyTorch(world, pos, state, ETorchState.UNLIT);
 	}
 
 	public void burnOut(World world, BlockPos pos, BlockState state, boolean playSound) {
 		if (!world.isClient) {
-			if (playSound) {
-				world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
-			}
-
-			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-
-			modifyTorch(world, pos, state, ETorchState.BURNT);
+			return;
 		}
+
+		if (playSound) {
+			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
+		}
+
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+
+		modifyTorch(world, pos, state, ETorchState.BURNT);
 	}
 
 	public void light(World world, BlockPos pos, BlockState state) {
 		if (!world.isClient) {
-			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
-			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
-			world.playSound(null, pos, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.5f, 1f);
-			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
-
-			TorchUtils.displayParticle(ParticleTypes.LAVA, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.FLAME, state, world, pos);
-
-			modifyTorch(world, pos, state, ETorchState.LIT);
+			return;
 		}
+
+		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
+		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
+		world.playSound(null, pos, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.3f, 2f);
+		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
+
+		TorchUtils.displayParticle(ParticleTypes.LAVA, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.FLAME, state, world, pos);
+
+		modifyTorch(world, pos, state, ETorchState.LIT);
 	}
 
 	@Override
