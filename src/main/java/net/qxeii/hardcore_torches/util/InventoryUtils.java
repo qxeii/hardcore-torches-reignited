@@ -12,8 +12,12 @@ public class InventoryUtils {
 	// Item Type Check
 
 	public static boolean canUseAsFireStarter(ItemStack stack) {
-		return stack.isIn(Mod.UNBREAKING_LIGHTER_ITEMS) || stack.isIn(Mod.MULTI_USE_LIGHTER_ITEMS)
+		var state = stack.isIn(Mod.UNBREAKING_LIGHTER_ITEMS) || stack.isIn(Mod.MULTI_USE_LIGHTER_ITEMS)
 				|| stack.isIn(Mod.SINGLE_USE_LIGHTER_ITEMS);
+
+		Mod.LOGGER.debug("Inventory utils reports use of {} as fire starter: {}", stack.getName(), state);
+
+		return state;
 	}
 
 	public static boolean canUseAsFuelSource(ItemStack stack) {
@@ -29,14 +33,20 @@ public class InventoryUtils {
 
 	public static ItemStack getFirstUsableFireStarterItemFromMap(FireStarterItemMap map) {
 		if (!map.unbreaking.isEmpty()) {
+			Mod.LOGGER.debug("Returning {} as first unbreaking fire starter item from map.",
+					map.unbreaking.get(0).getName());
 			return map.unbreaking.get(0);
 		}
 
 		if (!map.singleUse.isEmpty()) {
+			Mod.LOGGER.debug("Returning {} as first single-use fire starter item from map.",
+					map.singleUse.get(0).getName());
 			return map.singleUse.get(0);
 		}
 
 		if (!map.multiUse.isEmpty()) {
+			Mod.LOGGER.debug("Returning {} as first multi-use fire starter item from map.",
+					map.multiUse.get(0).getName());
 			return map.multiUse.get(0);
 		}
 
@@ -46,16 +56,14 @@ public class InventoryUtils {
 	public static FireStarterItemMap getFireStarterItemsMap(PlayerInventory inventory) {
 		var map = FireStarterItemMap.of();
 
-		List<ItemStack> allInventoryStacks = List.of();
-
-		allInventoryStacks.addAll(inventory.main);
-		allInventoryStacks.addAll(inventory.offHand);
-
-		for (ItemStack stack : allInventoryStacks) {
-			map.addStackIfMatching(stack);
-		}
+		inventory.main.forEach(stack -> map.addStackIfMatching(stack));
+		inventory.offHand.forEach(stack -> map.addStackIfMatching(stack));
 
 		map.sortAllListsByDamageValue();
+
+		Mod.LOGGER.debug("Created fire starter item map with {} unbreaking, {} single-use, {} multi-use items.",
+				map.unbreaking.size(), map.singleUse.size(), map.multiUse.size());
+
 		return map;
 	}
 
