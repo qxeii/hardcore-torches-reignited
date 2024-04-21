@@ -117,6 +117,67 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		return oldNbt == null || oldNbt.equals(null);
 	}
 
+	// Actions
+
+	public void extinguish(World world, PlayerEntity player, int slot) {
+		PlayerInventory inventory = player.getInventory();
+		ItemStack stack = inventory.getStack(slot);
+
+		stack = modifiedStackWithAddedFuel(stack, world, -Mod.config.torchesExtinguishFuelLoss);
+
+		if (getFuel(stack) <= 0) {
+			// Torch is expended, break and remove.
+			stack = modifiedStackWithState(stack, ETorchState.BURNT);
+			player.getInventory().setStack(slot, stack);
+		} else {
+			if (Mod.config.torchesSmolder) {
+				stack = modifiedStackWithState(stack, ETorchState.SMOLDERING);
+			} else {
+				stack = modifiedStackWithState(stack, ETorchState.UNLIT);
+			}
+
+			inventory.setStack(slot, stack);
+		}
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 1f,
+				1f);
+	}
+
+	public void light(World world, PlayerEntity player, int slot) {
+		var inventory = player.getInventory();
+		var stack = inventory.getStack(slot);
+
+		if (stack.getCount() > 1) {
+			// Holding multiple unlit (unused) torches in stack.
+			// Stack must be split, remaining stack of torches moved to free inventory slot,
+			// and one new stack created with lit torch in hand slot.
+
+			int emptySlot = inventory.getEmptySlot();
+			ItemStack deductedTorchStack = stack.copyWithCount(stack.getCount() - 1);
+
+			if (emptySlot == -1) {
+				Mod.LOGGER.debug("Lighting torch in stack of unlit torches, no empty slot found, dropping stack.");
+				player.dropItem(deductedTorchStack, true);
+			} else {
+				Mod.LOGGER.debug("Lighting torch in stack of unlit torches, moving remaining torches to empty slot.");
+				inventory.setStack(emptySlot, deductedTorchStack);
+			}
+
+			Mod.LOGGER.debug("Lighting torch in stack of unlit torches, creating new stack with lit torch in hand.");
+			ItemStack heldTorchStack = modifiedStackWithState(stack, ETorchState.LIT);
+			heldTorchStack.setCount(1);
+
+			inventory.setStack(slot, heldTorchStack);
+		} else {
+			Mod.LOGGER.debug("Lighting single unlit torch in hand.");
+
+			ItemStack heldTorchStack = modifiedStackWithState(stack, ETorchState.LIT);
+			inventory.setStack(slot, heldTorchStack);
+		}
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
+	}
+
 	// Interaction
 
 	@Override
@@ -148,32 +209,15 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		}
 	}
 
-	private void extinguishWithInteraction(World world, PlayerEntity player, Hand hand) {
+	public void extinguishWithInteraction(World world, PlayerEntity player, Hand hand) {
 		PlayerInventory inventory = player.getInventory();
 		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
-		ItemStack stack = inventory.getStack(slot);
 
-		stack = modifiedStackWithAddedFuel(stack, world, -Mod.config.torchesExtinguishFuelLoss);
-
-		if (getFuel(stack) <= 0) {
-			// Torch is expended, break and remove.
-			stack = modifiedStackWithState(stack, ETorchState.BURNT);
-			player.getInventory().setStack(slot, stack);
-		} else {
-			if (Mod.config.torchesSmolder) {
-				stack = modifiedStackWithState(stack, ETorchState.SMOLDERING);
-			} else {
-				stack = modifiedStackWithState(stack, ETorchState.UNLIT);
-			}
-			inventory.setStack(slot, stack);
-			player.setStackInHand(hand, stack);
-		}
-
-		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 1f,
-				1f);
+		extinguish(world, player, slot);
+		player.swingHand(hand);
 	}
 
-	private boolean useLighterAndLightWithInteraction(World world, PlayerEntity player, Hand hand) {
+	public boolean useLighterAndLightWithInteraction(World world, PlayerEntity player, Hand hand) {
 		if (!findAndUseLighterItem(player, hand)) {
 			return false;
 		}
@@ -181,45 +225,20 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		return lightWithInteraction(world, player, hand);
 	}
 
-	private boolean lightWithInteraction(World world, PlayerEntity player, Hand hand) {
-		PlayerInventory inventory = player.getInventory();
-		int handSlot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
-		ItemStack torchStack = hand == Hand.MAIN_HAND ? player.getMainHandStack() : player.getOffHandStack();
+	public boolean lightWithInteraction(World world, PlayerEntity player, Hand hand) {
+		var inventory = player.getInventory();
+		var slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
+		var stack = inventory.getStack(slot);
+		var state = ((TorchItem) stack.getItem()).getTorchState();
 
-		if (torchState == ETorchState.LIT || torchState == ETorchState.BURNT) {
+		if (state == ETorchState.LIT || state == ETorchState.BURNT) {
 			Mod.LOGGER.debug("Torch is already lit or burnt, can not light.");
 			return false;
 		}
 
-		if (torchStack.getCount() > 1) {
-			// Holding multiple unlit (unused) torches in stack.
-			// Stack must be split, remaining stack of torches moved to free inventory slot,
-			// and one new stack created with lit torch in hand slot.
+		light(world, player, slot);
+		player.swingHand(hand);
 
-			int emptySlot = inventory.getEmptySlot();
-			ItemStack deductedTorchStack = torchStack.copyWithCount(torchStack.getCount() - 1);
-
-			if (emptySlot == -1) {
-				Mod.LOGGER.debug("Lighting torch in stack of unlit torches, no empty slot found, dropping stack.");
-				player.dropItem(deductedTorchStack, true);
-			} else {
-				Mod.LOGGER.debug("Lighting torch in stack of unlit torches, moving remaining torches to empty slot.");
-				inventory.setStack(emptySlot, deductedTorchStack);
-			}
-
-			Mod.LOGGER.debug("Lighting torch in stack of unlit torches, creating new stack with lit torch in hand.");
-			ItemStack heldTorchStack = modifiedStackWithState(torchStack, ETorchState.LIT);
-			heldTorchStack.setCount(1);
-
-			inventory.setStack(handSlot, heldTorchStack);
-		} else {
-			Mod.LOGGER.debug("Lighting single unlit torch in hand.");
-
-			ItemStack heldTorchStack = modifiedStackWithState(torchStack, ETorchState.LIT);
-			inventory.setStack(handSlot, heldTorchStack);
-		}
-
-		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
 		return true;
 	}
 

@@ -96,40 +96,24 @@ public class LanternItem extends BlockItem {
 		return oldNbt.equals(null);
 	}
 
-	// Interaction
+	// Actions
 
-	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-		if (world.isClient) {
-			return super.use(world, user, hand);
-		}
-
-		if (isLit) {
-			extinguishLanternWithInteraction(world, user, hand);
-		} else {
-			lightLanternWithInteraction(world, user, hand);
-		}
-
-		return super.use(world, user, hand);
-	}
-
-	private void extinguishLanternWithInteraction(World world, PlayerEntity player, Hand hand) {
+	public void extinguish(World world, PlayerEntity player, int slot) {
 		PlayerInventory inventory = player.getInventory();
-		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
 		ItemStack stack = inventory.getStack(slot);
 
 		if (stack.getItem() instanceof LanternItem) {
 			stack = modifiedStackWithState(stack, false);
-			player.getInventory().setStack(slot, stack);
+			inventory.setStack(slot, stack);
 		}
 
 		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f,
 				1.0f);
 	}
 
-	private void lightLanternWithInteraction(World world, PlayerEntity player, Hand hand) {
-		int slot = hand == Hand.MAIN_HAND ? player.getInventory().selectedSlot : PlayerInventory.OFF_HAND_SLOT;
-		ItemStack stack = player.getInventory().getStack(slot);
+	public void light(World world, PlayerEntity player, int slot) {
+		PlayerInventory inventory = player.getInventory();
+		ItemStack stack = inventory.getStack(slot);
 
 		stack = addFuel(stack, world, -Mod.config.lanternLightFuelLoss);
 
@@ -141,11 +125,44 @@ public class LanternItem extends BlockItem {
 
 		if (stack.getItem() instanceof LanternItem) {
 			stack = modifiedStackWithState(stack, true);
-			player.getInventory().setStack(slot, stack);
+			inventory.setStack(slot, stack);
 		}
 
 		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 0.5f,
 				1.0f);
+	}
+
+	// Interaction
+
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+		if (world.isClient) {
+			return super.use(world, user, hand);
+		}
+
+		if (isLit) {
+			extinguishWithInteraction(world, user, hand);
+		} else {
+			lightWithInteraction(world, user, hand);
+		}
+
+		return super.use(world, user, hand);
+	}
+
+	public void extinguishWithInteraction(World world, PlayerEntity player, Hand hand) {
+		PlayerInventory inventory = player.getInventory();
+		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
+
+		extinguish(world, player, slot);
+		player.swingHand(hand);
+	}
+
+	public void lightWithInteraction(World world, PlayerEntity player, Hand hand) {
+		PlayerInventory inventory = player.getInventory();
+		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
+
+		light(world, player, slot);
+		player.swingHand(hand);
 	}
 
 	// Fuel
