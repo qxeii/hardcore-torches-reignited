@@ -78,7 +78,7 @@ public class InventoryUtils {
 				unbreaking.add(stack);
 			} else if (stack.isIn(Mod.SINGLE_USE_LIGHTER_ITEMS)) {
 				singleUse.add(stack);
-			} else if (stack.isIn(Mod.MULTI_USE_LIGHTER_ITEMS) && stack.getDamage() < stack.getMaxDamage() - 1) {
+			} else if (stack.isIn(Mod.MULTI_USE_LIGHTER_ITEMS) && stack.getDamage() < stack.getMaxDamage()) {
 				multiUse.add(stack);
 			}
 		}
