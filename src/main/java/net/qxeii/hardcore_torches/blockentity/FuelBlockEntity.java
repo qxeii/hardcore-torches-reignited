@@ -12,13 +12,12 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.qxeii.hardcore_torches.item.LightableItem;
 
 public class FuelBlockEntity extends BlockEntity {
 
-	protected int fuel;
-	protected static Random random = new Random();
+	public static Random random = new Random();
+
+	private int fuel;
 
 	public FuelBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -56,6 +55,12 @@ public class FuelBlockEntity extends BlockEntity {
 		}
 	}
 
+	// Fuel Access
+
+	public boolean isOutOfFuel() {
+		return fuel <= 0;
+	}
+
 	public int getFuel() {
 		return fuel;
 	}
@@ -64,19 +69,7 @@ public class FuelBlockEntity extends BlockEntity {
 		fuel = Math.max(0, newValue);
 	}
 
-	public void changeFuel(int increment) {
-		World world = this.getWorld();
-		BlockPos pos = this.getPos();
-
-		fuel += increment;
-
-		if (fuel <= 0) {
-			fuel = 0;
-
-			if (world.getBlockState(pos).getBlock() instanceof LightableItem) {
-				var block = (LightableBlock) world.getBlockState(pos).getBlock();
-				block.onOutOfFuel(world, pos, world.getBlockState(pos), false);
-			}
-		}
+	public void modifyFuel(int increment) {
+		setFuel(fuel + increment);
 	}
 }
