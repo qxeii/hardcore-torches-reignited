@@ -49,7 +49,9 @@ import net.qxeii.hardcore_torches.util.TorchUtils;
 public abstract class AbstractLanternBlock extends BlockWithEntity implements LightableBlock {
 	public static final BooleanProperty HANGING;
 	public static final BooleanProperty WATERLOGGED;
+
 	public boolean isLit;
+
 	public IntSupplier maxFuel;
 
 	static {
@@ -197,7 +199,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 		light(world, pos, state);
 		player.swingHand(hand);
 
-		blockEntity.changeFuel(-Mod.config.lanternLightFuelLoss);
+		blockEntity.modifyFuel(-Mod.config.lanternLightFuelLoss);
 
 		if (Mod.config.fuelMessage && !world.isClient && hand == Hand.MAIN_HAND) {
 			player.sendMessage(MutableText.of(new LiteralTextContent("Fuel: " + blockEntity.getFuel())), true);
