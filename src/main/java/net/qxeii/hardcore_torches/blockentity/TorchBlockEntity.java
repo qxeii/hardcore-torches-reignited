@@ -11,61 +11,67 @@ public class TorchBlockEntity extends FuelBlockEntity {
 
 	public TorchBlockEntity(BlockPos pos, BlockState state) {
 		super(Mod.TORCH_BLOCK_ENTITY, pos, state);
-		fuel = Mod.config.defaultTorchFuel;
+		setFuel(Mod.config.defaultTorchFuel);
 	}
 
-	public static void tick(World world, BlockPos pos, BlockState state, TorchBlockEntity be) {
+	public static void tick(World world, BlockPos position, BlockState state, TorchBlockEntity blockEntity) {
 		if (!world.isClient) {
-			if (!(state.getBlock() instanceof AbstractTorchBlock))
-				return;
-			if (((AbstractTorchBlock) state.getBlock()).getBurnState() == ETorchState.LIT) {
-				tickLit(world, pos, state, be);
-			} else if (((AbstractTorchBlock) state.getBlock()).getBurnState() == ETorchState.SMOLDERING) {
-				tickSmoldering(world, pos, state, be);
-			}
+			return;
+		}
+
+		if (!(state.getBlock() instanceof AbstractTorchBlock)) {
+			return;
+		}
+
+		var block = (AbstractTorchBlock) state.getBlock();
+
+		if (block.getBurnState() == ETorchState.LIT) {
+			tickLit(world, position, state, blockEntity);
+		} else if (block.getBurnState() == ETorchState.SMOLDERING) {
+			tickSmoldering(world, position, state, blockEntity);
 		}
 	}
 
-	private static void tickLit(World world, BlockPos pos, BlockState state, TorchBlockEntity be) {
-		AbstractTorchBlock torchBlock = (AbstractTorchBlock) world.getBlockState(pos).getBlock();
+	private static void tickLit(World world, BlockPos position, BlockState state, TorchBlockEntity blockEntity) {
+		AbstractTorchBlock torchBlock = (AbstractTorchBlock) world.getBlockState(position).getBlock();
 
 		// Extinguish
-		if (Mod.config.torchesRain && world.hasRain(pos)) {
+		if (Mod.config.torchesRain && world.hasRain(position)) {
 			if (random.nextInt(Mod.config.torchesRainAffectTickChance) == 0) {
 				if (Mod.config.torchesSmolder) {
-					torchBlock.smother(world, pos, state, true);
+					torchBlock.smother(world, position, state, true);
 				} else {
-					torchBlock.extinguish(world, pos, state,
+					torchBlock.extinguish(world, position, state,
 							true);
 				}
 			}
 
-			be.fuel -= Mod.config.torchesExtinguishFuelLoss;
+			blockEntity.modifyFuel(-Mod.config.torchesExtinguishFuelLoss);
 		} else {
-			be.fuel--;
+			blockEntity.modifyFuel(-1);
 		}
 
-		if (be.fuel == 0) {
-			((AbstractTorchBlock) world.getBlockState(pos).getBlock()).onOutOfFuel(world, pos, state, false);
+		if (blockEntity.isOutOfFuel()) {
+			((AbstractTorchBlock) world.getBlockState(position).getBlock()).onOutOfFuel(world, position, state, false);
 		}
 
-		be.markDirty();
+		blockEntity.markDirty();
 	}
 
-	private static void tickSmoldering(World world, BlockPos pos, BlockState state, TorchBlockEntity be) {
+	private static void tickSmoldering(World world, BlockPos position, BlockState state, TorchBlockEntity blockEntity) {
 
 		// Burn out
 		if (random.nextInt(Mod.config.torchesSmolderFuelUseTickChance) == 0) {
-			be.fuel--;
+			blockEntity.modifyFuel(-1);
 
-			if (be.fuel == 0) {
-				((AbstractTorchBlock) world.getBlockState(pos).getBlock()).burnOut(world, pos, state,
+			if (blockEntity.isOutOfFuel()) {
+				((AbstractTorchBlock) world.getBlockState(position).getBlock()).burnOut(world, position, state,
 						false);
 			}
 		} else if (random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
-			((AbstractTorchBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state, false);
+			((AbstractTorchBlock) world.getBlockState(position).getBlock()).extinguish(world, position, state, false);
 		}
 
-		be.markDirty();
+		blockEntity.markDirty();
 	}
 }
