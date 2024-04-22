@@ -122,15 +122,17 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	public void extinguish(World world, PlayerEntity player, int slot) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack stack = inventory.getStack(slot);
+		var state = getTorchState();
 
 		stack = modifiedStackWithAddedFuel(stack, world, -Mod.config.torchesExtinguishFuelLoss);
 
 		if (getFuel(stack) <= 0) {
 			// Torch is expended, break and remove.
 			stack = modifiedStackWithState(stack, ETorchState.BURNT);
-			player.getInventory().setStack(slot, stack);
+			inventory.setStack(slot, stack);
 		} else {
-			if (Mod.config.torchesSmolder) {
+			// Torch still has fuel left, can smolder or become unlit.
+			if (state == ETorchState.LIT && Mod.config.torchesSmolder) {
 				stack = modifiedStackWithState(stack, ETorchState.SMOLDERING);
 			} else {
 				stack = modifiedStackWithState(stack, ETorchState.UNLIT);
@@ -141,6 +143,16 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 
 		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 1f,
 				1f);
+	}
+
+	public void burnOut(World world, PlayerEntity player, int slot) {
+		PlayerInventory inventory = player.getInventory();
+		ItemStack stack = inventory.getStack(slot);
+
+		stack = modifiedStackWithState(stack, ETorchState.BURNT);
+		inventory.setStack(slot, stack);
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 1f, 1f);
 	}
 
 	public void light(World world, PlayerEntity player, int slot) {
