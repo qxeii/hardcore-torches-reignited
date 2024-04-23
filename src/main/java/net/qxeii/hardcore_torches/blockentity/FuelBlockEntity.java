@@ -58,7 +58,7 @@ public class FuelBlockEntity extends BlockEntity {
 	// Fuel Access
 
 	public boolean isOutOfFuel() {
-		return fuel <= 0;
+		return fuel == 0;
 	}
 
 	public int getFuel() {
