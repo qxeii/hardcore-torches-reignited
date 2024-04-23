@@ -11,7 +11,7 @@ public class TorchBlockEntity extends FuelBlockEntity {
 
 	public TorchBlockEntity(BlockPos pos, BlockState state) {
 		super(Mod.TORCH_BLOCK_ENTITY, pos, state);
-		setFuel(Mod.config.defaultTorchFuel);
+		setFuel(0);
 	}
 
 	public static void tick(World world, BlockPos position, BlockState state, TorchBlockEntity blockEntity) {
