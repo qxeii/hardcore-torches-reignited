@@ -34,8 +34,9 @@ public class LanternLootFunction extends ConditionalLootFunction {
 
 	@Override
 	protected ItemStack process(ItemStack stack, LootContext context) {
-		if (!(stack.getItem() instanceof BlockItem))
-			return stack; // No regular items
+		if (!(stack.getItem() instanceof BlockItem)) {
+			return stack;
+		}
 
 		BlockEntity blockEntity = context.get(LootContextParameters.BLOCK_ENTITY);
 		Block block = ((BlockItem) stack.getItem()).getBlock();
@@ -71,5 +72,6 @@ public class LanternLootFunction extends ConditionalLootFunction {
 				JsonDeserializationContext jsonDeserializationContext, LootCondition[] lootConditions) {
 			return new LanternLootFunction(lootConditions);
 		}
+
 	}
 }
