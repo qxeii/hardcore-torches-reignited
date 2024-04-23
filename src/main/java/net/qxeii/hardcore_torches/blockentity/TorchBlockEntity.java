@@ -65,7 +65,7 @@ public class TorchBlockEntity extends FuelBlockEntity {
 			blockEntity.modifyFuel(-1);
 
 			if (blockEntity.isOutOfFuel()) {
-				((AbstractTorchBlock) world.getBlockState(position).getBlock()).burnOut(world, position, state,
+				((AbstractTorchBlock) world.getBlockState(position).getBlock()).onOutOfFuel(world, position, state,
 						false);
 			}
 		} else if (random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
