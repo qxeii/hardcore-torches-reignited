@@ -33,6 +33,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 
 	ETorchState torchState;
 	TorchGroup torchGroup;
+
 	int maxFuel;
 
 	public TorchItem(Block standingBlock, Block wallBlock, Item.Settings settings, ETorchState torchState, int maxFuel,
@@ -61,18 +62,22 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			return Mod.config.defaultTorchFuel;
 		}
 
-		return nbt.getInt("Fuel");
+		return clamp(nbt.getInt("Fuel"), 0, Mod.config.defaultTorchFuel);
 	}
 
-	@Override
-	public boolean isItemBarVisible(ItemStack stack) {
+	public static boolean isUsed(ItemStack stack) {
 		int fuel = getFuel(stack);
 
-		if (fuel > 0 && fuel < maxFuel) {
+		if (fuel < Mod.config.defaultTorchFuel) {
 			return true;
 		}
 
 		return false;
+	}
+
+	@Override
+	public boolean isItemBarVisible(ItemStack stack) {
+		return isUsed(stack);
 	}
 
 	@Override
@@ -130,7 +135,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 
 		stack = modifiedStackWithAddedFuel(stack, world, -Mod.config.torchesExtinguishFuelLoss);
 
-		if (getFuel(stack) <= 0) {
+		if (getFuel(stack) == 0) {
 			// Torch is expended, break and remove.
 			stack = modifiedStackWithState(stack, ETorchState.BURNT);
 			inventory.setStack(slot, stack);
@@ -234,12 +239,6 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	public boolean lightWithInteraction(World world, PlayerEntity player, Hand hand) {
 		var inventory = player.getInventory();
 		var slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
-		var stack = inventory.getStack(slot);
-		var state = ((TorchItem) stack.getItem()).getTorchState();
-
-		if (state == ETorchState.LIT || state == ETorchState.BURNT) {
-			return false;
-		}
 
 		light(world, player, slot);
 		player.swingHand(hand);
@@ -263,62 +262,25 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	}
 
 	@Override
-	public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player,
+	public boolean onClicked(ItemStack lhsStack, ItemStack rhsStack, Slot slot, ClickType clickType,
+			PlayerEntity player,
 			StackReference cursorStackReference) {
-		// If you are clicking on it with a non HCTorch item or with empty,
-		// use vanilla behavior.
-		if (!slot.canTakePartial(player) || !(otherStack.getItem() instanceof TorchItem) || otherStack.isEmpty()) {
-			return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
+		if (!slot.canTakePartial(player) || rhsStack.isEmpty() || !(rhsStack.getItem() instanceof TorchItem)) {
+			return super.onClicked(lhsStack, rhsStack, slot, clickType, player, cursorStackReference);
 		}
 
-		// Return left click if either is full
-		if (clickType != ClickType.RIGHT
-				&& (stack.getCount() >= stack.getMaxCount() || otherStack.getCount() >= otherStack.getMaxCount())) {
+		if (isUsed(lhsStack) || isUsed(rhsStack)) {
 			return false;
 		}
 
-		// Ensure torches are in same group
-		if (!equalTorchGroup((TorchItem) stack.getItem(), (TorchItem) otherStack.getItem())) {
+		var lhsTorchItem = (TorchItem) lhsStack.getItem();
+		var rhsTorchItem = (TorchItem) rhsStack.getItem();
+
+		if (!equalTorchGroup(lhsTorchItem, rhsTorchItem)) {
 			return false;
 		}
 
-		if (((TorchItem) stack.getItem()).torchState == ETorchState.LIT) {
-			// If clicked is lit, return if clicked with burnt
-			if (((TorchItem) otherStack.getItem()).torchState == ETorchState.BURNT) {
-				return false;
-			}
-		} else if (((TorchItem) stack.getItem()).torchState == ETorchState.UNLIT) {
-			// If clicked is unlit, return if clicked is not unlit
-			if (((TorchItem) otherStack.getItem()).torchState != ETorchState.UNLIT) {
-				return false;
-			}
-		}
-
-		if (!otherStack.isEmpty()) {
-			int max = stack.getMaxCount();
-			int usedCount = clickType != ClickType.RIGHT ? otherStack.getCount() : 1;
-
-			int remainder = Math.max(0, usedCount - (max - stack.getCount()));
-			int addedNew = usedCount - remainder;
-
-			// Average both stacks
-			int stack1Fuel = getFuel(stack) * stack.getCount();
-			int stack2Fuel = getFuel(otherStack) * addedNew;
-			int totalFuel = stack1Fuel + stack2Fuel;
-
-			// NBT
-			NbtCompound nbt = new NbtCompound();
-			nbt.putInt("Fuel", totalFuel / (stack.getCount() + addedNew));
-
-			if (addedNew > 0) {
-				stack.increment(addedNew);
-				stack.setNbt(nbt);
-				otherStack.setCount(otherStack.getCount() - addedNew);
-				return true;
-			}
-		}
-
-		return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
+		return super.onClicked(lhsStack, rhsStack, slot, clickType, player, cursorStackReference);
 	}
 
 	public boolean equalTorchGroup(TorchItem lhsItem, TorchItem rhsItem) {
@@ -385,12 +347,10 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			return stack;
 		}
 
-		NbtCompound nbt = stack.getNbt();
-		int fuel = 0;
+		var fuel = getFuel(stack);
+		var nbt = stack.getNbt();
 
-		if (nbt != null) {
-			fuel = nbt.getInt("Fuel");
-		} else {
+		if (nbt == null) {
 			nbt = new NbtCompound();
 		}
 
@@ -415,7 +375,6 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		}
 
 		stack.setNbt(nbt);
-
 		return stack;
 	}
 
