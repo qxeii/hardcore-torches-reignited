@@ -210,17 +210,10 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 			ItemStack itemStack) {
 		super.onPlaced(world, position, state, placer, itemStack);
 
-		BlockEntity blockEntity = world.getBlockEntity(position);
+		var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
 
-		if (blockEntity != null && blockEntity instanceof FuelBlockEntity && itemStack.getItem() instanceof TorchItem) {
-			int fuel = TorchItem.getFuel(itemStack);
-
-			if (fuel == 0) {
-				((FuelBlockEntity) blockEntity).setFuel(Mod.config.defaultTorchFuel);
-			} else {
-				((FuelBlockEntity) blockEntity).setFuel(fuel);
-			}
-		}
+		int fuel = TorchItem.getFuel(itemStack);
+		((FuelBlockEntity) blockEntity).setFuel(fuel);
 	}
 
 	// Random Tick
