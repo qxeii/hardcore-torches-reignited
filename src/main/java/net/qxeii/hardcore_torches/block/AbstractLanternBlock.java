@@ -66,16 +66,19 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 	}
 
 	public void setState(World world, BlockPos position, boolean lit) {
-		BlockState oldState = world.getBlockState(position);
-		BlockState newState = lit ? Mod.LIT_LANTERN.getDefaultState() : Mod.UNLIT_LANTERN.getDefaultState();
-		newState = newState.with(HANGING, oldState.get(HANGING)).with(WATERLOGGED, oldState.get(WATERLOGGED));
-		int newFuel = Mod.config.startingLanternFuel;
+		var currentBlockState = world.getBlockState(position);
+		var currentBlockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+		var newBlockState = lit ? Mod.LIT_LANTERN.getDefaultState() : Mod.UNLIT_LANTERN.getDefaultState();
 
-		if (world.getBlockEntity(position) != null)
-			newFuel = ((FuelBlockEntity) world.getBlockEntity(position)).getFuel();
-		world.setBlockState(position, newState);
-		if (world.getBlockEntity(position) != null)
-			((FuelBlockEntity) world.getBlockEntity(position)).setFuel(newFuel);
+		newBlockState = newBlockState.with(HANGING, currentBlockState.get(HANGING)).with(WATERLOGGED,
+				currentBlockState.get(WATERLOGGED));
+
+		int fuel = currentBlockEntity.getFuel();
+
+		world.setBlockState(position, newBlockState);
+
+		var newBlockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+		newBlockEntity.setFuel(fuel);
 	}
 
 	protected ItemStack getStack(World world, BlockPos pos) {
@@ -182,8 +185,6 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 		if (!world.isClient) {
 			world.playSound(null, position, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1.0f, 1.0f);
 		}
-
-		player.swingHand(hand);
 	}
 
 	public void useFuelAndLightWithInteraction(BlockState state, World world, BlockPos position, PlayerEntity player,
@@ -196,14 +197,12 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 				world.playSound(null, position, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 1.0f, 2.0f);
 			}
 
-			player.swingHand(hand);
 			return;
 		}
 
-		light(world, position, state);
-		player.swingHand(hand);
-
 		blockEntity.modifyFuel(-Mod.config.lanternLightFuelLoss);
+
+		light(world, position, state);
 
 		if (Mod.config.fuelMessage && !world.isClient && hand == Hand.MAIN_HAND) {
 			player.sendMessage(MutableText.of(new LiteralTextContent("Fuel: " + blockEntity.getFuel())), true);
@@ -213,7 +212,6 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 	public void extinguishWithInteraction(World world, BlockPos position, BlockState state, PlayerEntity player,
 			Hand hand) {
 		extinguish(world, position, state, true);
-		player.swingHand(hand);
 	}
 
 	public void refuelWithInteraction(World world, BlockPos position, BlockState state, PlayerEntity player,
@@ -228,8 +226,6 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 					SoundCategory.BLOCKS, 1f, 2f);
 			world.playSound(null, position, SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.BLOCKS, 0.3f, 0f);
 		}
-
-		player.swingHand(hand);
 	}
 
 	// Events

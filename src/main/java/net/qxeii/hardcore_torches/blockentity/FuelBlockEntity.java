@@ -26,7 +26,6 @@ public class FuelBlockEntity extends BlockEntity {
 	// Serialize the BlockEntity
 	@Override
 	public void writeNbt(NbtCompound tag) {
-		// Save the current value of the number to the tag
 		tag.putInt("Fuel", fuel);
 		super.writeNbt(tag);
 	}

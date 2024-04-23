@@ -96,54 +96,54 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 		modifyTorch(world, position, state, ETorchState.SMOLDERING);
 	}
 
-	public void extinguish(World world, BlockPos pos, BlockState state, boolean playSound) {
+	public void extinguish(World world, BlockPos position, BlockState state, boolean playSound) {
 		if (world.isClient) {
 			return;
 		}
 
 		if (playSound) {
-			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
+			world.playSound(null, position, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
 		}
 
-		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, position);
 
-		modifyTorch(world, pos, state, ETorchState.UNLIT);
+		modifyTorch(world, position, state, ETorchState.UNLIT);
 	}
 
-	public void burnOut(World world, BlockPos pos, BlockState state, boolean playSound) {
+	public void burnOut(World world, BlockPos position, BlockState state, boolean playSound) {
 		if (world.isClient) {
 			return;
 		}
 
 		if (playSound) {
-			world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
+			world.playSound(null, position, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
 		}
 
-		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, position);
 
-		modifyTorch(world, pos, state, ETorchState.BURNT);
+		modifyTorch(world, position, state, ETorchState.BURNT);
 	}
 
-	public void light(World world, BlockPos pos, BlockState state) {
+	public void light(World world, BlockPos position, BlockState state) {
 		if (world.isClient) {
 			return;
 		}
 
-		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
-		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
-		world.playSound(null, pos, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.3f, 2f);
-		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
+		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
+		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
+		world.playSound(null, position, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.3f, 2f);
+		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
 
-		TorchUtils.displayParticle(ParticleTypes.LAVA, state, world, pos);
-		TorchUtils.displayParticle(ParticleTypes.FLAME, state, world, pos);
+		TorchUtils.displayParticle(ParticleTypes.LAVA, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.FLAME, state, world, position);
 
-		modifyTorch(world, pos, state, ETorchState.LIT);
+		modifyTorch(world, position, state, ETorchState.LIT);
 	}
 
 	@Override
@@ -186,8 +186,10 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 	private void extinguishWithInteraction(World world, BlockPos position, BlockState state, PlayerEntity player,
 			ItemStack stack, Hand hand) {
+		var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+		blockEntity.modifyFuel(-Mod.config.torchesExtinguishFuelLoss);
+
 		smother(world, position, state, true);
-		player.swingHand(hand);
 	}
 
 	private boolean useFuelAndLightWithInteraction(World world, BlockPos position, BlockState state,
@@ -198,8 +200,6 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 		}
 
 		light(world, position, state);
-		player.swingHand(hand);
-
 		return true;
 	}
 
@@ -211,8 +211,8 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 		super.onPlaced(world, position, state, placer, itemStack);
 
 		var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
-
 		int fuel = TorchItem.getFuel(itemStack);
+
 		((FuelBlockEntity) blockEntity).setFuel(fuel);
 	}
 
@@ -231,30 +231,27 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 	// Modification
 
-	public void modifyTorch(World world, BlockPos position, BlockState currentState, ETorchState newType) {
-		var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+	public void modifyTorch(World world, BlockPos position, BlockState currentBlockState, ETorchState newTorchState) {
+		var currentBlockEntity = (FuelBlockEntity) world.getBlockEntity(position);
 
-		BlockState newBlockState;
-		int newFuel = 0;
-
-		if (isWall()) {
-			newBlockState = group.getWallTorch(newType).getDefaultState().with(
-					HorizontalFacingBlock.FACING,
-					currentState.get(WallTorchBlock.FACING));
-		} else {
-			newBlockState = group.getStandingTorch(newType).getDefaultState();
-		}
-
-		if (world.getBlockEntity(position) != null) {
-			newFuel = blockEntity.getFuel();
-		}
+		var newBlockState = getDefaultBlockStateForModification(currentBlockState, newTorchState);
+		var fuel = currentBlockEntity.getFuel();
 
 		world.setBlockState(position, newBlockState);
 
-		if (world.getBlockEntity(position) != null) {
-			blockEntity.setFuel(newFuel);
-		}
+		var newBlockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+		newBlockEntity.setFuel(fuel);
 
+	}
+
+	private BlockState getDefaultBlockStateForModification(BlockState currentState, ETorchState newTorchState) {
+		if (isWall()) {
+			return group.getWallTorch(newTorchState).getDefaultState().with(
+					HorizontalFacingBlock.FACING,
+					currentState.get(WallTorchBlock.FACING));
+		} else {
+			return group.getStandingTorch(newTorchState).getDefaultState();
+		}
 	}
 
 }
