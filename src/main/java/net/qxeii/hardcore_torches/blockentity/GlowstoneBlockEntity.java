@@ -14,29 +14,33 @@ public class GlowstoneBlockEntity extends FuelBlockEntity {
 
 	public GlowstoneBlockEntity(BlockPos pos, BlockState state) {
 		super(Mod.GLOWSTONE_BLOCK_ENTITY, pos, state);
-		fuel = Mod.config.defaultGlowstoneFuel;
+		setFuel(Mod.config.defaultGlowstoneFuel);
 	}
 
-	public static void tick(World world, BlockPos pos, BlockState state, GlowstoneBlockEntity be) {
+	public static void tick(World world, BlockPos position, BlockState state, GlowstoneBlockEntity blockEntity) {
 		// Burn out
-		if (!world.isClient) {
-			if (world.getBlockState(pos).getBlock() instanceof AbstractGlowstoneBlock) {
-				int newLight = floor((((double) be.fuel / (double) Mod.config.defaultGlowstoneFuel) * 15.0D));
-				if (state.get(Properties.LEVEL_15) != newLight) {
-					BlockState newState = state.with(Properties.LEVEL_15, newLight);
-					world.setBlockState(pos, newState);
-				}
-				if (world.getDimensionKey() == DimensionTypes.THE_NETHER) {
-					if (be.fuel < Mod.config.defaultGlowstoneFuel) {
-						be.fuel++;
-					}
-				} else {
-					if (be.fuel > 0) {
-						be.fuel--;
-					}
-				}
-				be.markDirty();
+		if (world.isClient) {
+			return;
+		}
+
+		if (world.getBlockState(position).getBlock() instanceof AbstractGlowstoneBlock) {
+			double fuelRatio = ((double) blockEntity.getFuel() / (double) Mod.config.defaultGlowstoneFuel);
+			int lightPower = floor((fuelRatio * 15.0D));
+
+			if (state.get(Properties.LEVEL_15) != lightPower) {
+				BlockState newState = state.with(Properties.LEVEL_15, lightPower);
+				world.setBlockState(position, newState);
 			}
+
+			if (world.getDimensionKey() == DimensionTypes.THE_NETHER) {
+				if (blockEntity.getFuel() < Mod.config.defaultGlowstoneFuel) {
+					blockEntity.modifyFuel(1);
+				}
+			} else {
+				blockEntity.modifyFuel(-1);
+			}
+
+			blockEntity.markDirty();
 		}
 	}
 }

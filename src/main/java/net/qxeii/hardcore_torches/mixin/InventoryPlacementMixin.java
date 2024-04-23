@@ -28,7 +28,7 @@ public abstract class InventoryPlacementMixin {
 			if (item instanceof TorchItem) {
 				if (((TorchItem) item).getTorchState() == ETorchState.LIT
 						|| ((TorchItem) item).getTorchState() == ETorchState.SMOLDERING) {
-					this.getInvStackList().set(var1, TorchItem.stateStack(var2, ETorchState.UNLIT));
+					this.getInvStackList().set(var1, TorchItem.modifiedStackWithState(var2, ETorchState.UNLIT));
 				}
 			}
 		}

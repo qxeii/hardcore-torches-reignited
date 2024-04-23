@@ -9,8 +9,8 @@ public class ModConfig implements ConfigData {
 	@Comment("Torches will extinguish if broken. Default: false")
 	public boolean torchesExtinguishWhenBroken = false;
 
-	@Comment("Torches are fully expended when broken. Overrides torchesExtinguishWhenBroken. Default: false")
-	public boolean torchesBurnWhenDropped = false;
+	@Comment("Torches are fully depleted when broken. Overrides torchesExtinguishWhenBroken. Default: false")
+	public boolean torchesDepleteWhenDropped = false;
 
 	@Comment("Torches become unlit in rain. If torchesSmolder is true, they will instead smolder in rain. Default: true")
 	public boolean torchesRain = true;
@@ -40,16 +40,19 @@ public class ModConfig implements ConfigData {
 	public int defaultLanternFuel = 24000;
 
 	@Comment("The amount a fuel item adds to the lantern by default. Default: 12000")
-	public int defLanternFuelItem = 12000;
+	public int defaultLanternFuelItem = 12000;
 
-	@Comment("A lantern must have at least this much fuel (min 1) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 1")
-	public int minLanternIgnitionFuel = 1;
+	@Comment("A lantern must have at least this much fuel (min 600) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 400")
+	public int minLanternIgnitionFuel = 400;
 
 	@Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 800")
-	public int torchesExtinguishConditionLoss = 800;
+	public int torchesExtinguishFuelLoss = 800;
 
-	@Comment("Torches use up more fuel when held by a player vs. being placed (e.g. 2 means burn time is halved). Default: 2")
-	public int torchFuelUseMultiplierWhenHeld = 2;
+	@Comment("The amount of fuel wasted in a lantern when it is lit. Used to balance durable lanterns. Default: 200")
+	public int lanternLightFuelLoss = 200;
+
+	@Comment("Items use up more fuel when held by a player vs. being placed (e.g. 2 means burn time is halved). Default: 2")
+	public int itemUseMultiplierWhenHeld = 2;
 
 	@Comment("Do torches become unlit when placed in storage. Default: false")
 	public boolean unlightInChest = false;
@@ -77,9 +80,6 @@ public class ModConfig implements ConfigData {
 
 	@Comment("Max fuel an oil can holds. Default: 576000")
 	public int maxCanFuel = 576000;
-
-	@Comment("Do lanterns have to be filled using an oil can. Default: true")
-	public boolean lanternsNeedCan = true;
 
 	@Comment("Can you refuel a torch using an oil can. Default: false")
 	public boolean torchesUseCan = false;

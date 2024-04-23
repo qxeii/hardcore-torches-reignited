@@ -4,7 +4,6 @@ import java.util.function.IntSupplier;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -18,9 +17,10 @@ import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.GlowstoneBlockEntity;
-import net.qxeii.hardcore_torches.blockentity.IFuelBlock;
+import net.qxeii.hardcore_torches.blockentity.LightableBlock;
 
-public abstract class AbstractGlowstoneBlock extends BlockWithEntity implements BlockEntityProvider, IFuelBlock {
+public abstract class AbstractGlowstoneBlock extends BlockWithEntity
+		implements LightableBlock {
 	public IntSupplier maxFuel;
 
 	protected AbstractGlowstoneBlock(Settings settings, IntSupplier maxFuel) {

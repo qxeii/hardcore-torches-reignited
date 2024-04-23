@@ -10,7 +10,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.Waterloggable;
@@ -36,8 +35,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
+import net.qxeii.hardcore_torches.blockentity.LightableBlock;
 
-public class CandleBlock extends AbstractHardcoreCandleBlock implements BlockEntityProvider, Waterloggable {
+public class CandleBlock extends AbstractCandleBlock implements LightableBlock, Waterloggable {
 	public static final int field_31050 = 1;
 	public static final int MAX_CANDLE_AMOUNT = 4;
 	public static final IntProperty CANDLES;
@@ -151,7 +151,7 @@ public class CandleBlock extends AbstractHardcoreCandleBlock implements BlockEnt
 
 	static {
 		CANDLES = Properties.CANDLES;
-		LIT = AbstractHardcoreCandleBlock.LIT;
+		LIT = AbstractCandleBlock.LIT;
 		WATERLOGGED = Properties.WATERLOGGED;
 		STATE_TO_LUMINANCE = (state) -> {
 			return (Boolean) state.get(LIT) ? 3 * (Integer) state.get(CANDLES) : 0;

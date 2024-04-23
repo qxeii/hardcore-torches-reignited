@@ -1,12 +1,17 @@
 {
 	"type": "minecraft:crafting_shaped",
-	"pattern": ["###", "#|#", "###"],
+	"pattern": ["###", 
+				"#|#", 
+				"#F#"],
 	"key": {
 		"#": {
 			"item": "minecraft:copper_ingot"
 		},
 		"|": {
-			"tag": "hardcore_torches:torches"
+			"tag": "minecraft:string"
+		},
+		"F": {
+			"item": "minecraft:flint_and_steel"
 		}
 	},
 	"result": {

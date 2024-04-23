@@ -118,29 +118,34 @@ public class OilCanItem extends Item implements FabricItem {
 		return stack;
 	}
 
-	public static boolean fuelBlock(FuelBlockEntity be, World world, ItemStack stack) {
-		if (!world.isClient) {
-			int maxTaken = 0;
-
-			// Lanterns
-			if (be instanceof LanternBlockEntity) {
-				maxTaken = Math.max(0, Mod.config.defaultLanternFuel - be.getFuel());
-			}
-
-			// Torches
-			if (be instanceof TorchBlockEntity) {
-				maxTaken = Math.max(0, Mod.config.defaultTorchFuel - be.getFuel());
-			}
-
-			int taken = Math.min(maxTaken, getFuel(stack));
-
-			// Set the fuel values
-			addFuel(stack, -taken);
-			be.setFuel(be.getFuel() + taken);
-
-			return taken > 0;
+	public static boolean fuelBlock(FuelBlockEntity blockEntity, World world, ItemStack stack) {
+		if (world.isClient) {
+			return false;
 		}
-		return false;
+
+		int maxFuel = transferrableFuelCapacityForEntity(blockEntity);
+		int currentFuel = blockEntity.getFuel();
+		int transferrableFuel = Math.min(maxFuel, getFuel(stack));
+
+		addFuel(stack, -transferrableFuel);
+		blockEntity.setFuel(currentFuel + transferrableFuel);
+
+		return transferrableFuel > 0;
 	}
-	// endregion
+
+	private static int transferrableFuelCapacityForEntity(FuelBlockEntity blockEntity) {
+		int currentFuel = blockEntity.getFuel();
+
+		// Lanterns
+		if (blockEntity instanceof LanternBlockEntity) {
+			return Math.max(0, Mod.config.defaultLanternFuel - currentFuel);
+		}
+
+		// Torches
+		if (blockEntity instanceof TorchBlockEntity) {
+			return Math.max(0, Mod.config.defaultTorchFuel - currentFuel);
+		}
+
+		return 0;
+	}
 }

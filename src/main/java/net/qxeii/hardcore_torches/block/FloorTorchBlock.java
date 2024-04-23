@@ -2,7 +2,6 @@ package net.qxeii.hardcore_torches.block;
 
 import java.util.function.IntSupplier;
 
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
@@ -15,9 +14,9 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.qxeii.hardcore_torches.util.ETorchState;
 
-public class HardcoreFloorTorchBlock extends AbstractHardcoreTorchBlock implements BlockEntityProvider {
+public class FloorTorchBlock extends AbstractTorchBlock {
 
-	public HardcoreFloorTorchBlock(Settings settings, ParticleEffect particle, ETorchState type, IntSupplier maxFuel) {
+	public FloorTorchBlock(Settings settings, ParticleEffect particle, ETorchState type, IntSupplier maxFuel) {
 		super(settings, particle, type, maxFuel);
 	}
 

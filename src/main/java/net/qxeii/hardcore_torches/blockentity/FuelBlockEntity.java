@@ -12,23 +12,29 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class FuelBlockEntity extends BlockEntity {
-	protected int fuel;
-	protected static Random random = new Random();
 
-	public FuelBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-		super(type, pos, state);
+	public static Random random = new Random();
+
+	private int fuel = 0;
+
+	public FuelBlockEntity(BlockEntityType<?> type, BlockPos position, BlockState state) {
+		super(type, position, state);
 	}
 
 	// Serialize the BlockEntity
 	@Override
 	public void writeNbt(NbtCompound tag) {
-		super.writeNbt(tag);
-
-		// Save the current value of the number to the tag
 		tag.putInt("Fuel", fuel);
+		super.writeNbt(tag);
+	}
+
+	// Deserialize the BlockEntity
+	@Override
+	public void readNbt(NbtCompound tag) {
+		super.readNbt(tag);
+		fuel = tag.getInt("Fuel");
 	}
 
 	@Nullable
@@ -42,16 +48,10 @@ public class FuelBlockEntity extends BlockEntity {
 		return createNbt();
 	}
 
-	// Deserialize the BlockEntity
-	@Override
-	public void readNbt(NbtCompound tag) {
-		super.readNbt(tag);
+	// Fuel Access
 
-		if (tag.contains("number")) {
-			fuel = tag.getInt("number");
-		} else {
-			fuel = tag.getInt("Fuel");
-		}
+	public boolean isOutOfFuel() {
+		return fuel == 0;
 	}
 
 	public int getFuel() {
@@ -59,22 +59,10 @@ public class FuelBlockEntity extends BlockEntity {
 	}
 
 	public void setFuel(int newValue) {
-		fuel = newValue;
+		fuel = Math.max(0, newValue);
 	}
 
-	public void changeFuel(int increment) {
-		World world = this.getWorld();
-		BlockPos pos = this.getPos();
-
-		fuel += increment;
-
-		if (fuel <= 0) {
-			fuel = 0;
-
-			if (world.getBlockState(pos).getBlock() instanceof IFuelBlock) {
-				IFuelBlock block = (IFuelBlock) world.getBlockState(pos).getBlock();
-				block.outOfFuel(world, pos, world.getBlockState(pos), false);
-			}
-		}
+	public void modifyFuel(int increment) {
+		setFuel(fuel + increment);
 	}
 }

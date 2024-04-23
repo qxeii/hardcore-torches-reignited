@@ -1,34 +1,33 @@
 package net.qxeii.hardcore_torches.item;
 
-import net.qxeii.hardcore_torches.util.ETorchState;
-import net.qxeii.hardcore_torches.util.TorchGroup;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.StackReference;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.Items;
+import net.minecraft.item.VerticallyAttachableBlockItem;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
+import net.qxeii.hardcore_torches.block.AbstractTorchBlock;
+import net.qxeii.hardcore_torches.util.ETorchState;
+import net.qxeii.hardcore_torches.util.TorchGroup;
 
-public class TorchItem extends VerticallyAttachableBlockItem {
+public class TorchItem extends VerticallyAttachableBlockItem implements LightableItem {
+
 	ETorchState torchState;
 	TorchGroup torchGroup;
 	int maxFuel;
@@ -39,6 +38,26 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		this.torchState = torchState;
 		this.maxFuel = maxFuel;
 		this.torchGroup = group;
+	}
+
+	// State & Properties
+
+	public ETorchState getTorchState() {
+		return torchState;
+	}
+
+	public TorchGroup getTorchGroup() {
+		return torchGroup;
+	}
+
+	public static int getFuel(ItemStack stack) {
+		NbtCompound nbt = stack.getNbt();
+
+		if (nbt == null) {
+			return Mod.config.defaultTorchFuel;
+		}
+
+		return nbt.getInt("Fuel");
 	}
 
 	@Override
@@ -83,15 +102,90 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 			newNbt.remove("Fuel");
 		}
 
-		if (oldNbt == null && newNbt != null)
+		if (oldNbt == null && newNbt != null) {
 			return true;
-		if (oldNbt != null && newNbt == null)
-			return true;
-		if (oldNbt == null && newNbt == null)
-			return false;
+		}
 
-		return oldNbt.equals(null);
+		if (oldNbt != null && newNbt == null) {
+			return true;
+		}
+
+		if (oldNbt == null && newNbt == null) {
+			return false;
+		}
+
+		return oldNbt == null || oldNbt.equals(null);
 	}
+
+	// Actions
+
+	public void extinguish(World world, PlayerEntity player, int slot) {
+		PlayerInventory inventory = player.getInventory();
+		ItemStack stack = inventory.getStack(slot);
+		var state = getTorchState();
+
+		stack = modifiedStackWithAddedFuel(stack, world, -Mod.config.torchesExtinguishFuelLoss);
+
+		if (getFuel(stack) <= 0) {
+			// Torch is expended, break and remove.
+			stack = modifiedStackWithState(stack, ETorchState.BURNT);
+			inventory.setStack(slot, stack);
+		} else {
+			// Torch still has fuel left, can smolder or become unlit.
+			if (state == ETorchState.LIT && Mod.config.torchesSmolder) {
+				stack = modifiedStackWithState(stack, ETorchState.SMOLDERING);
+			} else {
+				stack = modifiedStackWithState(stack, ETorchState.UNLIT);
+			}
+
+			inventory.setStack(slot, stack);
+		}
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 1f,
+				1f);
+	}
+
+	public void burnOut(World world, PlayerEntity player, int slot) {
+		PlayerInventory inventory = player.getInventory();
+		ItemStack stack = inventory.getStack(slot);
+
+		stack = modifiedStackWithState(stack, ETorchState.BURNT);
+		inventory.setStack(slot, stack);
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 1f, 1f);
+	}
+
+	public void light(World world, PlayerEntity player, int slot) {
+		var inventory = player.getInventory();
+		var stack = inventory.getStack(slot);
+
+		if (stack.getCount() > 1) {
+			// Holding multiple unlit (unused) torches in stack.
+			// Stack must be split, remaining stack of torches moved to free inventory slot,
+			// and one new stack created with lit torch in hand slot.
+
+			int emptySlot = inventory.getEmptySlot();
+			ItemStack deductedTorchStack = stack.copyWithCount(stack.getCount() - 1);
+
+			if (emptySlot == -1) {
+				player.dropItem(deductedTorchStack, true);
+			} else {
+				inventory.setStack(emptySlot, deductedTorchStack);
+			}
+
+			ItemStack heldTorchStack = modifiedStackWithState(stack, ETorchState.LIT);
+			heldTorchStack.setCount(1);
+
+			inventory.setStack(slot, heldTorchStack);
+		} else {
+			ItemStack heldTorchStack = modifiedStackWithState(stack, ETorchState.LIT);
+			inventory.setStack(slot, heldTorchStack);
+		}
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
+	}
+
+	// Interaction
 
 	@Override
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
@@ -102,217 +196,67 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 			return super.use(world, player, hand);
 		}
 
+		ItemStack stack = player.getStackInHand(hand);
+		ETorchState torchState = ((TorchItem) stack.getItem()).getTorchState();
+
 		switch (torchState) {
 			case UNLIT, SMOLDERING: {
-				if (!useFlintAndSteelFromPlayerInventory(player, player.getInventory())) {
-					return super.use(world, player, hand);
-				}
-
-				lightTorchInHand(world, player, hand);
+				useLighterAndLightWithInteraction(world, player, hand);
 				return super.use(world, player, hand);
 			}
 			case LIT: {
-				unlightTorchInHand(world, player, hand);
+				extinguishWithInteraction(world, player, hand);
 				return super.use(world, player, hand);
 			}
-			default:
+			default: {
 				return super.use(world, player, hand);
-		}
-	}
-
-	// Torch Lighting in Hand Mechanics
-
-	private void unlightTorchInHand(World world, PlayerEntity player, Hand hand) {
-		// Get lit torch in either hand.
-
-		HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
-
-		if (handStackTuple == null || torchState != ETorchState.LIT) {
-			return;
-		}
-
-		ItemStack heldTorchStack = handStackTuple.stack;
-
-		if (Mod.config.torchesSmolder) {
-			heldTorchStack = stateStack(heldTorchStack, ETorchState.SMOLDERING);
-		} else {
-			heldTorchStack = stateStack(heldTorchStack, ETorchState.UNLIT);
-		}
-
-		heldTorchStack = addFuel(heldTorchStack, world, -Mod.config.torchesExtinguishConditionLoss);
-
-		PlayerInventory inventory = player.getInventory();
-		inventory.setStack(handStackTuple.slot, heldTorchStack);
-		player.setStackInHand(handStackTuple.hand, heldTorchStack);
-
-		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f,
-				1.0f);
-	}
-
-	private void lightTorchInHand(World world, PlayerEntity player, Hand hand) {
-		// Get unlit torch in either hand.
-		// (Branch A) If held stack contains a stack of items, remove one, move
-		// remaining stack to inventory,
-		// and replace held stack with new stack of one lit torch.
-		// (Branch B) If held stack contains only a single item, read torch damage
-		// value, and replace held stack
-		// with new stack of one lit torch with same torch damage value.
-
-		PlayerInventory inventory = player.getInventory();
-		HandStackTuple handStackTuple = getTorchStackTupleInHandFromPlayer(player, hand);
-
-		if (handStackTuple == null || torchState == ETorchState.LIT || torchState == ETorchState.BURNT) {
-			return;
-		}
-
-		if (handStackTuple.stack.getCount() > 1) {
-			int emptySlot = inventory.getEmptySlot();
-			ItemStack deductedTorchStack = handStackTuple.stack.copyWithCount(handStackTuple.stack.getCount() - 1);
-
-			if (emptySlot == -1) {
-				player.dropItem(deductedTorchStack, true);
-			} else {
-				inventory.setStack(emptySlot, deductedTorchStack);
 			}
-
-			ItemStack heldTorchStack = stateStack(handStackTuple.stack, ETorchState.LIT);
-			heldTorchStack.setCount(1);
-
-			inventory.setStack(handStackTuple.slot, heldTorchStack);
-		} else {
-			ItemStack heldTorchStack = stateStack(handStackTuple.stack, ETorchState.LIT);
-			inventory.setStack(handStackTuple.slot, heldTorchStack);
 		}
-
-		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1.0f);
 	}
 
-	// Torch Inventory Utilities
-
-	private HandStackTuple getTorchStackTupleInHandFromPlayer(PlayerEntity player, Hand hand) {
+	public void extinguishWithInteraction(World world, PlayerEntity player, Hand hand) {
 		PlayerInventory inventory = player.getInventory();
+		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
 
-		switch (hand) {
-			case MAIN_HAND: {
-				int selectedSlot = inventory.selectedSlot;
-				ItemStack mainHandStack = inventory.getStack(selectedSlot);
-				return new HandStackTuple(Hand.MAIN_HAND, selectedSlot, mainHandStack);
-			}
-			case OFF_HAND: {
-				int selectedSlot = PlayerInventory.OFF_HAND_SLOT;
-				ItemStack offHandStack = inventory.getStack(selectedSlot);
-				return new HandStackTuple(Hand.OFF_HAND, selectedSlot, offHandStack);
-			}
-			default:
-				return null;
-		}
+		extinguish(world, player, slot);
+		player.swingHand(hand);
 	}
 
-	private static class HandStackTuple {
-		public Hand hand;
-		public int slot;
-		public ItemStack stack;
-
-		public HandStackTuple(Hand hand, int slot, ItemStack stack) {
-			this.hand = hand;
-			this.slot = slot;
-			this.stack = stack;
-		}
-	}
-
-	// Flint and Steel Inventory Utilities
-
-	private static boolean useFlintAndSteelFromPlayerInventory(PlayerEntity player, PlayerInventory inventory) {
-		// Get flint and steel from player inventory, resolve as stack.
-
-		int flintAndSteelItemSlot = getFlintAndSteelSlotFromPlayerInventory(inventory);
-
-		if (flintAndSteelItemSlot == -1) {
+	public boolean useLighterAndLightWithInteraction(World world, PlayerEntity player, Hand hand) {
+		if (!findAndUseLighterItem(player, hand)) {
 			return false;
 		}
 
-		ItemStack flintAndSteelItemStack = inventory.getStack(flintAndSteelItemSlot);
+		return lightWithInteraction(world, player, hand);
+	}
 
-		flintAndSteelItemStack.damage(1, player, (playerEntity) -> {
-			ItemStack actualHandStack = player.getMainHandStack();
-			player.equipStack(EquipmentSlot.MAINHAND, flintAndSteelItemStack);
-			player.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND);
-			player.equipStack(EquipmentSlot.MAINHAND, actualHandStack);
+	public boolean lightWithInteraction(World world, PlayerEntity player, Hand hand) {
+		var inventory = player.getInventory();
+		var slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
+		var stack = inventory.getStack(slot);
+		var state = ((TorchItem) stack.getItem()).getTorchState();
 
-			if (FabricLoader.getInstance().isModLoaded("ruined_equipment")) {
-				// Get ruined flint and steel from the ruined_equipment mod.
+		if (state == ETorchState.LIT || state == ETorchState.BURNT) {
+			return false;
+		}
 
-				Identifier ruinedFlintAndSteelId = new Identifier("ruined_equipment", "ruined_flint_and_steel");
-				Item ruinedFlintAndSteel = Registries.ITEM.get(ruinedFlintAndSteelId);
-
-				// Check if the item is registered.
-				if (ruinedFlintAndSteel != Items.AIR) {
-					// Create an ItemStack of the ruined flint and steel.
-					ItemStack ruinedFlintAndSteelStack = new ItemStack(ruinedFlintAndSteel, 1);
-
-					// Add ruined flint and steel to player inventory.
-					player.getInventory().setStack(flintAndSteelItemSlot, ruinedFlintAndSteelStack);
-				}
-			}
-		});
+		light(world, player, slot);
+		player.swingHand(hand);
 
 		return true;
 	}
 
-	private static int getFlintAndSteelSlotFromPlayerInventory(PlayerInventory inventory) {
-		// Iterates through all stacks in the inventory and returns the flint and steel
-		// with the lowest condition.
-		int highestDamage = 0;
-		int highestDamageItemSlot = -1;
-
-		for (int i = 0; i < inventory.size(); i++) {
-			ItemStack stack = inventory.getStack(i);
-			Item item = stack.getItem();
-
-			if (item != Items.FLINT_AND_STEEL) {
-				continue;
-			}
-
-			int itemDamage = stack.getDamage();
-
-			if (highestDamageItemSlot == -1 || itemDamage > highestDamage) {
-				highestDamage = itemDamage;
-				highestDamageItemSlot = i;
-			}
-		}
-
-		return highestDamageItemSlot;
-	}
+	// Events
 
 	@Override
 	public ActionResult useOnBlock(ItemUsageContext context) {
-		ItemStack stack = context.getStack();
-		World world = context.getWorld();
-		BlockPos pos = context.getBlockPos();
-		BlockState state = world.getBlockState(pos);
+		// Light torch in hand on existing torch.
 
-		// Make sure it's a torch and get its type
-		if (stack.getItem() instanceof TorchItem) {
-			ETorchState torchState = ((TorchItem) stack.getItem()).torchState;
-
-			if (torchState == ETorchState.UNLIT || torchState == ETorchState.SMOLDERING) {
-
-				// Unlit and Smoldering
-				if (state.isIn(Mod.FREE_TORCH_LIGHT_BLOCKS)) {
-					// No lighting on unlit fires etc.
-					if (state.contains(Properties.LIT))
-						if (state.get(Properties.LIT).booleanValue() == false)
-							return super.useOnBlock(context);
-
-					PlayerEntity player = context.getPlayer();
-					if (player != null && !world.isClient)
-						player.setStackInHand(context.getHand(), stateStack(stack, ETorchState.LIT));
-					if (!world.isClient)
-						world.playSound(null, pos, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.5f, 1.2f);
-					return ActionResult.SUCCESS;
-				}
-			}
-		}
+		// var world = context.getWorld();
+		// var blockPosition = context.getBlockPos();
+		// var blockEntity = world.getBlockEntity(blockPosition);
+		// var blockState = world.getBlockState(blockPosition);
+		// var stack = context.getStack();
 
 		return super.useOnBlock(context);
 	}
@@ -320,8 +264,8 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 	@Override
 	public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player,
 			StackReference cursorStackReference) {
-		// If you are clicking on it with a non HCTorch item or with empty, use vanilla
-		// behavior
+		// If you are clicking on it with a non HCTorch item or with empty,
+		// use vanilla behavior.
 		if (!slot.canTakePartial(player) || !(otherStack.getItem() instanceof TorchItem) || otherStack.isEmpty()) {
 			return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
 		}
@@ -333,7 +277,7 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		}
 
 		// Ensure torches are in same group
-		if (!sameTorchGroup((TorchItem) stack.getItem(), (TorchItem) otherStack.getItem())) {
+		if (!equalTorchGroup((TorchItem) stack.getItem(), (TorchItem) otherStack.getItem())) {
 			return false;
 		}
 
@@ -352,7 +296,6 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		if (!otherStack.isEmpty()) {
 			int max = stack.getMaxCount();
 			int usedCount = clickType != ClickType.RIGHT ? otherStack.getCount() : 1;
-			int otherMax = otherStack.getMaxCount();
 
 			int remainder = Math.max(0, usedCount - (max - stack.getCount()));
 			int addedNew = usedCount - remainder;
@@ -373,21 +316,25 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 				return true;
 			}
 		}
+
 		return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
 	}
 
-	public boolean sameTorchGroup(TorchItem item1, TorchItem item2) {
-		if (item1.torchGroup == item2.torchGroup) {
+	public boolean equalTorchGroup(TorchItem lhsItem, TorchItem rhsItem) {
+		if (lhsItem.torchGroup == rhsItem.torchGroup) {
 			return true;
 		}
+
 		return false;
 	}
 
-	public static Item stateItem(Item inputItem, ETorchState newState) {
+	// Modification
+
+	public static Item modifiedItemWithState(Item inputItem, ETorchState newState) {
 		Item outputItem = Items.AIR;
 
 		if (inputItem instanceof BlockItem && inputItem instanceof TorchItem) {
-			AbstractHardcoreTorchBlock newBlock = (AbstractHardcoreTorchBlock) ((BlockItem) inputItem).getBlock();
+			AbstractTorchBlock newBlock = (AbstractTorchBlock) ((BlockItem) inputItem).getBlock();
 			TorchItem newItem = (TorchItem) newBlock.group.getStandingTorch(newState).asItem();
 
 			outputItem = newItem;
@@ -396,11 +343,11 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		return outputItem;
 	}
 
-	public static ItemStack stateStack(ItemStack inputStack, ETorchState newState) {
+	public static ItemStack modifiedStackWithState(ItemStack inputStack, ETorchState newState) {
 		ItemStack outputStack = ItemStack.EMPTY;
 
 		if (inputStack.getItem() instanceof BlockItem && inputStack.getItem() instanceof TorchItem) {
-			AbstractHardcoreTorchBlock newBlock = (AbstractHardcoreTorchBlock) ((BlockItem) inputStack.getItem())
+			AbstractTorchBlock newBlock = (AbstractTorchBlock) ((BlockItem) inputStack.getItem())
 					.getBlock();
 			TorchItem newItem = (TorchItem) newBlock.group.getStandingTorch(newState).asItem();
 
@@ -410,14 +357,6 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		}
 
 		return outputStack;
-	}
-
-	public ETorchState getTorchState() {
-		return torchState;
-	}
-
-	public TorchGroup getTorchGroup() {
-		return torchGroup;
 	}
 
 	public static ItemStack modifiedItemForReplacement(ItemStack stack, Item replacementItem) {
@@ -434,49 +373,44 @@ public class TorchItem extends VerticallyAttachableBlockItem {
 		return itemStack;
 	}
 
-	public static int getFuel(ItemStack stack) {
+	public static ItemStack modifiedStackWithAddedFuel(ItemStack stack, World world, int amount) {
+		if (world.isClient) {
+			return stack;
+		}
+
+		if (!(stack.getItem() instanceof TorchItem)) {
+			return stack;
+		}
+
 		NbtCompound nbt = stack.getNbt();
-		int fuel;
+		int fuel = 0;
 
 		if (nbt != null) {
-			return nbt.getInt("Fuel");
+			fuel = nbt.getInt("Fuel");
+		} else {
+			nbt = new NbtCompound();
 		}
 
-		return Mod.config.defaultTorchFuel;
-	}
+		fuel += amount;
 
-	public static ItemStack addFuel(ItemStack stack, World world, int amount) {
-		if (stack.getItem() instanceof TorchItem && !world.isClient) {
-			NbtCompound nbt = stack.getNbt();
-			int fuel = Mod.config.defaultTorchFuel;
-
-			if (nbt != null) {
-				fuel = nbt.getInt("Fuel");
+		if (fuel <= 0) {
+			if (Mod.config.burntStick) {
+				stack = new ItemStack(Items.STICK, stack.getCount());
 			} else {
-				nbt = new NbtCompound();
+				stack = modifiedStackWithState(stack, ETorchState.BURNT);
 			}
 
-			fuel += amount;
-
-			// If burn out
-			if (fuel <= 0) {
-				if (Mod.config.burntStick) {
-					stack = new ItemStack(Items.STICK, stack.getCount());
-				} else {
-					stack = stateStack(stack, ETorchState.BURNT);
-				}
-			} else {
-				if (fuel > Mod.config.defaultTorchFuel) {
-					fuel = Mod.config.defaultTorchFuel;
-				}
-
-				nbt.putInt("Fuel", fuel);
-				stack.setNbt(nbt);
-			}
+			return stack;
 		}
+
+		if (fuel > Mod.config.defaultTorchFuel) {
+			fuel = Mod.config.defaultTorchFuel;
+		}
+
+		nbt.putInt("Fuel", fuel);
+		stack.setNbt(nbt);
 
 		return stack;
 	}
 
-	// Private Utilties
 }

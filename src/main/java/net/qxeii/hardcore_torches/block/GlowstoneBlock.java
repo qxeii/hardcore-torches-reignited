@@ -4,7 +4,6 @@ import java.util.function.IntSupplier;
 import java.util.function.ToIntFunction;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.state.StateManager.Builder;
 import net.minecraft.state.property.IntProperty;
@@ -13,7 +12,8 @@ import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class GlowstoneBlock extends AbstractGlowstoneBlock implements BlockEntityProvider {
+public class GlowstoneBlock extends AbstractGlowstoneBlock {
+
 	public static final IntProperty LEVEL_15;
 	public static final ToIntFunction<BlockState> STATE_TO_LUMINANCE;
 
@@ -34,7 +34,8 @@ public class GlowstoneBlock extends AbstractGlowstoneBlock implements BlockEntit
 	}
 
 	@Override
-	public void outOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
+	public void onOutOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
 
 	}
+
 }

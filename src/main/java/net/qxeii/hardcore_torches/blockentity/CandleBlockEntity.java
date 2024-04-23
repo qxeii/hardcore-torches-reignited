@@ -4,30 +4,35 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.block.AbstractHardcoreCandleBlock;
+import net.qxeii.hardcore_torches.block.AbstractCandleBlock;
 
 public class CandleBlockEntity extends FuelBlockEntity {
 
 	public CandleBlockEntity(BlockPos pos, BlockState state) {
 		super(Mod.CANDLE_BLOCK_ENTITY, pos, state);
-		fuel = Mod.config.defaultCandleFuel;
+		setFuel(Mod.config.defaultCandleFuel);
 	}
 
-	public static void tick(World world, BlockPos pos, BlockState state, CandleBlockEntity be) {
-		if (!world.isClient) {
-			// Burn out
-			if (world.getBlockState(pos).getBlock() instanceof AbstractHardcoreCandleBlock) {
-				if (be.fuel > 0 && AbstractHardcoreCandleBlock.isLitCandle(state)) {
-					be.fuel--;
+	public static void tick(World world, BlockPos position, BlockState state, CandleBlockEntity blockEntity) {
+		if (world.isClient) {
+			return;
+		}
 
-					if (be.fuel <= 0) {
-						((AbstractHardcoreCandleBlock) world.getBlockState(pos).getBlock()).outOfFuel(world, pos, state,
-								false);
-					}
-				}
+		if (!(world.getBlockState(position).getBlock() instanceof AbstractCandleBlock)) {
+			return;
+		}
 
-				be.markDirty();
-			}
+		var block = (AbstractCandleBlock) world.getBlockState(position).getBlock();
+
+		if (!block.isLit) {
+			return;
+		}
+
+		blockEntity.modifyFuel(-1);
+		blockEntity.markDirty();
+
+		if (blockEntity.isOutOfFuel()) {
+			block.onOutOfFuel(world, position, state, true);
 		}
 	}
 }

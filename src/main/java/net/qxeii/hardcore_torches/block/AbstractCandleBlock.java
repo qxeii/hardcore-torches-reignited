@@ -7,7 +7,6 @@ import java.util.function.IntSupplier;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -34,14 +33,14 @@ import net.minecraft.world.event.GameEvent;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.blockentity.CandleBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
-import net.qxeii.hardcore_torches.blockentity.IFuelBlock;
+import net.qxeii.hardcore_torches.blockentity.LightableBlock;
 
-public abstract class AbstractHardcoreCandleBlock extends BlockWithEntity implements BlockEntityProvider, IFuelBlock {
+public abstract class AbstractCandleBlock extends BlockWithEntity implements LightableBlock {
 	public static final BooleanProperty LIT;
 	public IntSupplier maxFuel;
 	public boolean isLit;
 
-	protected AbstractHardcoreCandleBlock(AbstractBlock.Settings settings, IntSupplier maxFuel, boolean isLit) {
+	protected AbstractCandleBlock(AbstractBlock.Settings settings, IntSupplier maxFuel, boolean isLit) {
 		super(settings);
 		this.maxFuel = maxFuel;
 		this.isLit = isLit;
@@ -55,10 +54,13 @@ public abstract class AbstractHardcoreCandleBlock extends BlockWithEntity implem
 	}
 
 	public void onProjectileHit(World world, BlockState state, BlockHitResult hit, ProjectileEntity projectile) {
-		if (!world.isClient && projectile.isOnFire() && this.isNotLit(state)) {
-			setLit(world, state, hit.getBlockPos(), true);
+		if (world.isClient) {
+			return;
 		}
 
+		if (projectile.isOnFire() && this.isNotLit(state)) {
+			setLit(world, state, hit.getBlockPos(), true);
+		}
 	}
 
 	protected boolean isNotLit(BlockState state) {
@@ -89,8 +91,8 @@ public abstract class AbstractHardcoreCandleBlock extends BlockWithEntity implem
 
 	public static void extinguish(@Nullable PlayerEntity player, BlockState state, WorldAccess world, BlockPos pos) {
 		setLit(world, state, pos, false);
-		if (state.getBlock() instanceof AbstractHardcoreCandleBlock) {
-			((AbstractHardcoreCandleBlock) state.getBlock()).getParticleOffsets(state).forEach((offset) -> {
+		if (state.getBlock() instanceof AbstractCandleBlock) {
+			((AbstractCandleBlock) state.getBlock()).getParticleOffsets(state).forEach((offset) -> {
 				world.addParticle(ParticleTypes.SMOKE, (double) pos.getX() + offset.getX(),
 						(double) pos.getY() + offset.getY(), (double) pos.getZ() + offset.getZ(), 0.0D,
 						0.10000000149011612D, 0.0D);
@@ -106,7 +108,7 @@ public abstract class AbstractHardcoreCandleBlock extends BlockWithEntity implem
 		((FuelBlockEntity) be).setFuel(Mod.config.defaultCandleFuel);
 		be.markDirty();
 		changeCandles(world, state, pos, -1);
-		((AbstractHardcoreCandleBlock) state.getBlock()).getParticleOffsets(state).forEach((offset) -> {
+		((AbstractCandleBlock) state.getBlock()).getParticleOffsets(state).forEach((offset) -> {
 			world.addParticle(ParticleTypes.SMOKE, (double) pos.getX() + offset.getX(),
 					(double) pos.getY() + offset.getY(), (double) pos.getZ() + offset.getZ(), 0.0D, 0.001D, 0.0D);
 		});
@@ -119,7 +121,7 @@ public abstract class AbstractHardcoreCandleBlock extends BlockWithEntity implem
 	public static void ignite(@Nullable PlayerEntity player, BlockState state, World world, BlockPos pos) {
 		setLit(world, state, pos, true);
 		if (state.getBlock() instanceof CandleBlock) {
-			((AbstractHardcoreCandleBlock) state.getBlock()).getParticleOffsets(state).forEach((offset) -> {
+			((AbstractCandleBlock) state.getBlock()).getParticleOffsets(state).forEach((offset) -> {
 				world.addParticle(ParticleTypes.SMALL_FLAME, (double) pos.getX() + offset.getX(),
 						(double) pos.getY() + offset.getY(), (double) pos.getZ() + offset.getZ(), 0.0D, 0.0D, 0.0D);
 			});
@@ -151,8 +153,8 @@ public abstract class AbstractHardcoreCandleBlock extends BlockWithEntity implem
 	}
 
 	@Override
-	public void outOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
-		((AbstractHardcoreCandleBlock) world.getBlockState(pos).getBlock()).melt(state, world, pos);
+	public void onOutOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
+		((AbstractCandleBlock) world.getBlockState(pos).getBlock()).melt(state, world, pos);
 	}
 
 	// region BlockEntity code
