@@ -406,9 +406,14 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			return stack;
 		}
 
+		nbt.putInt("Fuel", fuel);
+
+		if (fuel < Mod.config.defaultTorchFuel && fuel > 0) {
+			nbt.putInt("Salt", Random.create().nextInt());
+		} else {
+			nbt.remove("Salt");
 		}
 
-		nbt.putInt("Fuel", fuel);
 		stack.setNbt(nbt);
 
 		return stack;
