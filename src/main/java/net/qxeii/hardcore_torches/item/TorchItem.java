@@ -316,13 +316,15 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 				return true;
 			}
 		}
+
 		return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
 	}
 
-	public boolean equalTorchGroup(TorchItem item1, TorchItem item2) {
-		if (item1.torchGroup == item2.torchGroup) {
+	public boolean equalTorchGroup(TorchItem lhsItem, TorchItem rhsItem) {
+		if (lhsItem.torchGroup == rhsItem.torchGroup) {
 			return true;
 		}
+
 		return false;
 	}
 
