@@ -352,8 +352,10 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			TorchItem newItem = (TorchItem) newBlock.group.getStandingTorch(newState).asItem();
 
 			outputStack = modifiedItemForReplacement(inputStack, newItem);
-			if (newState == ETorchState.BURNT)
+
+			if (newState == ETorchState.BURNT) {
 				outputStack.setNbt(null);
+			}
 		}
 
 		return outputStack;
@@ -391,9 +393,9 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			nbt = new NbtCompound();
 		}
 
-		fuel += amount;
+		fuel = clamp(fuel + amount, 0, Mod.config.defaultTorchFuel);
 
-		if (fuel <= 0) {
+		if (fuel == 0) {
 			if (Mod.config.burntStick) {
 				stack = new ItemStack(Items.STICK, stack.getCount());
 			} else {
@@ -403,8 +405,6 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			return stack;
 		}
 
-		if (fuel > Mod.config.defaultTorchFuel) {
-			fuel = Mod.config.defaultTorchFuel;
 		}
 
 		nbt.putInt("Fuel", fuel);

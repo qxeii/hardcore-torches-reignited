@@ -1,5 +1,7 @@
 package net.qxeii.hardcore_torches.item;
 
+import static net.minecraft.util.math.MathHelper.clamp;
+
 import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
@@ -40,16 +42,7 @@ public class ShroomlightItem extends BlockItem implements FabricItem {
 			nbt = new NbtCompound();
 		}
 
-		fuel += amount;
-
-		// If burn out
-		if (fuel > Mod.config.defaultShroomlightFuel) {
-			fuel = Mod.config.defaultShroomlightFuel;
-		}
-
-		if (fuel < 0) {
-			fuel = 0;
-		}
+		fuel = clamp(fuel + amount, 0, Mod.config.defaultShroomlightFuel);
 
 		nbt.putInt("Fuel", fuel);
 		stack.setNbt(nbt);
