@@ -1,5 +1,7 @@
 package net.qxeii.hardcore_torches.item;
 
+import static net.minecraft.util.math.MathHelper.clamp;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -20,6 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.block.AbstractTorchBlock;
@@ -35,9 +38,10 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	public TorchItem(Block standingBlock, Block wallBlock, Item.Settings settings, ETorchState torchState, int maxFuel,
 			TorchGroup group) {
 		super(standingBlock, wallBlock, settings, Direction.DOWN);
+
+		this.torchGroup = group;
 		this.torchState = torchState;
 		this.maxFuel = maxFuel;
-		this.torchGroup = group;
 	}
 
 	// State & Properties
@@ -189,9 +193,6 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 
 	@Override
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-		// If torch is unlit and player has `minecraft:flint_and_steel` in inventory,
-		// light torch. Use one condition from flint and steel.
-
 		if (world.isClient) {
 			return super.use(world, player, hand);
 		}

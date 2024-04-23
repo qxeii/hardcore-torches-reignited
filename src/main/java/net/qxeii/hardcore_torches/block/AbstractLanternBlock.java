@@ -235,16 +235,10 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 			ItemStack itemStack) {
 		super.onPlaced(world, position, state, placer, itemStack);
 
-		BlockEntity be = world.getBlockEntity(position);
+		var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+		var fuel = LanternItem.getFuel(itemStack);
 
-		// Temporarily disabled for testing, placed lanterns should not have zero fuel.
-		// ((FuelBlockEntity) be).setFuel(0);
-
-		if (be != null && be instanceof FuelBlockEntity && itemStack.getItem() instanceof LanternItem) {
-			int fuel = LanternItem.getFuel(itemStack);
-
-			((FuelBlockEntity) be).setFuel(fuel);
-		}
+		blockEntity.setFuel(fuel);
 	}
 
 	// Utility
