@@ -40,7 +40,6 @@ import net.qxeii.hardcore_torches.blockentity.ShroomlightBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.TorchBlockEntity;
 import net.qxeii.hardcore_torches.config.ModConfig;
 import net.qxeii.hardcore_torches.item.CandleItem;
-import net.qxeii.hardcore_torches.item.FireStarterItem;
 import net.qxeii.hardcore_torches.item.GlowstoneItem;
 import net.qxeii.hardcore_torches.item.LanternItem;
 import net.qxeii.hardcore_torches.item.OilCanItem;
@@ -171,7 +170,6 @@ public class Mod implements ModInitializer {
 			() -> config.defaultLanternFuel);
 
 	public static final Item OIL_CAN = new OilCanItem(new FabricItemSettings().maxCount(1));
-	public static final Item FIRE_STARTER = new FireStarterItem(new FabricItemSettings());
 
 	public static TorchGroup basicTorches = new TorchGroup("basic");
 
@@ -360,12 +358,10 @@ public class Mod implements ModInitializer {
 				new ShroomlightItem(SHROOMLIGHT, new FabricItemSettings(), Mod.config.defaultShroomlightFuel, true));
 
 		Registry.register(Registries.ITEM, new Identifier("hardcore_torches", "oil_can"), OIL_CAN);
-		Registry.register(Registries.ITEM, new Identifier("hardcore_torches", "fire_starter"), FIRE_STARTER);
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> entries.add(OIL_CAN));
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS)
 				.register(entries -> OilCanItem.setFuel(new ItemStack(OIL_CAN), Mod.config.maxCanFuel));
-		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> entries.add(FIRE_STARTER));
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.add(LIT_TORCH));
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.add(UNLIT_TORCH));
