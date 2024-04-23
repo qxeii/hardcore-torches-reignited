@@ -113,10 +113,11 @@ public abstract class InventoryTickMixin {
 			int slot) {
 		var item = (TorchItem) stack.getItem();
 		var state = item.getTorchState();
-		var fuelUse = getFuelUseForStack(inventory, stack);
 
 		if (state == ETorchState.LIT) {
-			ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -fuelUse);
+			var fuelUse = getFuelUseForStack(inventory, stack);
+			var modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -fuelUse);
+
 			inventory.setStack(slot, modifiedStack);
 
 			if (TorchItem.getFuel(modifiedStack) <= 0) {
@@ -127,6 +128,8 @@ public abstract class InventoryTickMixin {
 		}
 
 		if (state == ETorchState.SMOLDERING) {
+			var fuelUse = getFuelUseForStack(inventory, stack);
+
 			if (random.nextInt(Mod.config.torchesSmolderFuelUseTickChance) == 0) {
 				ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -fuelUse);
 				inventory.setStack(slot, modifiedStack);
@@ -141,13 +144,14 @@ public abstract class InventoryTickMixin {
 	private void tickLanternItem(ServerWorld world, PlayerEntity player, PlayerInventory inventory, ItemStack stack,
 			int slot) {
 		var lanternItem = (LanternItem) stack.getItem();
-		var fuelUse = getFuelUseForStack(inventory, stack);
 
 		if (!lanternItem.isLit) {
 			return;
 		}
 
-		ItemStack modifiedStack = LanternItem.addFuel(stack, world, -fuelUse);
+		var fuelUse = getFuelUseForStack(inventory, stack);
+		var modifiedStack = LanternItem.addFuel(stack, world, -fuelUse);
+
 		inventory.setStack(slot, modifiedStack);
 
 		if (LanternItem.getFuel(modifiedStack) <= 0) {
@@ -248,22 +252,50 @@ public abstract class InventoryTickMixin {
 
 	// Utility
 
-	private static boolean worldIsRaining(ServerWorld world, BlockPos position) {
+	private boolean worldIsRaining(ServerWorld world, BlockPos position) {
 		return world.hasRain(position);
 	}
 
-	private static boolean stackIsInHand(PlayerInventory inventory, ItemStack stack) {
+	private boolean stackIsInHand(PlayerInventory inventory, ItemStack stack) {
 		return stack == inventory.getMainHandStack() || stack == inventory.offHand.get(0);
 	}
 
-	private static int getFuelUseForStack(PlayerInventory inventory, ItemStack stack) {
-		int baseFuelUse = 1;
+	private int getFuelUseForStack(PlayerInventory inventory, ItemStack stack) {
+		int fuelUse = 1;
 
 		if (stackIsInHand(inventory, stack)) {
-			return baseFuelUse * Mod.config.itemUseMultiplierWhenHeld;
+			fuelUse = fuelUse * Mod.config.itemFuelUseMultiplierWhenHeld;
+
+			// For: Mod.config.itemFuelUseJitterChanceWhenHeld
+			// Take half of jitter chance as probability for jitter to be applied per tick.
+			// The higher the jitter value, the higher the chance, zero means no chance.
+
+			if (Mod.config.itemFuelUseJitterChanceWhenHeld > 0) {
+				float jitterRawValue = (float) Mod.config.itemFuelUseJitterChanceWhenHeld;
+				int jitterRandomRange = (int) Math.max(0, (1 / (jitterRawValue + 1)) * 1000 - 1);
+
+				if (jitterRandomRange == 0 || random.nextInt(jitterRandomRange) == 0) {
+					int jitterFuelMax = (int) Math.max(1, jitterRawValue / 50);
+					int jitterFuelUse = random.nextInt(0, jitterFuelMax + 1);
+
+					fuelUse = fuelUse + jitterFuelUse;
+
+					Mod.LOGGER
+							.info("Fuel use in tick with jitter applied: " + fuelUse + " with jitter raw value: "
+									+ jitterRawValue + " and jitter random range: " + jitterRandomRange
+									+ ", jitter fuel use: " + jitterFuelUse);
+				} else {
+
+					Mod.LOGGER
+							.info("Fuel use in tick without jitter applied: " + fuelUse + " with jitter raw value: "
+									+ jitterRawValue + " and jitter random range of: " + jitterRandomRange);
+				}
+			} else {
+				Mod.LOGGER.info("Fuel use in tick: " + fuelUse);
+			}
 		}
 
-		return baseFuelUse;
+		return fuelUse;
 	}
 
 }
