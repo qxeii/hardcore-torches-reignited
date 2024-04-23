@@ -40,7 +40,7 @@ public class ModConfig implements ConfigData {
 	public int defaultLanternFuel = 24000;
 
 	@Comment("The amount a fuel item adds to the lantern by default. Default: 12000")
-	public int defLanternFuelItem = 12000;
+	public int defaultLanternFuelItem = 12000;
 
 	@Comment("A lantern must have at least this much fuel (min 600) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 400")
 	public int minLanternIgnitionFuel = 400;

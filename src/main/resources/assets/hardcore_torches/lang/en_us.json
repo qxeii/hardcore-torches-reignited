@@ -45,7 +45,7 @@
 	"text.autoconfig.hardcore_torches.option.lanternsBurnWhenConverted": "Lanterns burn when converted",
 	"text.autoconfig.hardcore_torches.option.defaultTorchFuel": "Default torch fuel",
 	"text.autoconfig.hardcore_torches.option.defaultLanternFuel": "Default lantern fuel",
-	"text.autoconfig.hardcore_torches.option.defLanternFuelItem": "Default lantern fuel item",
+	"text.autoconfig.hardcore_torches.option.defaultLanternFuelItem": "Default lantern fuel item",
 	"text.autoconfig.hardcore_torches.option.minLanternIgnitionFuel": "Minimum lantern ignition fuel",
 	"text.autoconfig.hardcore_torches.option.torchesExtinguishFuelLoss": "Torches extinguish fuel loss",
 	"text.autoconfig.hardcore_torches.option.lanternLightFuelLoss": "Lantern light fuel loss",
