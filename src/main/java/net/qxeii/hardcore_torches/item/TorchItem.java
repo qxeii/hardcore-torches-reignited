@@ -1,5 +1,7 @@
 package net.qxeii.hardcore_torches.item;
 
+import static net.minecraft.util.math.MathHelper.clamp;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -20,6 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.block.AbstractTorchBlock;
@@ -35,9 +38,10 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	public TorchItem(Block standingBlock, Block wallBlock, Item.Settings settings, ETorchState torchState, int maxFuel,
 			TorchGroup group) {
 		super(standingBlock, wallBlock, settings, Direction.DOWN);
+
+		this.torchGroup = group;
 		this.torchState = torchState;
 		this.maxFuel = maxFuel;
-		this.torchGroup = group;
 	}
 
 	// State & Properties
@@ -189,9 +193,6 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 
 	@Override
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-		// If torch is unlit and player has `minecraft:flint_and_steel` in inventory,
-		// light torch. Use one condition from flint and steel.
-
 		if (world.isClient) {
 			return super.use(world, player, hand);
 		}
@@ -352,8 +353,10 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			TorchItem newItem = (TorchItem) newBlock.group.getStandingTorch(newState).asItem();
 
 			outputStack = modifiedItemForReplacement(inputStack, newItem);
-			if (newState == ETorchState.BURNT)
+
+			if (newState == ETorchState.BURNT) {
 				outputStack.setNbt(null);
+			}
 		}
 
 		return outputStack;
@@ -391,9 +394,9 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			nbt = new NbtCompound();
 		}
 
-		fuel += amount;
+		fuel = clamp(fuel + amount, 0, Mod.config.defaultTorchFuel);
 
-		if (fuel <= 0) {
+		if (fuel == 0) {
 			if (Mod.config.burntStick) {
 				stack = new ItemStack(Items.STICK, stack.getCount());
 			} else {
@@ -403,11 +406,14 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			return stack;
 		}
 
-		if (fuel > Mod.config.defaultTorchFuel) {
-			fuel = Mod.config.defaultTorchFuel;
+		nbt.putInt("Fuel", fuel);
+
+		if (fuel < Mod.config.defaultTorchFuel && fuel > 0) {
+			nbt.putInt("Salt", Random.create().nextInt());
+		} else {
+			nbt.remove("Salt");
 		}
 
-		nbt.putInt("Fuel", fuel);
 		stack.setNbt(nbt);
 
 		return stack;
