@@ -38,16 +38,16 @@ public class InventoryUtils {
 			return map.unbreaking.get(0);
 		}
 
-		if (!map.singleUse.isEmpty()) {
-			Mod.LOGGER.debug("Returning {} as first single-use fire starter item from map.",
-					map.singleUse.get(0).getName());
-			return map.singleUse.get(0);
-		}
-
 		if (!map.multiUse.isEmpty()) {
 			Mod.LOGGER.debug("Returning {} as first multi-use fire starter item from map.",
 					map.multiUse.get(0).getName());
 			return map.multiUse.get(0);
+		}
+
+		if (!map.singleUse.isEmpty()) {
+			Mod.LOGGER.debug("Returning {} as first single-use fire starter item from map.",
+					map.singleUse.get(0).getName());
+			return map.singleUse.get(0);
 		}
 
 		return null;

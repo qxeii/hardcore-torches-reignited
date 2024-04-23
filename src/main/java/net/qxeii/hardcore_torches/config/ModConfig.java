@@ -108,21 +108,6 @@ public class ModConfig implements ConfigData {
 	@Comment("0: When in rain, torches in your inventory will be unaffected\n1: When in rain, torches in mainhand or offhand will be extinguished or smolder\n2: When in rain, torches in inventory will be extinguished or smolder. Default: 1")
 	public int invExtinguishInRain = 1;
 
-	@Comment("Can the fire starter light campfires. Default: true")
-	public boolean starterLightCampfires = true;
-
-	@Comment("Can the fire starter light torches. Default: true")
-	public boolean starterLightTorches = true;
-
-	@Comment("Can the fire starter create full-block fires. Default: true")
-	public boolean starterStartFires = true;
-
-	@Comment("Can the fire starter light lanterns. Default: true")
-	public boolean starterLightLanterns = true;
-
-	@Comment("Percentage chance that the fire starter works. Default: 0.5")
-	public float starterSuccessChance = 0.5f;
-
 	@Comment("Default: fuel that a lantern starts with when crafted. Default: 0")
 	public int startingLanternFuel = 0;
 
