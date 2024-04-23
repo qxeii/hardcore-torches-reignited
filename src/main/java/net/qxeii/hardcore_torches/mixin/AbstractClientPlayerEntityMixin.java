@@ -12,6 +12,6 @@ public class AbstractClientPlayerEntityMixin {
 
 	@Inject(at = @At("RETURN"), method = "tick")
 	public void onTick(CallbackInfo ci) {
-
+		// …
 	}
 }
