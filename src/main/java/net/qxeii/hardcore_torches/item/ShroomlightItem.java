@@ -22,33 +22,37 @@ public class ShroomlightItem extends BlockItem implements FabricItem {
 	}
 
 	public static ItemStack modifiedStackWithAddedFuel(ItemStack stack, World world, int amount) {
-
-		if (stack.getItem() instanceof ShroomlightItem && !world.isClient) {
-			ShroomlightItem item = (ShroomlightItem) stack.getItem();
-
-			NbtCompound nbt = stack.getNbt();
-			int fuel = item.isLit ? item.maxFuel : 0;
-
-			if (nbt != null) {
-				fuel = nbt.getInt("Fuel");
-			} else {
-				nbt = new NbtCompound();
-			}
-
-			fuel += amount;
-
-			// If burn out
-			if (fuel > Mod.config.defaultShroomlightFuel) {
-				fuel = Mod.config.defaultShroomlightFuel;
-			}
-
-			if (fuel < 0) {
-				fuel = 0;
-			}
-
-			nbt.putInt("Fuel", fuel);
-			stack.setNbt(nbt);
+		if (world.isClient) {
+			return stack;
 		}
+
+		if (!(stack.getItem() instanceof ShroomlightItem)) {
+			return stack;
+		}
+
+		ShroomlightItem item = (ShroomlightItem) stack.getItem();
+		NbtCompound nbt = stack.getNbt();
+		int fuel = item.isLit ? item.maxFuel : 0;
+
+		if (nbt != null) {
+			fuel = nbt.getInt("Fuel");
+		} else {
+			nbt = new NbtCompound();
+		}
+
+		fuel += amount;
+
+		// If burn out
+		if (fuel > Mod.config.defaultShroomlightFuel) {
+			fuel = Mod.config.defaultShroomlightFuel;
+		}
+
+		if (fuel < 0) {
+			fuel = 0;
+		}
+
+		nbt.putInt("Fuel", fuel);
+		stack.setNbt(nbt);
 
 		return stack;
 	}

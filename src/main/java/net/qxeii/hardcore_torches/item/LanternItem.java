@@ -168,31 +168,37 @@ public class LanternItem extends BlockItem {
 	// Fuel
 
 	public static ItemStack addFuel(ItemStack stack, World world, int amount) {
-		if (stack.getItem() instanceof LanternItem && !world.isClient) {
-			LanternItem item = (LanternItem) stack.getItem();
+		if (world.isClient) {
+			return stack;
+		}
 
-			NbtCompound nbt = stack.getNbt();
-			int fuel = item.isLit ? item.maxFuel : 0;
+		if (!(stack.getItem() instanceof LanternItem)) {
+			return stack;
+		}
 
-			if (nbt != null) {
-				fuel = nbt.getInt("Fuel");
-			} else {
-				nbt = new NbtCompound();
+		LanternItem item = (LanternItem) stack.getItem();
+
+		NbtCompound nbt = stack.getNbt();
+		int fuel = item.isLit ? item.maxFuel : 0;
+
+		if (nbt != null) {
+			fuel = nbt.getInt("Fuel");
+		} else {
+			nbt = new NbtCompound();
+		}
+
+		fuel += amount;
+
+		if (fuel <= 0) {
+			fuel = 0;
+			stack = modifiedStackWithState(stack, false);
+		} else {
+			if (fuel > Mod.config.defaultLanternFuel) {
+				fuel = Mod.config.defaultLanternFuel;
 			}
 
-			fuel += amount;
-
-			if (fuel <= 0) {
-				fuel = 0;
-				stack = modifiedStackWithState(stack, false);
-			} else {
-				if (fuel > Mod.config.defaultLanternFuel) {
-					fuel = Mod.config.defaultLanternFuel;
-				}
-
-				nbt.putInt("Fuel", fuel);
-				stack.setNbt(nbt);
-			}
+			nbt.putInt("Fuel", fuel);
+			stack.setNbt(nbt);
 		}
 
 		return stack;
@@ -203,14 +209,15 @@ public class LanternItem extends BlockItem {
 	public static ItemStack modifiedStackWithState(ItemStack inputStack, boolean isLit) {
 		ItemStack outputStack = ItemStack.EMPTY;
 
-		if (inputStack.getItem() instanceof BlockItem && inputStack.getItem() instanceof LanternItem) {
-			LanternItem newItem = (LanternItem) (isLit ? Mod.LIT_LANTERN.asItem() : Mod.UNLIT_LANTERN.asItem());
+		if (!(inputStack.getItem() instanceof LanternItem)) {
+			return outputStack;
+		}
 
-			outputStack = new ItemStack(newItem, inputStack.getCount());
+		LanternItem newItem = (LanternItem) (isLit ? Mod.LIT_LANTERN.asItem() : Mod.UNLIT_LANTERN.asItem());
+		outputStack = new ItemStack(newItem, inputStack.getCount());
 
-			if (inputStack.getNbt() != null) {
-				outputStack.setNbt(inputStack.getNbt().copy());
-			}
+		if (inputStack.getNbt() != null) {
+			outputStack.setNbt(inputStack.getNbt().copy());
 		}
 
 		return outputStack;

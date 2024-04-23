@@ -60,7 +60,6 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 	@Override
 	public BlockRenderType getRenderType(BlockState state) {
-		// With inheriting from BlockWithEntity this defaults to INVISIBLE.
 		return BlockRenderType.MODEL;
 	}
 
@@ -68,7 +67,8 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
 			BlockEntityType<T> type) {
 		return checkType(type, Mod.TORCH_BLOCK_ENTITY,
-				(world1, pos, state1, be) -> TorchBlockEntity.tick(world1, pos, state1, be));
+				(_world, _position, _state, _blockEntity) -> TorchBlockEntity.tick(_world, _position, _state,
+						_blockEntity));
 	}
 
 	// Entities
@@ -97,7 +97,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 	}
 
 	public void extinguish(World world, BlockPos pos, BlockState state, boolean playSound) {
-		if (!world.isClient) {
+		if (world.isClient) {
 			return;
 		}
 
@@ -114,7 +114,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 	}
 
 	public void burnOut(World world, BlockPos pos, BlockState state, boolean playSound) {
-		if (!world.isClient) {
+		if (world.isClient) {
 			return;
 		}
 
@@ -131,7 +131,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 	}
 
 	public void light(World world, BlockPos pos, BlockState state) {
-		if (!world.isClient) {
+		if (world.isClient) {
 			return;
 		}
 
@@ -238,7 +238,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 	// Modification
 
-	public void modifyTorch(World world, BlockPos position, BlockState curState, ETorchState newType) {
+	public void modifyTorch(World world, BlockPos position, BlockState currentState, ETorchState newType) {
 		var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
 
 		BlockState newBlockState;
@@ -247,7 +247,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 		if (isWall()) {
 			newBlockState = group.getWallTorch(newType).getDefaultState().with(
 					HorizontalFacingBlock.FACING,
-					curState.get(WallTorchBlock.FACING));
+					currentState.get(WallTorchBlock.FACING));
 		} else {
 			newBlockState = group.getStandingTorch(newType).getDefaultState();
 		}

@@ -38,29 +38,34 @@ public class GlowstoneItem extends BlockItem implements FabricItem {
 	}
 
 	public static ItemStack modifiedStackWithAddedFuel(ItemStack stack, World world, int amount) {
-
-		if (stack.getItem() instanceof GlowstoneItem && !world.isClient) {
-			GlowstoneItem item = (GlowstoneItem) stack.getItem();
-
-			NbtCompound nbt = stack.getNbt();
-			int fuel = item.isLit ? item.maxFuel : 0;
-
-			if (nbt != null) {
-				fuel = nbt.getInt("Fuel");
-			} else {
-				nbt = new NbtCompound();
-			}
-
-			fuel += amount;
-
-			// If burn out
-			if (fuel > Mod.config.defaultGlowstoneFuel) {
-				fuel = Mod.config.defaultGlowstoneFuel;
-			}
-
-			nbt.putInt("Fuel", fuel);
-			stack.setNbt(nbt);
+		if (world.isClient) {
+			return stack;
 		}
+
+		if (!(stack.getItem() instanceof GlowstoneItem)) {
+			return stack;
+		}
+
+		GlowstoneItem item = (GlowstoneItem) stack.getItem();
+
+		NbtCompound nbt = stack.getNbt();
+		int fuel = item.isLit ? item.maxFuel : 0;
+
+		if (nbt != null) {
+			fuel = nbt.getInt("Fuel");
+		} else {
+			nbt = new NbtCompound();
+		}
+
+		fuel += amount;
+
+		// If burn out
+		if (fuel > Mod.config.defaultGlowstoneFuel) {
+			fuel = Mod.config.defaultGlowstoneFuel;
+		}
+
+		nbt.putInt("Fuel", fuel);
+		stack.setNbt(nbt);
 
 		return stack;
 	}

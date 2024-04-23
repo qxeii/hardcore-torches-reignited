@@ -53,11 +53,11 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	public static int getFuel(ItemStack stack) {
 		NbtCompound nbt = stack.getNbt();
 
-		if (nbt != null) {
-			return nbt.getInt("Fuel");
+		if (nbt == null) {
+			return 0;
 		}
 
-		return Mod.config.defaultTorchFuel;
+		return nbt.getInt("Fuel");
 	}
 
 	@Override
@@ -380,34 +380,41 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	}
 
 	public static ItemStack modifiedStackWithAddedFuel(ItemStack stack, World world, int amount) {
-		if (stack.getItem() instanceof TorchItem && !world.isClient) {
-			NbtCompound nbt = stack.getNbt();
-			int fuel = Mod.config.defaultTorchFuel;
-
-			if (nbt != null) {
-				fuel = nbt.getInt("Fuel");
-			} else {
-				nbt = new NbtCompound();
-			}
-
-			fuel += amount;
-
-			// If burn out
-			if (fuel <= 0) {
-				if (Mod.config.burntStick) {
-					stack = new ItemStack(Items.STICK, stack.getCount());
-				} else {
-					stack = modifiedStackWithState(stack, ETorchState.BURNT);
-				}
-			} else {
-				if (fuel > Mod.config.defaultTorchFuel) {
-					fuel = Mod.config.defaultTorchFuel;
-				}
-
-				nbt.putInt("Fuel", fuel);
-				stack.setNbt(nbt);
-			}
+		if (world.isClient) {
+			return stack;
 		}
+
+		if (!(stack.getItem() instanceof TorchItem)) {
+			return stack;
+		}
+
+		NbtCompound nbt = stack.getNbt();
+		int fuel = 0;
+
+		if (nbt != null) {
+			fuel = nbt.getInt("Fuel");
+		} else {
+			nbt = new NbtCompound();
+		}
+
+		fuel += amount;
+
+		if (fuel <= 0) {
+			if (Mod.config.burntStick) {
+				stack = new ItemStack(Items.STICK, stack.getCount());
+			} else {
+				stack = modifiedStackWithState(stack, ETorchState.BURNT);
+			}
+
+			return stack;
+		}
+
+		if (fuel > Mod.config.defaultTorchFuel) {
+			fuel = Mod.config.defaultTorchFuel;
+		}
+
+		nbt.putInt("Fuel", fuel);
+		stack.setNbt(nbt);
 
 		return stack;
 	}

@@ -65,17 +65,17 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 		this.maxFuel = maxFuel;
 	}
 
-	public void setState(World world, BlockPos pos, boolean lit) {
-		BlockState oldState = world.getBlockState(pos);
+	public void setState(World world, BlockPos position, boolean lit) {
+		BlockState oldState = world.getBlockState(position);
 		BlockState newState = lit ? Mod.LIT_LANTERN.getDefaultState() : Mod.UNLIT_LANTERN.getDefaultState();
 		newState = newState.with(HANGING, oldState.get(HANGING)).with(WATERLOGGED, oldState.get(WATERLOGGED));
 		int newFuel = Mod.config.startingLanternFuel;
 
-		if (world.getBlockEntity(pos) != null)
-			newFuel = ((FuelBlockEntity) world.getBlockEntity(pos)).getFuel();
-		world.setBlockState(pos, newState);
-		if (world.getBlockEntity(pos) != null)
-			((FuelBlockEntity) world.getBlockEntity(pos)).setFuel(newFuel);
+		if (world.getBlockEntity(position) != null)
+			newFuel = ((FuelBlockEntity) world.getBlockEntity(position)).getFuel();
+		world.setBlockState(position, newState);
+		if (world.getBlockEntity(position) != null)
+			((FuelBlockEntity) world.getBlockEntity(position)).setFuel(newFuel);
 	}
 
 	protected ItemStack getStack(World world, BlockPos pos) {
@@ -96,107 +96,111 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 
 	// Actions
 
-	public void extinguish(World world, BlockPos pos, BlockState state, boolean playSound) {
-		if (!world.isClient) {
-			if (playSound) {
-				world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 0.5f);
-				world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 0.5f);
-			}
-
-			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-			TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, pos);
-
-			setState(world, pos, false);
-		}
-	}
-
-	public void light(World world, BlockPos pos, BlockState state) {
+	public void extinguish(World world, BlockPos position, BlockState state, boolean playSound) {
 		if (world.isClient) {
 			return;
 		}
 
-		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
-		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
-		world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 0.5f);
-		world.playSound(null, pos, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
-		world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
-		world.playSound(null, pos, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
+		if (playSound) {
+			world.playSound(null, position, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 0.5f);
+			world.playSound(null, position, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 0.5f);
+		}
+
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.LARGE_SMOKE, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, position);
+		TorchUtils.displayParticle(ParticleTypes.SMOKE, state, world, position);
+
+		setState(world, position, false);
+	}
+
+	public void light(World world, BlockPos position, BlockState state) {
+		if (world.isClient) {
+			return;
+		}
+
+		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
+		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
+		world.playSound(null, position, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1f, 0.5f);
+		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
+		world.playSound(null, position, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
+		world.playSound(null, position, SoundEvents.BLOCK_BLASTFURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 2f, 2f);
 
 		ServerWorld serverWorld = (ServerWorld) world;
 
-		serverWorld.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 10,
+		serverWorld.spawnParticles(ParticleTypes.SMOKE, position.getX() + 0.5, position.getY() + 0.5,
+				position.getZ() + 0.5, 10,
 				0.15, 0.15, 0.15, 0.001);
-		serverWorld.spawnParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 2,
+		serverWorld.spawnParticles(ParticleTypes.LAVA, position.getX() + 0.5, position.getY() + 0.5,
+				position.getZ() + 0.5, 2,
 				0.15, 0.15, 0.15, 0.001);
 
-		setState(world, pos, true);
+		setState(world, position, true);
 	}
 
 	// Interaction
 
 	@Override
-	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+	public ActionResult onUse(BlockState state, World world, BlockPos position, PlayerEntity player, Hand hand,
 			BlockHitResult hit) {
 		ItemStack stack = player.getStackInHand(hand);
 
 		// Pick up lantern
 		if (player.isSneaking() && Mod.config.pickUpLanterns) {
-			pickUp(world, pos, player, hand);
+			pickUp(world, position, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		// Adding fuel with can
 		if (stack.getItem() instanceof OilCanItem) {
-			refuelWithInteraction(world, pos, state, player, stack, hand);
+			refuelWithInteraction(world, position, state, player, stack, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		// Igniting
 		if (!this.isLit && stack.isEmpty()) {
-			useFuelAndLightWithInteraction(state, world, pos, player, hand);
+			useFuelAndLightWithInteraction(state, world, position, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		// Extinguishing
 		if (this.isLit && stack.isEmpty()) {
-			extinguishWithInteraction(world, pos, state, player, hand);
+			extinguishWithInteraction(world, position, state, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		return ActionResult.PASS;
 	}
 
-	private void pickUp(World world, BlockPos pos, PlayerEntity player, Hand hand) {
+	private void pickUp(World world, BlockPos position, PlayerEntity player, Hand hand) {
 		if (!world.isClient) {
-			player.giveItemStack(getStack(world, pos));
+			player.giveItemStack(getStack(world, position));
 		}
 
-		world.setBlockState(pos, Blocks.AIR.getDefaultState());
+		world.setBlockState(position, Blocks.AIR.getDefaultState());
 
 		if (!world.isClient) {
-			world.playSound(null, pos, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1.0f, 1.0f);
+			world.playSound(null, position, SoundEvents.BLOCK_LANTERN_HIT, SoundCategory.BLOCKS, 1.0f, 1.0f);
 		}
 
 		player.swingHand(hand);
 	}
 
-	public void useFuelAndLightWithInteraction(BlockState state, World world, BlockPos pos, PlayerEntity player,
+	public void useFuelAndLightWithInteraction(BlockState state, World world, BlockPos position, PlayerEntity player,
 			Hand hand) {
-		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(pos);
+		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
 
 		// If not enough fuel to light
 		if (blockEntity.getFuel() < Mod.config.minLanternIgnitionFuel) {
 			if (!world.isClient) {
-				world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 1.0f, 2.0f);
+				world.playSound(null, position, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 1.0f, 2.0f);
 			}
 
 			player.swingHand(hand);
 			return;
 		}
 
-		light(world, pos, state);
+		light(world, position, state);
 		player.swingHand(hand);
 
 		blockEntity.modifyFuel(-Mod.config.lanternLightFuelLoss);
@@ -206,22 +210,23 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 		}
 	}
 
-	public void extinguishWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand) {
-		extinguish(world, pos, state, true);
+	public void extinguishWithInteraction(World world, BlockPos position, BlockState state, PlayerEntity player,
+			Hand hand) {
+		extinguish(world, position, state, true);
 		player.swingHand(hand);
 	}
 
-	public void refuelWithInteraction(World world, BlockPos pos, BlockState state, PlayerEntity player,
+	public void refuelWithInteraction(World world, BlockPos position, BlockState state, PlayerEntity player,
 			ItemStack stack,
 			Hand hand) {
-		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(pos);
+		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
 
 		if (OilCanItem.fuelBlock((FuelBlockEntity) blockEntity, world, stack)) {
-			world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
+			world.playSound(null, position, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
 					SoundCategory.BLOCKS, 1f, 0f);
-			world.playSound(null, pos, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
+			world.playSound(null, position, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
 					SoundCategory.BLOCKS, 1f, 2f);
-			world.playSound(null, pos, SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.BLOCKS, 0.3f, 0f);
+			world.playSound(null, position, SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.BLOCKS, 0.3f, 0f);
 		}
 
 		player.swingHand(hand);
@@ -230,11 +235,11 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 	// Events
 
 	@Override
-	public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
+	public void onPlaced(World world, BlockPos position, BlockState state, @Nullable LivingEntity placer,
 			ItemStack itemStack) {
-		super.onPlaced(world, pos, state, placer, itemStack);
+		super.onPlaced(world, position, state, placer, itemStack);
 
-		BlockEntity be = world.getBlockEntity(pos);
+		BlockEntity be = world.getBlockEntity(position);
 
 		// Temporarily disabled for testing, placed lanterns should not have zero fuel.
 		// ((FuelBlockEntity) be).setFuel(0);
@@ -248,26 +253,26 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 
 	// Utility
 
-	public boolean canLight(World world, BlockPos pos) {
-		return ((LanternBlockEntity) world.getBlockEntity(pos)).getFuel() > 0 && !isLit;
+	public boolean canLight(World world, BlockPos position) {
+		return ((LanternBlockEntity) world.getBlockEntity(position)).getFuel() > 0 && !isLit;
 	}
 
 	@Override
-	public void onOutOfFuel(World world, BlockPos pos, BlockState state, boolean playSound) {
-		((AbstractLanternBlock) world.getBlockState(pos).getBlock()).extinguish(world, pos, state, playSound);
+	public void onOutOfFuel(World world, BlockPos position, BlockState state, boolean playSound) {
+		((AbstractLanternBlock) world.getBlockState(position).getBlock()).extinguish(world, position, state, playSound);
 	}
 
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return this.getOutlineShape(state, world, pos, context);
+	public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos position, ShapeContext context) {
+		return this.getOutlineShape(state, world, position, context);
 	}
 
 	@Override
-	public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+	public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos position, ShapeContext context) {
 		// Lantern uses a hanging property we don't have meaning I just copy it
 		// return VoxelShapes.union(Block.createCuboidShape(5.0D, 0.0D, 5.0D, 11.0D,
 		// 7.0D, 11.0D), Block.createCuboidShape(6.0D, 7.0D, 6.0D, 10.0D, 9.0D, 10.0D));
-		return Blocks.LANTERN.getOutlineShape(state, world, pos, context);
+		return Blocks.LANTERN.getOutlineShape(state, world, position, context);
 	}
 
 	@Override
@@ -284,13 +289,14 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 
 	@Override
 	public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState,
-			WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-		return Blocks.LANTERN.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+			WorldAccess world, BlockPos position, BlockPos neighborPosition) {
+		return Blocks.LANTERN.getStateForNeighborUpdate(state, direction, neighborState, world, position,
+				neighborPosition);
 	}
 
 	@Override
-	public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-		return Blocks.LANTERN.canPlaceAt(state, world, pos);
+	public boolean canPlaceAt(BlockState state, WorldView world, BlockPos position) {
+		return Blocks.LANTERN.canPlaceAt(state, world, position);
 	}
 
 	@Override
@@ -299,8 +305,8 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-		return new LanternBlockEntity(pos, state);
+	public BlockEntity createBlockEntity(BlockPos position, BlockState state) {
+		return new LanternBlockEntity(position, state);
 	}
 
 	@Override
@@ -314,7 +320,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
 			BlockEntityType<T> type) {
 		return checkType(type, Mod.LANTERN_BLOCK_ENTITY,
-				(world1, pos, state1, be) -> LanternBlockEntity.tick(world1, pos, state1, be));
+				(_world, position, _state, be) -> LanternBlockEntity.tick(_world, position, _state, be));
 	}
 
 }

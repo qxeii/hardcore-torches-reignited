@@ -54,10 +54,13 @@ public abstract class AbstractCandleBlock extends BlockWithEntity implements Lig
 	}
 
 	public void onProjectileHit(World world, BlockState state, BlockHitResult hit, ProjectileEntity projectile) {
-		if (!world.isClient && projectile.isOnFire() && this.isNotLit(state)) {
-			setLit(world, state, hit.getBlockPos(), true);
+		if (world.isClient) {
+			return;
 		}
 
+		if (projectile.isOnFire() && this.isNotLit(state)) {
+			setLit(world, state, hit.getBlockPos(), true);
+		}
 	}
 
 	protected boolean isNotLit(BlockState state) {

@@ -15,7 +15,7 @@ public class TorchBlockEntity extends FuelBlockEntity {
 	}
 
 	public static void tick(World world, BlockPos position, BlockState state, TorchBlockEntity blockEntity) {
-		if (!world.isClient) {
+		if (world.isClient) {
 			return;
 		}
 
