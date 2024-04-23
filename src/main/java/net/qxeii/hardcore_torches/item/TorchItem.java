@@ -54,7 +54,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		NbtCompound nbt = stack.getNbt();
 
 		if (nbt == null) {
-			return 0;
+			return Mod.config.defaultTorchFuel;
 		}
 
 		return nbt.getInt("Fuel");
