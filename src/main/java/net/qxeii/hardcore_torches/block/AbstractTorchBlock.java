@@ -84,6 +84,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 		if (world.isClient) {
 			return;
 		}
+
 		if (playSound) {
 			world.playSound(null, position, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 1f, 1f);
 		}
