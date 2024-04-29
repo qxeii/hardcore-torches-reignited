@@ -80,9 +80,9 @@ public interface InventoryTickMixinLogic {
 
 		if (state == ETorchState.LIT) {
 			var fuelUse = getFuelUseForStack(world, inventory, stack);
-			var modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -fuelUse);
 
 			inventory.setStack(slot, modifiedStack);
+			var modifiedStack = TorchItem.modifiedStackWithAddedFuel(world, stack, -fuelUse);
 
 			if (TorchItem.getFuel(modifiedStack) == 0) {
 				item.burnOut(world, player, slot);
@@ -95,7 +95,7 @@ public interface InventoryTickMixinLogic {
 			var fuelUse = getFuelUseForStack(world, inventory, stack);
 
 			if (world.random.nextInt(Mod.config.torchesSmolderFuelUseTickChance) == 0) {
-				ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(stack, world, -fuelUse);
+				ItemStack modifiedStack = TorchItem.modifiedStackWithAddedFuel(world, stack, -fuelUse);
 				inventory.setStack(slot, modifiedStack);
 			} else if (world.random.nextInt(Mod.config.torchesSmolderExtinguishTickChance) == 0) {
 				item.extinguish(world, player, slot);
@@ -114,7 +114,7 @@ public interface InventoryTickMixinLogic {
 		}
 
 		var fuelUse = getFuelUseForStack(world, inventory, stack);
-		var modifiedStack = LanternItem.addFuel(stack, world, -fuelUse);
+		var modifiedStack = LanternItem.modifiedStackWithAddedFuel(world, stack, -fuelUse);
 
 		inventory.setStack(slot, modifiedStack);
 
