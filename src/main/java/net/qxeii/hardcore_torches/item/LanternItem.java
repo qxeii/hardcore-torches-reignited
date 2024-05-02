@@ -71,7 +71,7 @@ public class LanternItem extends BlockItem {
 				return Mod.config.defaultLanternFuel;
 			}
 
-			return Mod.config.startingLanternFuel;
+			return Mod.config.defaultLanternFuel;
 		}
 
 		return clamp(nbt.getInt("Fuel"), 0, Mod.config.defaultLanternFuel);

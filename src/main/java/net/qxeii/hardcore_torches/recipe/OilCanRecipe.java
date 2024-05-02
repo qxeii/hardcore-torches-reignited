@@ -1,8 +1,7 @@
 package net.qxeii.hardcore_torches.recipe;
 
-import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.item.OilCanItem;
 import com.google.gson.JsonObject;
+
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -14,6 +13,8 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import net.qxeii.hardcore_torches.Mod;
+import net.qxeii.hardcore_torches.item.OilCanItem;
 
 public class OilCanRecipe extends ShapelessRecipe {
 	final int fuelAmount;
@@ -49,10 +50,10 @@ public class OilCanRecipe extends ShapelessRecipe {
 				OilCanItem can = (OilCanItem) itemstack.getItem();
 
 				startFuel = can.getFuel(itemstack);
-				int fuel = (int) (fuelAmount * Mod.config.oilRecipeMultiplier);
-				System.out.println("REC " + Mod.config.oilRecipeOverride);
-				if (Mod.config.oilRecipeOverride > -1) {
-					fuel = Mod.config.oilRecipeOverride;
+				int fuel = (int) (fuelAmount * Mod.config.fuelCanRecipeMultiplier);
+				System.out.println("REC " + Mod.config.fuelRecipeOverride);
+				if (Mod.config.fuelRecipeOverride > -1) {
+					fuel = Mod.config.fuelRecipeOverride;
 					System.out.println("REC " + fuel);
 				}
 

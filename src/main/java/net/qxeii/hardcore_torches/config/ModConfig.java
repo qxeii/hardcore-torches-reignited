@@ -6,32 +6,65 @@ import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
 @Config(name = "hardcore_torches")
 public class ModConfig implements ConfigData {
+
+	// Item Handling
+
 	@Comment("Torches will extinguish if broken. Default: false")
 	public boolean torchesExtinguishWhenBroken = false;
 
 	@Comment("Torches are fully depleted when broken. Overrides torchesExtinguishWhenBroken. Default: false")
 	public boolean torchesDepleteWhenDropped = false;
 
-	@Comment("Torches become unlit in rain. If torchesSmolder is true, they will instead smolder in rain. Default: true")
-	public boolean torchesRain = true;
+	@Comment("Burnt torches drop as vanilla stick when broken instead of a burnt torch. Default: false")
+	public boolean burntStick = false;
 
 	@Comment("Only matters if torchesRain is true. In rain, torches will extinguish but emit smoke, and consume fuel at 1/3 the rate until fully extinguished or re-lit. Default: true")
 	public boolean torchesSmolder = true;
 
-	@Comment("Burnt torches drop as vanilla stick when broken instead of a burnt torch. Default: false")
-	public boolean burntStick = false;
+	// Item Handling in Inventory
 
-	@Comment("Picking up vanilla torches converts them to lit torches. Default: false")
-	public boolean convertVanillaTorches = false;
+	@Comment("Do torches lose fuel while the player has then in their inventory. Default: true")
+	public boolean tickInInventory = true;
 
-	@Comment("Picking up vanilla lanterns converts them to lit torches. Default: false")
-	public boolean convertVanillaLanterns = false;
+	@Comment("Do torches become unlit when placed in storage. Default: false")
+	public boolean unlightInChest = false;
 
-	@Comment("Picked up vanilla torches will be converted as already lit. Default: false")
-	public boolean torchesBurnWhenConverted = false;
+	// Item Interaction
 
-	@Comment("Picked up vanilla lanterns will be converted as already lit. Default: false")
-	public boolean lanternsBurnWhenConverted = false;
+	@Comment("If true, you can right click torches to extinguish them while not holding fuel or a torch to light. Default: true")
+	public boolean handUnlightTorch = true;
+
+	@Comment("If true, you can right click lanterns to extinguish them while not holding fuel or a torch to light. Default: true")
+	public boolean handUnlightLantern = true;
+
+	@Comment("Allow the player to pick up lanterns with sneak-clicking. Default: true")
+	public boolean pickUpLanterns = true;
+
+	// Random Effects
+
+	@Comment("Chance value for a smoldering torch to consume fuel per tick (1/x). Default: 5 (1/5)")
+	public int torchesSmolderFuelUseTickChance = 5;
+
+	@Comment("Chance value for a smoldering torch to extinguish and become unlit per tick (1/x). Default: 1000 (1/1000)")
+	public int torchesSmolderExtinguishTickChance = 1000;
+
+	// Environmental Effects in World
+
+	@Comment("Torches become unlit in rain. If torchesSmolder is true, they will instead smolder in rain. Default: true")
+	public boolean torchesRain = true;
+
+	@Comment("Chance value for a burning torch to extinguish per tick (1/x). Default: 200 (1/200)")
+	public int torchesRainAffectTickChance = 200;
+
+	// Environmental Effects in Inventory
+
+	@Comment("0: When going underwater, torches in your inventory will be unaffected\n1: When going underwater, torches in mainhand or offhand will be extinguished\n2: When going underwater, torches in inventory will be extinguished. Default: 1")
+	public int invExtinguishInWater = 1;
+
+	@Comment("0: When in rain, torches in your inventory will be unaffected\n1: When in rain, torches in mainhand or offhand will be extinguished or smolder\n2: When in rain, torches in inventory will be extinguished or smolder. Default: 1")
+	public int invExtinguishInRain = 1;
+
+	// Item Fuel Defaults
 
 	@Comment("The amount of ticks the torch lasts. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
 	public int defaultTorchFuel = 24000;
@@ -41,6 +74,20 @@ public class ModConfig implements ConfigData {
 
 	@Comment("The amount a fuel item adds to the lantern by default. Default: 12000")
 	public int defaultLanternFuelItem = 12000;
+
+	@Comment("Default: fuel that a lantern starts with when crafted. Default: 0")
+	public int startingLanternFuel = 0;
+
+	@Comment("The fuel that candles start with. Default: 6000")
+	public int defaultCandleFuel = 6000;
+
+	@Comment("The fuel that glowstone starts with. Default: 576000")
+	public int defaultGlowstoneFuel = 576000;
+
+	@Comment("The fuel that shroomlights start with. Default: 10000")
+	public int defaultShroomlightFuel = 10000;
+
+	// Item Fuel Use
 
 	@Comment("A lantern must have at least this much fuel (min 600) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 400")
 	public int minLanternIgnitionFuel = 400;
@@ -57,29 +104,7 @@ public class ModConfig implements ConfigData {
 	@Comment("Items randomly use more or less fuel when held by a player per tick (e.g. 10–100 is minor jitter, 1000 is significant jitter). Default: 0")
 	public int itemFuelUseJitterChanceWhenHeld = 0;
 
-	@Comment("Do torches become unlit when placed in storage. Default: false")
-	public boolean unlightInChest = false;
-
-	@Comment("Do torches lose fuel while the player has then in their inventory. Default: true")
-	public boolean tickInInventory = true;
-
-	@Comment("Chance value for a burning torch to extinguish per tick (1/x). Default: 200 (1/200)")
-	public int torchesRainAffectTickChance = 200;
-
-	@Comment("Chance value for a smoldering torch to consume fuel per tick (1/x). Default: 5 (1/5)")
-	public int torchesSmolderFuelUseTickChance = 5;
-
-	@Comment("Chance value for a smoldering torch to extinguish and become unlit per tick (1/x). Default: 1000 (1/1000)")
-	public int torchesSmolderExtinguishTickChance = 1000;
-
-	@Comment("How many torches are crafted. Default: 2")
-	public int craftAmount = 2;
-
-	@Comment("How many candles are crafted. Default: 4")
-	public int candleCraftAmount = 4;
-
-	@Comment("Right click torch or lantern to see fuel value. Default: false")
-	public boolean fuelMessage = false;
+	// Fuel Can
 
 	@Comment("Max fuel an oil can holds. Default: 576000")
 	public int maxCanFuel = 576000;
@@ -88,10 +113,10 @@ public class ModConfig implements ConfigData {
 	public boolean torchesUseCan = false;
 
 	@Comment("Multiplies the fuel value of all oil can recipes. 0.5 makes all fuel recipes return half as much fuel. Default: 1")
-	public float oilRecipeMultiplier = 1;
+	public float fuelCanRecipeMultiplier = 1;
 
 	@Comment("Overrides the oil can fuel recipe if set. Default: -1")
-	public int oilRecipeOverride = -1;
+	public int fuelRecipeOverride = -1;
 
 	@Comment("If true, you can craft fuel with an oil can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. Default: true")
 	public boolean enableFuelOil = true;
@@ -99,36 +124,37 @@ public class ModConfig implements ConfigData {
 	@Comment("If true, you can craft coal with an oil can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. Default: false")
 	public boolean enableCoalOil = false;
 
-	@Comment("If true, you can right click torches to extinguish them while not holding fuel or a torch to light. Default: true")
-	public boolean handUnlightTorch = true;
+	@Comment("Right click torch or lantern to see fuel value. Default: false")
+	public boolean fuelMessage = false;
 
-	@Comment("If true, you can right click lanterns to extinguish them while not holding fuel or a torch to light. Default: true")
-	public boolean handUnlightLantern = true;
+	// Item Crafting
 
-	@Comment("0: When going underwater, torches in your inventory will be unaffected\n1: When going underwater, torches in mainhand or offhand will be extinguished\n2: When going underwater, torches in inventory will be extinguished. Default: 1")
-	public int invExtinguishInWater = 1;
+	@Comment("How many torches are crafted. Default: 2")
+	public int craftAmount = 2;
 
-	@Comment("0: When in rain, torches in your inventory will be unaffected\n1: When in rain, torches in mainhand or offhand will be extinguished or smolder\n2: When in rain, torches in inventory will be extinguished or smolder. Default: 1")
-	public int invExtinguishInRain = 1;
+	@Comment("How many candles are crafted. Default: 4")
+	public int candleCraftAmount = 4;
 
-	@Comment("Default: fuel that a lantern starts with when crafted. Default: 0")
-	public int startingLanternFuel = 0;
-
-	@Comment("Allow the player to pick up lanterns with sneak-clicking. Default: true")
-	public boolean pickUpLanterns = true;
-
-	@Comment("The fuel that candles start with. Default: 6000")
-	public int defaultCandleFuel = 6000;
-
-	@Comment("The fuel that glowstone starts with. Default: 576000")
-	public int defaultGlowstoneFuel = 576000;
-
-	@Comment("The fuel that shroomlights start with. Default: 10000")
-	public int defaultShroomlightFuel = 10000;
+	// World Configuration
 
 	@Comment("The length of daytime in ticks. May be adjusted if other mods alter the length of days. Default: 13000")
 	public int worldDaytimeDuration = 13000;
 
 	@Comment("The length of nighttime in ticks. May be adjusted if other mods alter the length of days. Default: 11000")
 	public int worldNighttimeDuration = 11000;
+
+	// Vanilla to Mod Item Conversion
+
+	@Comment("Picking up vanilla torches converts them to lit torches. Default: false")
+	public boolean convertVanillaTorches = false;
+
+	@Comment("Picking up vanilla lanterns converts them to lit torches. Default: false")
+	public boolean convertVanillaLanterns = false;
+
+	@Comment("Picked up vanilla torches will be converted as already lit. Default: false")
+	public boolean torchesBurnWhenConverted = false;
+
+	@Comment("Picked up vanilla lanterns will be converted as already lit. Default: false")
+	public boolean lanternsBurnWhenConverted = false;
+
 }
