@@ -56,6 +56,9 @@ public class ModConfig implements ConfigData {
 	@Comment("Chance value for a burning torch to extinguish per tick (1/x). Default: 200 (1/200)")
 	public int torchesRainAffectTickChance = 200;
 
+	@Comment("Chance value for a burning campfire to extinguish per tick (1/x). Default: 400 (1/200)")
+	public int campfiresRainAffectTickChance = 400;
+
 	// Environmental Effects in Inventory
 
 	@Comment("0: When going underwater, torches in your inventory will be unaffected\n1: When going underwater, torches in mainhand or offhand will be extinguished\n2: When going underwater, torches in inventory will be extinguished. Default: 1")
@@ -68,6 +71,9 @@ public class ModConfig implements ConfigData {
 
 	@Comment("The amount of ticks the torch lasts. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
 	public int defaultTorchFuel = 24000;
+
+	@Comment("The amount of ticks the campfire can last. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
+	public int defaultCampfireFuel = 24000;
 
 	@Comment("The amount of ticks the lantern can last. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
 	public int defaultLanternFuel = 24000;
