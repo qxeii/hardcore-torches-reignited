@@ -1,6 +1,7 @@
 package net.qxeii.hardcore_torches.util;
 
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionTypes;
 import net.qxeii.hardcore_torches.Mod;
 
@@ -20,17 +21,21 @@ public class WorldUtils {
 		return getWorldDaytimeLength() + getWorldNighttimeLength();
 	}
 
-	public static boolean worldIsDaytime(ServerWorld world) {
+	public static boolean worldIsRaining(World world, BlockEntity entity) {
+		return world.hasRain(entity.getPos());
+	}
+
+	public static boolean worldIsDaytime(World world) {
 		return (world.getTimeOfDay() % getWorldDayLength()) < getWorldDaytimeLength();
 	}
 
-	public static boolean worldIsNighttime(ServerWorld world) {
+	public static boolean worldIsNighttime(World world) {
 		return !worldIsDaytime(world);
 	}
 
 	// Environment
 
-	public static boolean worldIsNether(ServerWorld world) {
+	public static boolean worldIsNether(World world) {
 		return world.getDimensionKey().equals(DimensionTypes.THE_NETHER);
 	}
 
