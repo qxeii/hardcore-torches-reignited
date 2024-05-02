@@ -6,7 +6,9 @@
 	"mixins": [
 		"InventoryPlacementMixin",
 		"InventoryTickMixin",
-		"FlintAndSteelItemMixin"
+		"FlintAndSteelItemMixin",
+		"CampfireBlockMixin",
+		"CampfireBlockEntityMixin"
 	],
 	"client": [],
 	"injectors": {

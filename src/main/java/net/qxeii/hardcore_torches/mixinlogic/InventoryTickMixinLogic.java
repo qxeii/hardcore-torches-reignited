@@ -1,4 +1,4 @@
-package net.qxeii.hardcore_torches.util;
+package net.qxeii.hardcore_torches.mixinlogic;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,6 +12,8 @@ import net.qxeii.hardcore_torches.item.GlowstoneItem;
 import net.qxeii.hardcore_torches.item.LanternItem;
 import net.qxeii.hardcore_torches.item.ShroomlightItem;
 import net.qxeii.hardcore_torches.item.TorchItem;
+import net.qxeii.hardcore_torches.util.ETorchState;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 
 public interface InventoryTickMixinLogic {
 
