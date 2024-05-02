@@ -7,6 +7,7 @@
 	"block.hardcore_torches.lit_wall_torch": "Lit Torch",
 	"block.hardcore_torches.unlit_wall_torch": "Torch",
 	"block.hardcore_torches.smoldering_wall_torch": "Smoldering Torch",
+	"block.hardcore_torches.burnt_wall_torch": "Burnt Torch",
 	"block.hardcore_torches.unlit_torch": "Torch",
 	"block.hardcore_torches.smoldering_torch": "Smoldering Torch",
 	"block.hardcore_torches.burnt_torch": "Burnt Torch",
