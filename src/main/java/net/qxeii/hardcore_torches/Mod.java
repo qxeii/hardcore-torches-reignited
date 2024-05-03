@@ -26,6 +26,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.qxeii.hardcore_torches.block.CandleBlock;
 import net.qxeii.hardcore_torches.block.FloorTorchBlock;
@@ -187,6 +188,11 @@ public class Mod implements ModInitializer {
 	public static BlockEntityType<CandleBlockEntity> CANDLE_BLOCK_ENTITY;
 	public static BlockEntityType<GlowstoneBlockEntity> GLOWSTONE_BLOCK_ENTITY;
 	public static BlockEntityType<ShroomlightBlockEntity> SHROOMLIGHT_BLOCK_ENTITY;
+
+	// Sounds
+
+	public static final SoundEvent CAMPFIRE_LOG_PLACE_SOUND = SoundEvent
+			.of(new Identifier("hardcore_torches:log_place"));
 
 	// Recipe Types
 
