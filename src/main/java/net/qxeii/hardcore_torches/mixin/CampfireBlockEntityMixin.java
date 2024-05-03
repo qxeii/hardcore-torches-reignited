@@ -1,7 +1,5 @@
 package net.qxeii.hardcore_torches.mixin;
 
-import static net.minecraft.util.math.MathHelper.clamp;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,7 +30,11 @@ public abstract class CampfireBlockEntityMixin implements CampfireBlockEntityTic
 
 	@Unique
 	public void setFuel(int fuel) {
-		this.fuel = clamp(fuel, 0, Mod.config.defaultCampfireFuel);
+		if (fuel < 0) {
+			fuel = 0;
+		}
+
+		this.fuel = fuel;
 	}
 
 	@Unique
