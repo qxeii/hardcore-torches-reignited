@@ -79,6 +79,8 @@ public class Mod implements ModInitializer {
 			new Identifier("hardcore_torches", "campfire_fuels"));
 	public static final TagKey<Item> CAMPFIRE_LOG_FUELS = TagKey.of(RegistryKeys.ITEM,
 			new Identifier("minecraft", "logs_that_burn"));
+	public static final TagKey<Item> CAMPFIRE_SHOVELS = TagKey.of(RegistryKeys.ITEM,
+			new Identifier("minecraft", "shovels"));
 
 	public static final LootFunctionType HARDCORE_TORCH_LOOT_FUNCTION = new LootFunctionType(
 			new TorchLootFunction.Serializer());

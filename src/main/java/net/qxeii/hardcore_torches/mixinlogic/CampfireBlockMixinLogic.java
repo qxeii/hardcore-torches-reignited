@@ -51,18 +51,35 @@ public interface CampfireBlockMixinLogic {
 			BlockHitResult hit) {
 		var blockEntity = (CampfireBlockEntity) world.getBlockEntity(pos);
 		var campfireBlockEntity = (CampfireBlockEntityMixinLogic) (Object) blockEntity;
+		var isLit = state.get(LIT);
+
 		var stack = player.getStackInHand(hand);
 
-		if (stack.isEmpty()) {
+		if (stack.isEmpty() && player.isSneaking()) {
 			if (world.isClient && Mod.config.fuelMessage) {
-				sendFuelMessageToPlayer(player, campfireBlockEntity.getFuel());
+				displayFuelMessage(player, campfireBlockEntity.getFuel());
 			}
 
 			return ActionResult.PASS;
 		}
 
+		var stackIsShovel = stack.isIn(Mod.CAMPFIRE_SHOVELS);
 		var stackIsCoal = stack.isIn(Mod.CAMPFIRE_FUELS);
 		var stackIsLog = stack.isIn(Mod.CAMPFIRE_LOG_FUELS);
+
+		if (stackIsShovel) {
+			if (!isLit) {
+				return ActionResult.PASS;
+			}
+
+			CampfireBlockEntityMixinLogic.extinguish(world, pos, state);
+
+			if (world.isClient) {
+				player.swingHand(hand);
+			}
+
+			return ActionResult.SUCCESS;
+		}
 
 		if (!stackIsCoal && !stackIsLog) {
 			return ActionResult.PASS;
@@ -84,14 +101,14 @@ public interface CampfireBlockMixinLogic {
 			player.swingHand(hand);
 
 			if (Mod.config.fuelMessage) {
-				sendFuelMessageToPlayer(player, campfireBlockEntity.getFuel());
+				displayFuelMessage(player, campfireBlockEntity.getFuel());
 			}
 		}
 
 		return ActionResult.CONSUME;
 	}
 
-	private void sendFuelMessageToPlayer(PlayerEntity player, int fuel) {
+	private void displayFuelMessage(PlayerEntity player, int fuel) {
 		var fuelTimeMessage = WorldUtils.formattedFuelText(fuel);
 		player.sendMessage(fuelTimeMessage, true);
 	}

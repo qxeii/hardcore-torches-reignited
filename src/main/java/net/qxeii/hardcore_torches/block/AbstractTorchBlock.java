@@ -158,6 +158,17 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 			BlockHitResult hit) {
 		ItemStack stack = player.getStackInHand(hand);
 
+		// Fuel Check
+
+		if (stack.isEmpty() && player.isSneaking()) {
+			if (Mod.config.fuelMessage && !world.isClient) {
+				var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+				displayFuelMessage(world, player, blockEntity);
+			}
+
+			return ActionResult.SUCCESS;
+		}
+
 		// Extinguishing
 
 		if (stack.isEmpty() && burnState == ETorchState.LIT) {
@@ -174,10 +185,10 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 			BlockEntity blockEntity = world.getBlockEntity(position);
 
-			if (!world.isClient && blockEntity.getType() == Mod.TORCH_BLOCK_ENTITY && Mod.config.fuelMessage
-					&& stack.isEmpty()) {
+			if (!world.isClient && Mod.config.fuelMessage) {
 				var fuel = ((TorchBlockEntity) blockEntity).getFuel();
 				var fuelText = WorldUtils.formattedFuelText(fuel);
+
 				player.sendMessage(fuelText, true);
 			}
 
@@ -198,7 +209,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 	private boolean useFuelAndLightWithInteraction(World world, BlockPos position, BlockState state,
 			PlayerEntity player,
 			ItemStack stack, Hand hand) {
-		if (!findAndUseLighterItem(player, hand)) {
+		if (!findAndUseLighterItem(player, hand, true)) {
 			return false;
 		}
 
@@ -255,6 +266,15 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 		} else {
 			return group.getStandingTorch(newTorchState).getDefaultState();
 		}
+	}
+
+	// Fuel Message
+
+	private void displayFuelMessage(World world, PlayerEntity player, FuelBlockEntity blockEntity) {
+		var fuel = blockEntity.getFuel();
+		var fuelText = WorldUtils.formattedFuelText(fuel);
+
+		player.sendMessage(fuelText, true);
 	}
 
 }

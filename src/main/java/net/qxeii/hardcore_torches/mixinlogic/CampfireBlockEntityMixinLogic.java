@@ -76,7 +76,7 @@ public interface CampfireBlockEntityMixinLogic {
 		markDirty(world, pos, state);
 	}
 
-	private static void extinguish(World world, BlockPos pos, BlockState state) {
+	public static void extinguish(World world, BlockPos pos, BlockState state) {
 		CampfireBlock.extinguish(null, world, pos, state);
 
 		if (!world.isClient()) {
