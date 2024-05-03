@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CampfireBlock;
@@ -21,7 +22,7 @@ public abstract class CampfireBlockEntityMixin implements CampfireBlockEntityMix
 	// Properties
 
 	@Unique
-	public int fuel = Mod.config.defaultCampfireFuel;
+	private int fuel = Mod.config.defaultCampfireFuel;
 
 	@Unique
 	public int getFuel() {
@@ -52,7 +53,13 @@ public abstract class CampfireBlockEntityMixin implements CampfireBlockEntityMix
 
 	@Inject(method = "readNbt", at = @At("TAIL"))
 	private void readNbt(NbtCompound nbt, CallbackInfo callbackInfo) {
-		injectedRead(nbt);
+		injectedReadNbt(nbt);
+	}
+
+	@Inject(method = "toInitialChunkDataNbt", at = @At("TAIL"))
+	private void toInitialChunkDataNbt(CallbackInfoReturnable<NbtCompound> callbackInfo) {
+		NbtCompound nbtCompound = callbackInfo.getReturnValue();
+		injectedInitialChunkDataNbt(nbtCompound);
 	}
 
 	// Tick

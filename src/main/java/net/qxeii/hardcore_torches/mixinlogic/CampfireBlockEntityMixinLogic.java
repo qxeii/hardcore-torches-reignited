@@ -27,13 +27,15 @@ public interface CampfireBlockEntityMixinLogic {
 		nbt.putInt(NBT_KEY_FUEL, this.getFuel());
 	}
 
-	public default void injectedRead(NbtCompound nbt) {
-		if (!nbt.contains(NBT_KEY_FUEL)) {
-			return;
+	public default void injectedReadNbt(NbtCompound nbt) {
+		if (nbt.contains(NBT_KEY_FUEL)) {
+			var fuel = nbt.getInt(NBT_KEY_FUEL);
+			setFuel(fuel);
 		}
+	}
 
-		var fuel = nbt.getInt(NBT_KEY_FUEL);
-		setFuel(fuel);
+	public default void injectedInitialChunkDataNbt(NbtCompound nbt) {
+		nbt.putInt(NBT_KEY_FUEL, this.getFuel());
 	}
 
 	public static void litClientTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity _campfire) {
@@ -50,17 +52,20 @@ public interface CampfireBlockEntityMixinLogic {
 
 		if (campfire.isOutOfFuel()) {
 			extinguish(world, pos, state);
+			markDirty(world, pos, state);
 			return;
 		}
 
 		if (WorldUtils.worldIsRaining(world, (BlockEntity) campfire)) {
 			if (world.random.nextInt(Mod.config.campfiresRainAffectTickChance) == 0) {
 				extinguish(world, pos, state);
+				markDirty(world, pos, state);
 				return;
 			}
 		}
 
 		campfire.setFuel(campfire.getFuel() - 1);
+		markDirty(world, pos, state);
 	}
 
 	private static void extinguish(World world, BlockPos pos, BlockState state) {
@@ -71,6 +76,14 @@ public interface CampfireBlockEntityMixinLogic {
 					1.0F, 1.0F);
 
 			world.setBlockState(pos, state.with(CampfireBlock.LIT, false), 3);
+		}
+	}
+
+	private static void markDirty(World world, BlockPos position, BlockState state) {
+		world.markDirty(position);
+
+		if (!state.isAir()) {
+			world.updateComparators(position, state.getBlock());
 		}
 	}
 
