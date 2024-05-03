@@ -69,13 +69,13 @@ public class ModConfig implements ConfigData {
 
 	// Item Fuel Defaults
 
-	@Comment("The amount of ticks the torch lasts. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
+	@Comment("The amount of ticks the torch lasts. Default: 24000. 20 ticks per second, 24000 = 20 minutes")
 	public int defaultTorchFuel = 24000;
 
-	@Comment("The amount of ticks the campfire can last. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
-	public int defaultCampfireFuel = 24000;
+	@Comment("The amount of ticks the campfire lasts without added fuel. Default: 6400 (4x coal). 20 ticks per second, 6400 = around 5 minutes")
+	public int defaultCampfireFuel = 6400;
 
-	@Comment("The amount of ticks the lantern can last. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
+	@Comment("The amount of ticks the lantern can last. Default: 24000. 20 ticks per second, 24000 = 20 minutes")
 	public int defaultLanternFuel = 24000;
 
 	@Comment("The amount a fuel item adds to the lantern by default. Default: 12000")
@@ -84,8 +84,8 @@ public class ModConfig implements ConfigData {
 	@Comment("Default: fuel that a lantern starts with when crafted. Default: 0")
 	public int startingLanternFuel = 0;
 
-	@Comment("The fuel that candles start with. Default: 6000")
-	public int defaultCandleFuel = 6000;
+	@Comment("The fuel that candles start with. Default: 6400")
+	public int defaultCandleFuel = 6400;
 
 	@Comment("The fuel that glowstone starts with. Default: 576000")
 	public int defaultGlowstoneFuel = 576000;
@@ -95,20 +95,20 @@ public class ModConfig implements ConfigData {
 
 	// Item Fuel Use
 
-	@Comment("A lantern must have at least this much fuel (min 600) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 400")
-	public int minLanternIgnitionFuel = 400;
-
-	@Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 800")
-	public int torchesExtinguishFuelLoss = 800;
-
-	@Comment("The amount of fuel wasted in a lantern when it is lit. Used to balance durable lanterns. Default: 200")
-	public int lanternLightFuelLoss = 200;
-
 	@Comment("Items use up more fuel when held by a player (e.g. 2 means items burn half as long). Default: 2")
 	public int itemFuelUseMultiplierWhenHeld = 2;
 
 	@Comment("Items randomly use more or less fuel when held by a player per tick (e.g. 10–100 is minor jitter, 1000 is significant jitter). Default: 0")
 	public int itemFuelUseJitterChanceWhenHeld = 0;
+
+	@Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 800")
+	public int torchesExtinguishFuelLoss = 800;
+
+	@Comment("A lantern must have at least this much fuel (min 600) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 400")
+	public int minLanternIgnitionFuel = 400;
+
+	@Comment("The amount of fuel wasted in a lantern when it is lit. Used to balance durable lanterns. Default: 200")
+	public int lanternLightFuelLoss = 200;
 
 	// Fuel Can
 
