@@ -97,12 +97,12 @@ public interface CampfireBlockMixinLogic {
 			} else if (stackIsCoal) {
 				world.playSound(null, pos, Mod.CAMPFIRE_LOG_PLACE_SOUND, SoundCategory.BLOCKS, 0.75F, 1.75F);
 			}
-		} else {
-			player.swingHand(hand);
 
 			if (Mod.config.fuelMessage) {
 				displayFuelMessage(player, campfireBlockEntity.getFuel());
 			}
+		} else {
+			player.swingHand(hand);
 		}
 
 		return ActionResult.CONSUME;
