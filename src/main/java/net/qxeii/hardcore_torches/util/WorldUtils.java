@@ -1,6 +1,7 @@
 package net.qxeii.hardcore_torches.util;
 
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionTypes;
 import net.qxeii.hardcore_torches.Mod;
@@ -31,6 +32,21 @@ public class WorldUtils {
 
 	public static boolean worldIsNighttime(World world) {
 		return !worldIsDaytime(world);
+	}
+
+	public static Text formattedFuelText(int fuel) {
+		return Text.translatable("text.hardcore_torches.fuel_message", formattedFuelTime(fuel));
+	}
+
+	public static Text formattedFuelTime(int fuel) {
+		int seconds = fuel / 20;
+		int minutes = seconds / 60;
+
+		if (minutes > 1) {
+			return Text.translatable("text.hardcore_torches.fuel_time_minutes", minutes);
+		}
+
+		return Text.translatable("text.hardcore_torches.fuel_time_seconds", seconds);
 	}
 
 	// Environment
