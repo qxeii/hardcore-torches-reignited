@@ -70,7 +70,7 @@
 	"text.autoconfig.hardcore_torches.option.fuelMessage": "Fuel message",
 	"text.autoconfig.hardcore_torches.option.maxCanFuel": "Max can fuel",
 	"text.autoconfig.hardcore_torches.option.torchesUseCan": "Torches use can",
-	"text.autoconfig.hardcore_torches.option.fuelRecipeMultiplier": "Fuel recipe multiplier",
+	"text.autoconfig.hardcore_torches.option.fuelCanRecipeMultiplier": "Fuel recipe multiplier",
 	"text.autoconfig.hardcore_torches.option.fuelRecipeOverride": "Fuel recipe override",
 	"text.autoconfig.hardcore_torches.option.enableCanRefillWithFuel": "Enable can refill with fuel",
 	"text.autoconfig.hardcore_torches.option.enableCanRefillWithCoal": "Enable can refill with coal",
