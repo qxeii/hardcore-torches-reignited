@@ -42,10 +42,10 @@ public class ModConfig implements ConfigData {
 
 	// Random Effects
 
-	@Comment("Chance value for a smoldering torch to consume fuel per tick (1/x). Default: 5 (1/5)")
+	@Comment("Chance value for a smoldering torch to consume fuel per tick (1/x, default 1/5). Default: 5")
 	public int torchesSmolderFuelUseTickChance = 5;
 
-	@Comment("Chance value for a smoldering torch to extinguish and become unlit per tick (1/x). Default: 1000 (1/1000)")
+	@Comment("Chance value for a smoldering torch to extinguish and become unlit per tick (1/x, default 1/1000). Default: 1000")
 	public int torchesSmolderExtinguishTickChance = 1000;
 
 	// Environmental Effects in World
@@ -53,10 +53,10 @@ public class ModConfig implements ConfigData {
 	@Comment("Torches become unlit in rain. If torchesSmolder is true, they will instead smolder in rain. Default: true")
 	public boolean torchesRain = true;
 
-	@Comment("Chance value for a burning torch to extinguish per tick (1/x). Default: 200 (1/200)")
+	@Comment("Chance value for a burning torch to extinguish per tick (1/x, default 1/200). Default: 200")
 	public int torchesRainAffectTickChance = 200;
 
-	@Comment("Chance value for a burning campfire to extinguish per tick (1/x). Default: 400 (1/200)")
+	@Comment("Chance value for a burning campfire to extinguish per tick (1/x, default 1/400). Default: 400")
 	public int campfiresRainAffectTickChance = 400;
 
 	// Environmental Effects in Inventory
@@ -69,13 +69,13 @@ public class ModConfig implements ConfigData {
 
 	// Item Fuel Defaults
 
-	@Comment("The amount of ticks the torch lasts. Default: 24000. 20 ticks per second, 24000 = 20 minutes")
+	@Comment("The amount of ticks the torch lasts (20 ticks per second, 24000 = 20 minutes). Default: 24000")
 	public int defaultTorchFuel = 24000;
 
-	@Comment("The amount of ticks the campfire lasts without added fuel. Default: 6400 (4x coal). 20 ticks per second, 6400 = around 5 minutes")
+	@Comment("The amount of ticks the campfire lasts without added fuel (20 ticks per second, 6400 = around 5 minutes). Default: 6400")
 	public int defaultCampfireFuel = 6400;
 
-	@Comment("The amount of ticks the lantern can last. Default: 24000. 20 ticks per second, 24000 = 20 minutes")
+	@Comment("The amount of ticks the lantern can last (20 ticks per second, 24000 = 20 minutes). Default: 24000")
 	public int defaultLanternFuel = 24000;
 
 	@Comment("The amount a fuel item adds to the lantern by default. Default: 12000")
