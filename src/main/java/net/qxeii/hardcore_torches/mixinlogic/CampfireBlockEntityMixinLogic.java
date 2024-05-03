@@ -77,7 +77,10 @@ public interface CampfireBlockEntityMixinLogic {
 	}
 
 	public static void extinguish(World world, BlockPos pos, BlockState state) {
+		var campfire = (CampfireBlockEntityMixinLogic) world.getBlockEntity(pos);
+
 		CampfireBlock.extinguish(null, world, pos, state);
+		campfire.setFuel(campfire.getFuel() - Mod.config.campfireExtinguishFuelLoss);
 
 		if (!world.isClient) {
 			world.playSound((PlayerEntity) null, pos, SoundEvents.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.BLOCKS,

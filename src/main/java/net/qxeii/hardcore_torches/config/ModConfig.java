@@ -104,6 +104,9 @@ public class ModConfig implements ConfigData {
 	@Comment("Items added to a campfire have their fuel value multiplied (e.g. 4 means one coal adds the fuel value of 4x coal to the fire). Default: 4")
 	public int campfireFuelAdditionMultiplier = 4;
 
+	@Comment("The amount of damage to a campfire when it is extinguished (by water, rain, or manually). Default: 800")
+	public int campfireExtinguishFuelLoss = 800;
+
 	@Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 800")
 	public int torchesExtinguishFuelLoss = 800;
 
