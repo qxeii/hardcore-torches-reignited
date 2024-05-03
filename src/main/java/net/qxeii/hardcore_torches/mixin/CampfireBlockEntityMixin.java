@@ -31,11 +31,7 @@ public abstract class CampfireBlockEntityMixin implements CampfireBlockEntityMix
 
 	@Unique
 	public void setFuel(int fuel) {
-		if (fuel < 0) {
-			fuel = 0;
-		}
-
-		this.fuel = fuel;
+		this.fuel = Math.max(0, fuel);
 	}
 
 	@Unique
