@@ -47,6 +47,10 @@ public class WorldUtils {
 			return Text.translatable("text.hardcore_torches.fuel_time_minutes", minutes);
 		}
 
+		if (seconds == 1) {
+			return Text.translatable("text.hardcore_torches.fuel_time_second", seconds);
+		}
+
 		return Text.translatable("text.hardcore_torches.fuel_time_seconds", seconds);
 	}
 

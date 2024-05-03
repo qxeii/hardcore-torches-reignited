@@ -38,6 +38,7 @@
 	"text.hardcore_torches.fuel_message": "Fuel: %s",
 	"text.hardcore_torches.fuel_time_minutes": "%s Minutes",
 	"text.hardcore_torches.fuel_time_seconds": "%s Seconds",
+	"text.hardcore_torches.fuel_time_second": "%s Seconds",
 
 	"text.autoconfig.hardcore_torches.title": "Hardcore Torches",
 	"text.autoconfig.hardcore_torches.option.torchesExtinguishWhenBroken": "Torches extinguish when broken",
