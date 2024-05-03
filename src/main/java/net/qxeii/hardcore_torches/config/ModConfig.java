@@ -112,26 +112,26 @@ public class ModConfig implements ConfigData {
 
 	// Fuel Can
 
-	@Comment("Max fuel an oil can holds. Default: 576000")
+	@Comment("Max fuel an fuel can holds. Default: 576000")
 	public int maxCanFuel = 576000;
 
-	@Comment("Can you refuel a torch using an oil can. Default: false")
+	@Comment("Can you refuel a torch using an fuel can. Default: false")
 	public boolean torchesUseCan = false;
 
-	@Comment("Multiplies the fuel value of all oil can recipes. 0.5 makes all fuel recipes return half as much fuel. Default: 1")
+	@Comment("Multiplies the fuel value of all fuel can recipes. 0.5 makes all fuel recipes return half as much fuel. Default: 1")
 	public float fuelCanRecipeMultiplier = 1;
 
-	@Comment("Overrides the oil can fuel recipe if set. Default: -1")
+	@Comment("Overrides the fuel can fuel recipe if set. Default: -1")
 	public int fuelRecipeOverride = -1;
 
-	@Comment("If true, you can craft fuel with an oil can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. Default: true")
-	public boolean enableFuelOil = true;
+	@Comment("If true, you can craft fuel with an fuel can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. Default: true")
+	public boolean enableCanRefillWithFuel = true;
 
-	@Comment("If true, you can craft coal with an oil can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. Default: false")
-	public boolean enableCoalOil = false;
+	@Comment("If true, you can craft coal with an fuel can to fill it. You can also add custom fill recipes with a datapack, open the mod jar to see the JSON format. Default: false")
+	public boolean enableCanRefillWithCoal = false;
 
-	@Comment("Right click torch or lantern to see fuel value. Default: false")
-	public boolean fuelMessage = false;
+	@Comment("Right click torch or lantern to see fuel value. Default: true")
+	public boolean fuelMessage = true;
 
 	// Item Crafting
 

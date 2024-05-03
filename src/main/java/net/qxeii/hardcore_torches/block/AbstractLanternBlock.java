@@ -42,8 +42,8 @@ import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.LanternBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.LightableBlock;
+import net.qxeii.hardcore_torches.item.FuelCanItem;
 import net.qxeii.hardcore_torches.item.LanternItem;
-import net.qxeii.hardcore_torches.item.OilCanItem;
 import net.qxeii.hardcore_torches.util.TorchUtils;
 
 public abstract class AbstractLanternBlock extends BlockWithEntity implements LightableBlock {
@@ -155,7 +155,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 		}
 
 		// Adding fuel with can
-		if (stack.getItem() instanceof OilCanItem) {
+		if (stack.getItem() instanceof FuelCanItem) {
 			refuelWithInteraction(world, position, state, player, stack, hand);
 			return ActionResult.SUCCESS;
 		}
@@ -219,7 +219,7 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 			Hand hand) {
 		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
 
-		if (OilCanItem.fuelBlock((FuelBlockEntity) blockEntity, world, stack)) {
+		if (FuelCanItem.fuelBlock((FuelBlockEntity) blockEntity, world, stack)) {
 			world.playSound(null, position, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
 					SoundCategory.BLOCKS, 1f, 0f);
 			world.playSound(null, position, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,

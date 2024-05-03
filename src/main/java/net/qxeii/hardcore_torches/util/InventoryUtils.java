@@ -21,7 +21,7 @@ public class InventoryUtils {
 	}
 
 	public static boolean canUseAsFuelSource(ItemStack stack) {
-		return stack.getItem() == Mod.OIL_CAN;
+		return stack.getItem() == Mod.FUEL_CAN;
 	}
 
 	// Items from Inventory
