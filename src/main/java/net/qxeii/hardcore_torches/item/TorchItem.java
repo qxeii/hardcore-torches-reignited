@@ -240,7 +240,8 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 			inventory.setStack(slot, heldTorchStack);
 		}
 
-		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.4f, 1.0f);
+		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 0.3f,
+				1.0f);
 	}
 
 	// Events

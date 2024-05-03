@@ -138,7 +138,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
 		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
-		world.playSound(null, position, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.3f, 2f);
+		world.playSound(null, position, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 0.3f, 1f);
 		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
 
 		TorchUtils.displayParticle(ParticleTypes.LAVA, state, world, position);
