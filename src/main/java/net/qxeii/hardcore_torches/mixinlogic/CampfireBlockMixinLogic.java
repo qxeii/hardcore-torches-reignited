@@ -69,7 +69,7 @@ public interface CampfireBlockMixinLogic {
 		}
 
 		var item = stack.getItem();
-		var itemFuelValue = FuelRegistry.INSTANCE.get(item);
+		var itemFuelValue = FuelRegistry.INSTANCE.get(item) * Mod.config.campfireFuelAdditionMultiplier;
 
 		if (!world.isClient) {
 			stack.setCount(stack.getCount() - 1);

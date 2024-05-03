@@ -58,6 +58,7 @@
 	"text.autoconfig.hardcore_torches.option.lanternLightFuelLoss": "Lantern light fuel loss",
 	"text.autoconfig.hardcore_torches.option.itemFuelUseMultiplierWhenHeld": "Item fuel use multiplier when held",
 	"text.autoconfig.hardcore_torches.option.itemFuelUseJitterChanceWhenHeld": "Item fuel use jitter when held",
+	"text.autoconfig.hardcore_torches.option.campfireFuelAdditionMultiplier": "Campfire fuel addition multiplier",
 	"text.autoconfig.hardcore_torches.option.unlightInChest": "Torches unlight in chest",
 	"text.autoconfig.hardcore_torches.option.tickInInventory": "Torches tick in inventory",
 	"text.autoconfig.hardcore_torches.option.torchesRainAffectTickChance": "Torches rain affect tick chance",
