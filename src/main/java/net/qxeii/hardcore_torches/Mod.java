@@ -62,7 +62,6 @@ public class Mod implements ModInitializer {
 
 	// Tags
 
-	public static final TagKey<Item> CANDLES = TagKey.of(RegistryKeys.ITEM, new Identifier("minecraft", "candles"));
 	public static final TagKey<Item> ALL_TORCH_ITEMS = TagKey.of(RegistryKeys.ITEM,
 			new Identifier("hardcore_torches", "torches"));
 	public static final TagKey<Item> UNBREAKING_LIGHTER_ITEMS = TagKey.of(RegistryKeys.ITEM,
@@ -71,6 +70,14 @@ public class Mod implements ModInitializer {
 			new Identifier("hardcore_torches", "multi_use_lighter_items"));
 	public static final TagKey<Item> SINGLE_USE_LIGHTER_ITEMS = TagKey.of(RegistryKeys.ITEM,
 			new Identifier("hardcore_torches", "single_use_lighter_items"));
+	public static final TagKey<Item> CANDLES = TagKey.of(RegistryKeys.ITEM, new Identifier("minecraft", "candles"));
+
+	public static final TagKey<Item> LIQUID_FUELS = TagKey.of(RegistryKeys.ITEM,
+			new Identifier("hardcore_torches", "liquid_fuels"));
+	public static final TagKey<Item> CAMPFIRE_FUELS = TagKey.of(RegistryKeys.ITEM,
+			new Identifier("hardcore_torches", "campfire_fuels"));
+	public static final TagKey<Item> CAMPFIRE_LOG_FUELS = TagKey.of(RegistryKeys.ITEM,
+			new Identifier("minecraft", "logs_that_burn"));
 
 	public static final LootFunctionType HARDCORE_TORCH_LOOT_FUNCTION = new LootFunctionType(
 			new TorchLootFunction.Serializer());
