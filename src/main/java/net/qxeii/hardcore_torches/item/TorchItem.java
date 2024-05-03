@@ -194,7 +194,7 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 
 	private void displayFuelMessage(World world, PlayerEntity player, ItemStack stack) {
 		var fuel = TorchItem.getFuel(stack);
-		var fuelText = WorldUtils.formattedFuelText(fuel);
+		var fuelText = WorldUtils.formattedFuelText(fuel, true);
 
 		player.sendMessage(fuelText, true);
 	}
