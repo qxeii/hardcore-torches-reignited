@@ -1,0 +1,17 @@
+{
+	"type": "hardcore_torches:fuel_can",
+	"ingredients": [
+		{
+			"tag": "hardcore_torches:liquid_fuels"
+		},
+		{
+			"item": "hardcore_torches:fuel_can"
+		}
+	],
+	"result": {
+		"item": "hardcore_torches:fuel_can"
+	},
+	"fuel": 12000,
+	"config_type": 0,
+	"_comment": "If you are making a custom fuel recipe: Copy this file, set config_type to 2, change fuel amount, and change the item which is NOT the fuel can. Remember to pay attention to tag vs item."
+}

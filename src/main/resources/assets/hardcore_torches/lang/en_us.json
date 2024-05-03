@@ -1,7 +1,8 @@
 {
-	"item.hardcore_torches.oil_can": "Oil Can",
+	"item.hardcore_torches.fuel_can": "Fuel Can",
 	"item.hardcore_torches.fuel": "Fuel",
 	"item.hardcore_torches.fire_starter": "Fire Starter",
+	"item.hardcore_torches.liquid_fuels": "Liquid Fuels",
 
 	"block.hardcore_torches.lit_torch": "Lit Torch",
 	"block.hardcore_torches.lit_wall_torch": "Lit Torch",
@@ -66,8 +67,8 @@
 	"text.autoconfig.hardcore_torches.option.torchesUseCan": "Torches use can",
 	"text.autoconfig.hardcore_torches.option.fuelRecipeMultiplier": "Fuel recipe multiplier",
 	"text.autoconfig.hardcore_torches.option.fuelRecipeOverride": "Fuel recipe override",
-	"text.autoconfig.hardcore_torches.option.enableFuelOil": "Enable fuel oil",
-	"text.autoconfig.hardcore_torches.option.enableCoalOil": "Enable coal oil",
+	"text.autoconfig.hardcore_torches.option.enableCanRefillWithFuel": "Enable can refill with fuel",
+	"text.autoconfig.hardcore_torches.option.enableCanRefillWithCoal": "Enable can refill with coal",
 	"text.autoconfig.hardcore_torches.option.handUnlightTorch": "Hand unlight torch",
 	"text.autoconfig.hardcore_torches.option.handUnlightLantern": "Hand unlight lantern",
 	"text.autoconfig.hardcore_torches.option.invExtinguishInWater": "Inventory extinguish in water",

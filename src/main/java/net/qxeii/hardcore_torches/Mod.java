@@ -40,16 +40,16 @@ import net.qxeii.hardcore_torches.blockentity.ShroomlightBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.TorchBlockEntity;
 import net.qxeii.hardcore_torches.config.ModConfig;
 import net.qxeii.hardcore_torches.item.CandleItem;
+import net.qxeii.hardcore_torches.item.FuelCanItem;
 import net.qxeii.hardcore_torches.item.GlowstoneItem;
 import net.qxeii.hardcore_torches.item.LanternItem;
-import net.qxeii.hardcore_torches.item.OilCanItem;
 import net.qxeii.hardcore_torches.item.ShroomlightItem;
 import net.qxeii.hardcore_torches.item.TorchItem;
 import net.qxeii.hardcore_torches.loot.HCTLootNumberProviderTypes;
 import net.qxeii.hardcore_torches.loot.LanternLootFunction;
 import net.qxeii.hardcore_torches.loot.TorchLootFunction;
 import net.qxeii.hardcore_torches.recipe.CandleRecipe;
-import net.qxeii.hardcore_torches.recipe.OilCanRecipe;
+import net.qxeii.hardcore_torches.recipe.FuelCanRecipe;
 import net.qxeii.hardcore_torches.recipe.UnlitTorchRecipe;
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
@@ -169,7 +169,7 @@ public class Mod implements ModInitializer {
 			FabricBlockSettings.create().noCollision().breakInstantly().sounds(BlockSoundGroup.LANTERN), false,
 			() -> config.defaultLanternFuel);
 
-	public static final Item OIL_CAN = new OilCanItem(new FabricItemSettings().maxCount(1));
+	public static final Item FUEL_CAN = new FuelCanItem(new FabricItemSettings().maxCount(1));
 
 	public static TorchGroup basicTorches = new TorchGroup("basic");
 
@@ -183,10 +183,11 @@ public class Mod implements ModInitializer {
 
 	// Recipe Types
 
-	public static final RecipeType<OilCanRecipe> OIL_CAN_RECIPE = RecipeType.register("hardcore_torches:oil_can");
+	public static final RecipeType<FuelCanRecipe> FUEL_CAN_RECIPE = RecipeType.register("hardcore_torches:fuel_can");
 	public static final RecipeType<UnlitTorchRecipe> TORCH_RECIPE = RecipeType.register("hardcore_torches:torch");
 	public static final RecipeType<CandleRecipe> CANDLE_RECIPE = RecipeType.register("hardcore_torches:candle");
-	public static RecipeSerializer<OilCanRecipe> OIL_RECIPE_SERIALIZER;
+
+	public static RecipeSerializer<FuelCanRecipe> FUEL_RECIPE_SERIALIZER;
 	public static RecipeSerializer<UnlitTorchRecipe> UNLIT_TORCH_RECIPE_SERIALIZER;
 	public static RecipeSerializer<CandleRecipe> CANDLE_RECIPE_SERIALIZER;
 
@@ -357,11 +358,13 @@ public class Mod implements ModInitializer {
 		Registry.register(Registries.ITEM, new Identifier("hardcore_torches", "shroomlight"),
 				new ShroomlightItem(SHROOMLIGHT, new FabricItemSettings(), Mod.config.defaultShroomlightFuel, true));
 
-		Registry.register(Registries.ITEM, new Identifier("hardcore_torches", "oil_can"), OIL_CAN);
+		Registry.register(Registries.ITEM, new Identifier("hardcore_torches", "fuel_can"), FUEL_CAN);
 
-		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> entries.add(OIL_CAN));
+		Registry.register(Registries.SOUND_EVENT, CAMPFIRE_LOG_PLACE_SOUND.getId(), CAMPFIRE_LOG_PLACE_SOUND);
+
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> entries.add(FUEL_CAN));
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS)
-				.register(entries -> OilCanItem.setFuel(new ItemStack(OIL_CAN), Mod.config.maxCanFuel));
+				.register(entries -> FuelCanItem.setFuel(new ItemStack(FUEL_CAN), Mod.config.maxCanFuel));
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.add(LIT_TORCH));
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.add(UNLIT_TORCH));
@@ -395,8 +398,8 @@ public class Mod implements ModInitializer {
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.add(SHROOMLIGHT));
 
 		// Recipe Types
-		OIL_RECIPE_SERIALIZER = Registry.register(Registries.RECIPE_SERIALIZER,
-				new Identifier("hardcore_torches", "oil_can"), new OilCanRecipe.Serializer());
+		FUEL_RECIPE_SERIALIZER = Registry.register(Registries.RECIPE_SERIALIZER,
+				new Identifier("hardcore_torches", "fuel_can"), new FuelCanRecipe.Serializer());
 		UNLIT_TORCH_RECIPE_SERIALIZER = Registry.register(Registries.RECIPE_SERIALIZER,
 				new Identifier("hardcore_torches", "unlit_torch"), new UnlitTorchRecipe.Serializer());
 		CANDLE_RECIPE_SERIALIZER = Registry.register(Registries.RECIPE_SERIALIZER,
