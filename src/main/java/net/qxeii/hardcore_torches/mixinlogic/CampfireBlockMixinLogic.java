@@ -50,7 +50,7 @@ public interface CampfireBlockMixinLogic {
 			Hand hand,
 			BlockHitResult hit) {
 		var blockEntity = (CampfireBlockEntity) world.getBlockEntity(pos);
-		var campfireBlockEntity = (CampfireBlockEntityTickMixinLogic) (Object) blockEntity;
+		var campfireBlockEntity = (CampfireBlockEntityMixinLogic) (Object) blockEntity;
 		var stack = player.getStackInHand(hand);
 
 		if (stack.isEmpty()) {

@@ -13,10 +13,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.mixinlogic.CampfireBlockEntityTickMixinLogic;
+import net.qxeii.hardcore_torches.mixinlogic.CampfireBlockEntityMixinLogic;
 
 @Mixin(CampfireBlockEntity.class)
-public abstract class CampfireBlockEntityMixin implements CampfireBlockEntityTickMixinLogic {
+public abstract class CampfireBlockEntityMixin implements CampfireBlockEntityMixinLogic {
 
 	// Properties
 
@@ -66,13 +66,13 @@ public abstract class CampfireBlockEntityMixin implements CampfireBlockEntityTic
 			return;
 		}
 
-		CampfireBlockEntityTickMixinLogic.litClientTick(world, pos, state, campfire);
+		CampfireBlockEntityMixinLogic.litClientTick(world, pos, state, campfire);
 	}
 
 	@Inject(method = "litServerTick", at = @At("TAIL"))
 	private static void injectedLitServerTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity campfire,
 			CallbackInfo callbackInfo) {
-		CampfireBlockEntityTickMixinLogic.litServerTick(world, pos, state, campfire);
+		CampfireBlockEntityMixinLogic.litServerTick(world, pos, state, campfire);
 	}
 
 }

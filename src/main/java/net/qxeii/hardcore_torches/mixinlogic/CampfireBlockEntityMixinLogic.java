@@ -2,6 +2,7 @@ package net.qxeii.hardcore_torches.mixinlogic;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CampfireBlock;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CampfireBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -12,7 +13,7 @@ import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.util.WorldUtils;
 
-public interface CampfireBlockEntityTickMixinLogic {
+public interface CampfireBlockEntityMixinLogic {
 
 	public static final String NBT_KEY_FUEL = "Fuel";
 
@@ -35,31 +36,31 @@ public interface CampfireBlockEntityTickMixinLogic {
 		setFuel(fuel);
 	}
 
-	public static void litClientTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity campfire) {
-		var campfireMixin = (CampfireBlockEntityTickMixinLogic) (Object) campfire;
+	public static void litClientTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity _campfire) {
+		var campfire = (CampfireBlockEntityMixinLogic) world.getBlockEntity(pos);
 
-		if (campfireMixin.isOutOfFuel()) {
+		if (campfire.isOutOfFuel()) {
 			extinguish(world, pos, state);
 			return;
 		}
 	}
 
-	public static void litServerTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity campfire) {
-		var campfireMixin = (CampfireBlockEntityTickMixinLogic) (Object) campfire;
+	public static void litServerTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity _campfire) {
+		var campfire = (CampfireBlockEntityMixinLogic) world.getBlockEntity(pos);
 
-		if (campfireMixin.isOutOfFuel()) {
+		if (campfire.isOutOfFuel()) {
 			extinguish(world, pos, state);
 			return;
 		}
 
-		if (WorldUtils.worldIsRaining(world, campfire)) {
+		if (WorldUtils.worldIsRaining(world, (BlockEntity) campfire)) {
 			if (world.random.nextInt(Mod.config.campfiresRainAffectTickChance) == 0) {
 				extinguish(world, pos, state);
 				return;
 			}
 		}
 
-		campfireMixin.setFuel(campfireMixin.getFuel() - 1);
+		campfire.setFuel(campfire.getFuel() - 1);
 	}
 
 	private static void extinguish(World world, BlockPos pos, BlockState state) {
