@@ -81,7 +81,7 @@ public interface CampfireBlockEntityMixinLogic {
 
 		if (!world.isClient()) {
 			world.playSound((PlayerEntity) null, pos, SoundEvents.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.BLOCKS,
-					1.0F, 1.0F);
+					0.8F, 0.8F);
 
 			world.setBlockState(pos, state.with(CampfireBlock.LIT, false), 3);
 		}
