@@ -56,7 +56,8 @@ public abstract class CampfireBlockEntityMixin implements CampfireBlockEntityTic
 	// Tick
 
 	@Inject(method = "clientTick", at = @At("TAIL"))
-	private static void injectedClientTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity campfire) {
+	private static void injectedClientTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity campfire,
+			CallbackInfo callbackInfo) {
 		var isLit = state.get(CampfireBlock.LIT);
 
 		if (!isLit) {
