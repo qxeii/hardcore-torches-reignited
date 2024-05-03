@@ -36,6 +36,7 @@
 	"block.hardcore_torches.dead_shroomlight": "Dead Shroomlight",
 
 	"text.hardcore_torches.fuel_message": "Fuel: %s",
+	"text.hardcore_torches.fuel_when_held_message": "Fuel: %s (Held)",
 	"text.hardcore_torches.fuel_time_minutes": "%s Minutes",
 	"text.hardcore_torches.fuel_time_seconds": "%s Seconds",
 	"text.hardcore_torches.fuel_time_second": "%s Seconds",

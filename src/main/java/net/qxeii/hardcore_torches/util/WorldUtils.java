@@ -36,7 +36,16 @@ public class WorldUtils {
 	}
 
 	public static Text formattedFuelText(int fuel) {
-		return Text.translatable("text.hardcore_torches.fuel_message", formattedFuelTime(fuel));
+		return formattedFuelText(fuel, false);
+	}
+
+	public static Text formattedFuelText(int fuel, boolean isHeld) {
+		if (isHeld) {
+			fuel = fuel / Mod.config.itemFuelUseMultiplierWhenHeld;
+			return Text.translatable("text.hardcore_torches.fuel_held_message", formattedFuelTime(fuel));
+		} else {
+			return Text.translatable("text.hardcore_torches.fuel_message", formattedFuelTime(fuel));
+		}
 	}
 
 	public static Text formattedFuelTime(int fuel) {
