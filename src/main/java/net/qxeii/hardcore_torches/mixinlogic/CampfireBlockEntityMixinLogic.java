@@ -45,6 +45,14 @@ public interface CampfireBlockEntityMixinLogic {
 			extinguish(world, pos, state);
 			return;
 		}
+
+		if (WorldUtils.worldIsRaining(world, (BlockEntity) campfire)) {
+			if (world.random.nextInt(Mod.config.campfiresRainAffectTickChance) == 0) {
+				extinguish(world, pos, state);
+				markDirty(world, pos, state);
+				return;
+			}
+		}
 	}
 
 	public static void litServerTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity _campfire) {
