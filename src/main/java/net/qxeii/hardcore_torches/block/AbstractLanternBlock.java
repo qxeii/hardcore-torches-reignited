@@ -26,8 +26,6 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.MutableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -45,6 +43,7 @@ import net.qxeii.hardcore_torches.blockentity.LightableBlock;
 import net.qxeii.hardcore_torches.item.FuelCanItem;
 import net.qxeii.hardcore_torches.item.LanternItem;
 import net.qxeii.hardcore_torches.util.TorchUtils;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 
 public abstract class AbstractLanternBlock extends BlockWithEntity implements LightableBlock {
 	public static final BooleanProperty HANGING;
@@ -205,7 +204,10 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 		light(world, position, state);
 
 		if (Mod.config.fuelMessage && !world.isClient && hand == Hand.MAIN_HAND) {
-			player.sendMessage(MutableText.of(new LiteralTextContent("Fuel: " + blockEntity.getFuel())), true);
+			var fuel = blockEntity.getFuel();
+			var fuelText = WorldUtils.formattedFuelText(fuel);
+
+			player.sendMessage(fuelText, true);
 		}
 	}
 

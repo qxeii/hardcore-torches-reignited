@@ -19,7 +19,6 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -34,6 +33,7 @@ import net.qxeii.hardcore_torches.item.TorchItem;
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 import net.qxeii.hardcore_torches.util.TorchUtils;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 
 public abstract class AbstractTorchBlock extends BlockWithEntity implements LightableBlock {
 
@@ -176,7 +176,9 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 			if (!world.isClient && blockEntity.getType() == Mod.TORCH_BLOCK_ENTITY && Mod.config.fuelMessage
 					&& stack.isEmpty()) {
-				player.sendMessage(Text.of("Fuel: " + ((TorchBlockEntity) blockEntity).getFuel()), true);
+				var fuel = ((TorchBlockEntity) blockEntity).getFuel();
+				var fuelText = WorldUtils.formattedFuelText(fuel);
+				player.sendMessage(fuelText, true);
 			}
 
 			return ActionResult.SUCCESS;
