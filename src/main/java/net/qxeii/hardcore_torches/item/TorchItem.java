@@ -249,13 +249,6 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	@Override
 	public ActionResult useOnBlock(ItemUsageContext context) {
 		// Light torch in hand on existing torch.
-
-		// var world = context.getWorld();
-		// var blockPosition = context.getBlockPos();
-		// var blockEntity = world.getBlockEntity(blockPosition);
-		// var blockState = world.getBlockState(blockPosition);
-		// var stack = context.getStack();
-
 		return super.useOnBlock(context);
 	}
 
