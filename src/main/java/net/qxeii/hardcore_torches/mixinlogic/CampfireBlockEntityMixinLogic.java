@@ -41,6 +41,10 @@ public interface CampfireBlockEntityMixinLogic {
 	public static void litClientTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity _campfire) {
 		var campfire = (CampfireBlockEntityMixinLogic) world.getBlockEntity(pos);
 
+		if (campfire == null) {
+			return;
+		}
+
 		if (campfire.isOutOfFuel()) {
 			extinguish(world, pos, state);
 			return;
@@ -57,6 +61,10 @@ public interface CampfireBlockEntityMixinLogic {
 
 	public static void litServerTick(World world, BlockPos pos, BlockState state, CampfireBlockEntity _campfire) {
 		var campfire = (CampfireBlockEntityMixinLogic) world.getBlockEntity(pos);
+
+		if (campfire == null) {
+			return;
+		}
 
 		if (campfire.isOutOfFuel()) {
 			extinguish(world, pos, state);
