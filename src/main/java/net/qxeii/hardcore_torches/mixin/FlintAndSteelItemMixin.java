@@ -52,7 +52,7 @@ public class FlintAndSteelItemMixin {
 					});
 				}
 
-				cir.setReturnValue(ActionResult.success(world.isClient()));
+				cir.setReturnValue(ActionResult.success(world.isClient));
 				return;
 			} else {
 				cir.setReturnValue(ActionResult.FAIL);
@@ -69,7 +69,7 @@ public class FlintAndSteelItemMixin {
 				});
 			}
 
-			cir.setReturnValue(ActionResult.success(world.isClient()));
+			cir.setReturnValue(ActionResult.success(world.isClient));
 			return;
 		}
 	}

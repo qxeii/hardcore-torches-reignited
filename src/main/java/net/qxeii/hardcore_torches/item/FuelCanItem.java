@@ -1,6 +1,5 @@
 package net.qxeii.hardcore_torches.item;
 
-import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,9 +12,9 @@ import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.LanternBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.TorchBlockEntity;
 
-public class OilCanItem extends Item implements FabricItem {
+public class FuelCanItem extends Item {
 
-	public OilCanItem(Settings settings) {
+	public FuelCanItem(Settings settings) {
 		super(settings);
 	}
 
@@ -71,7 +70,7 @@ public class OilCanItem extends Item implements FabricItem {
 	// region Fuel Methods
 	public static int getFuel(ItemStack stack) {
 		Item item = stack.getItem();
-		if (!(item instanceof OilCanItem))
+		if (!(item instanceof FuelCanItem))
 			return 0;
 
 		NbtCompound nbt = stack.getNbt();
@@ -84,7 +83,7 @@ public class OilCanItem extends Item implements FabricItem {
 	}
 
 	public static ItemStack setFuel(ItemStack stack, int fuel) {
-		if (stack.getItem() instanceof OilCanItem) {
+		if (stack.getItem() instanceof FuelCanItem) {
 			NbtCompound nbt = stack.getNbt();
 
 			if (nbt == null)
@@ -99,7 +98,7 @@ public class OilCanItem extends Item implements FabricItem {
 
 	public static ItemStack addFuel(ItemStack stack, int amount) {
 
-		if (stack.getItem() instanceof OilCanItem) {
+		if (stack.getItem() instanceof FuelCanItem) {
 			NbtCompound nbt = stack.getNbt();
 			int fuel = 0;
 

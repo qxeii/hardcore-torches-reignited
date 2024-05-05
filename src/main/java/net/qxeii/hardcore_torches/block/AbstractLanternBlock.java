@@ -26,8 +26,6 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.MutableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -42,9 +40,10 @@ import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.blockentity.FuelBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.LanternBlockEntity;
 import net.qxeii.hardcore_torches.blockentity.LightableBlock;
+import net.qxeii.hardcore_torches.item.FuelCanItem;
 import net.qxeii.hardcore_torches.item.LanternItem;
-import net.qxeii.hardcore_torches.item.OilCanItem;
 import net.qxeii.hardcore_torches.util.TorchUtils;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 
 public abstract class AbstractLanternBlock extends BlockWithEntity implements LightableBlock {
 	public static final BooleanProperty HANGING;
@@ -148,26 +147,30 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 			BlockHitResult hit) {
 		ItemStack stack = player.getStackInHand(hand);
 
-		// Pick up lantern
-		if (player.isSneaking() && Mod.config.pickUpLanterns) {
-			pickUp(world, position, player, hand);
-			return ActionResult.SUCCESS;
-		}
-
 		// Adding fuel with can
-		if (stack.getItem() instanceof OilCanItem) {
+		if (stack.getItem() instanceof FuelCanItem) {
 			refuelWithInteraction(world, position, state, player, stack, hand);
 			return ActionResult.SUCCESS;
 		}
 
+		// Pick up lantern
+		if (stack.isEmpty() && player.isSneaking()) {
+			if (Mod.config.fuelMessage && !world.isClient) {
+				var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+				displayFuelMessage(world, player, blockEntity);
+			}
+
+			return ActionResult.SUCCESS;
+		}
+
 		// Igniting
-		if (!this.isLit && stack.isEmpty()) {
+		if (stack.isEmpty() && !this.isLit) {
 			useFuelAndLightWithInteraction(state, world, position, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		// Extinguishing
-		if (this.isLit && stack.isEmpty()) {
+		if (stack.isEmpty() && this.isLit) {
 			extinguishWithInteraction(world, position, state, player, hand);
 			return ActionResult.SUCCESS;
 		}
@@ -204,8 +207,8 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 
 		light(world, position, state);
 
-		if (Mod.config.fuelMessage && !world.isClient && hand == Hand.MAIN_HAND) {
-			player.sendMessage(MutableText.of(new LiteralTextContent("Fuel: " + blockEntity.getFuel())), true);
+		if (Mod.config.fuelMessage && !world.isClient) {
+			displayFuelMessage(world, player, blockEntity);
 		}
 	}
 
@@ -219,13 +222,20 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 			Hand hand) {
 		FuelBlockEntity blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
 
-		if (OilCanItem.fuelBlock((FuelBlockEntity) blockEntity, world, stack)) {
+		if (FuelCanItem.fuelBlock((FuelBlockEntity) blockEntity, world, stack)) {
 			world.playSound(null, position, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
 					SoundCategory.BLOCKS, 1f, 0f);
 			world.playSound(null, position, SoundEvents.BLOCK_POINTED_DRIPSTONE_DRIP_LAVA_INTO_CAULDRON,
 					SoundCategory.BLOCKS, 1f, 2f);
 			world.playSound(null, position, SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.BLOCKS, 0.3f, 0f);
 		}
+	}
+
+	private void displayFuelMessage(World world, PlayerEntity player, FuelBlockEntity blockEntity) {
+		var fuel = blockEntity.getFuel();
+		var fuelText = WorldUtils.formattedFuelText(fuel);
+
+		player.sendMessage(fuelText, true);
 	}
 
 	// Events

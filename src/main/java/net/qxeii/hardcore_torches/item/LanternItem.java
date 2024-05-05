@@ -21,6 +21,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 
 public class LanternItem extends BlockItem {
 
@@ -105,18 +106,26 @@ public class LanternItem extends BlockItem {
 	// Interaction
 
 	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		if (world.isClient) {
-			return super.use(world, user, hand);
+			return super.use(world, player, hand);
+		}
+
+		if (player.isSneaking()) {
+			if (Mod.config.fuelMessage) {
+				displayFuelMessage(world, player, player.getStackInHand(hand));
+			}
+
+			return super.use(world, player, hand);
 		}
 
 		if (isLit) {
-			extinguishWithInteraction(world, user, hand);
+			extinguishWithInteraction(world, player, hand);
 		} else {
-			lightWithInteraction(world, user, hand);
+			lightWithInteraction(world, player, hand);
 		}
 
-		return super.use(world, user, hand);
+		return super.use(world, player, hand);
 	}
 
 	public void extinguishWithInteraction(World world, PlayerEntity player, Hand hand) {
@@ -133,6 +142,15 @@ public class LanternItem extends BlockItem {
 
 		light(world, player, slot);
 		player.swingHand(hand);
+
+		if (Mod.config.fuelMessage) {
+			displayFuelMessage(world, player, player.getStackInHand(hand));
+		}
+	}
+
+	private void displayFuelMessage(World world, PlayerEntity player, ItemStack stack) {
+		var fuel = getFuel(stack);
+		player.sendMessage(WorldUtils.formattedFuelText(fuel), true);
 	}
 
 	// Actions

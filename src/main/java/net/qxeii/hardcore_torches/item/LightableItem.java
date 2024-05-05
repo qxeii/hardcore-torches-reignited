@@ -15,13 +15,18 @@ public interface LightableItem {
 
 	// Lighting
 
-	default boolean findAndUseLighterItem(PlayerEntity player, Hand hand) {
+	default boolean findAndUseLighterItem(PlayerEntity player, Hand hand, boolean heldOnly) {
 		ItemStack heldStack = player.getStackInHand(hand);
 
 		// Check if player holds a compatible item, use held item first.
 
 		if (InventoryUtils.canUseAsFireStarter(heldStack)) {
 			return useLighterItem(player, heldStack, hand);
+		}
+
+		if (heldOnly) {
+			Mod.LOGGER.debug("No usable lighter item found in hand (held only lighting).");
+			return false;
 		}
 
 		// Check if player has a compatible item in inventory.

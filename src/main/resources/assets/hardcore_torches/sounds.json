@@ -1,0 +1,25 @@
+{
+	"log_place": {
+		"sounds": [
+			{
+				"name": "hardcore_torches:log_place_0"
+			},
+			{
+				"name": "hardcore_torches:log_place_1"
+			},
+			{
+				"name": "hardcore_torches:log_place_2"
+			},
+			{
+				"name": "hardcore_torches:log_place_3"
+			},
+			{
+				"name": "hardcore_torches:log_place_4"
+			},
+			{
+				"name": "hardcore_torches:log_place_5"
+			}
+		],
+		"category": "block"
+	}
+}

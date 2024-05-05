@@ -11,7 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.qxeii.hardcore_torches.util.InventoryTickMixinLogic;
+import net.qxeii.hardcore_torches.mixinlogic.InventoryTickMixinLogic;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class InventoryTickMixin implements InventoryTickMixinLogic {

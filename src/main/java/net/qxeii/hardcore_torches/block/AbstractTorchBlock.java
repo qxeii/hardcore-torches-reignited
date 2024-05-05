@@ -19,7 +19,6 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -34,6 +33,7 @@ import net.qxeii.hardcore_torches.item.TorchItem;
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
 import net.qxeii.hardcore_torches.util.TorchUtils;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 
 public abstract class AbstractTorchBlock extends BlockWithEntity implements LightableBlock {
 
@@ -138,7 +138,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, 2, 1);
 		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2, 2);
-		world.playSound(null, position, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.3f, 2f);
+		world.playSound(null, position, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 0.3f, 1f);
 		world.playSound(null, position, SoundEvents.BLOCK_CANDLE_AMBIENT, SoundCategory.BLOCKS, 2f, 2f);
 
 		TorchUtils.displayParticle(ParticleTypes.LAVA, state, world, position);
@@ -158,6 +158,17 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 			BlockHitResult hit) {
 		ItemStack stack = player.getStackInHand(hand);
 
+		// Fuel Check
+
+		if (stack.isEmpty() && player.isSneaking()) {
+			if (Mod.config.fuelMessage && !world.isClient) {
+				var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+				displayFuelMessage(world, player, blockEntity);
+			}
+
+			return ActionResult.SUCCESS;
+		}
+
 		// Extinguishing
 
 		if (stack.isEmpty() && burnState == ETorchState.LIT) {
@@ -174,9 +185,11 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 
 			BlockEntity blockEntity = world.getBlockEntity(position);
 
-			if (!world.isClient && blockEntity.getType() == Mod.TORCH_BLOCK_ENTITY && Mod.config.fuelMessage
-					&& stack.isEmpty()) {
-				player.sendMessage(Text.of("Fuel: " + ((TorchBlockEntity) blockEntity).getFuel()), true);
+			if (!world.isClient && Mod.config.fuelMessage) {
+				var fuel = ((TorchBlockEntity) blockEntity).getFuel();
+				var fuelText = WorldUtils.formattedFuelText(fuel);
+
+				player.sendMessage(fuelText, true);
 			}
 
 			return ActionResult.SUCCESS;
@@ -196,7 +209,7 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 	private boolean useFuelAndLightWithInteraction(World world, BlockPos position, BlockState state,
 			PlayerEntity player,
 			ItemStack stack, Hand hand) {
-		if (!findAndUseLighterItem(player, hand)) {
+		if (!findAndUseLighterItem(player, hand, true)) {
 			return false;
 		}
 
@@ -253,6 +266,15 @@ public abstract class AbstractTorchBlock extends BlockWithEntity implements Ligh
 		} else {
 			return group.getStandingTorch(newTorchState).getDefaultState();
 		}
+	}
+
+	// Fuel Message
+
+	private void displayFuelMessage(World world, PlayerEntity player, FuelBlockEntity blockEntity) {
+		var fuel = blockEntity.getFuel();
+		var fuelText = WorldUtils.formattedFuelText(fuel);
+
+		player.sendMessage(fuelText, true);
 	}
 
 }
