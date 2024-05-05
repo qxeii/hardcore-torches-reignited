@@ -40,6 +40,10 @@ public class WorldUtils {
 	}
 
 	public static Text formattedFuelText(int fuel, boolean isHeld) {
+		if (fuel == 0) {
+			return Text.translatable("text.hardcore_torches.fuel_time_none");
+		}
+
 		if (isHeld) {
 			fuel = fuel / Mod.config.itemFuelUseMultiplierWhenHeld;
 			return Text.translatable("text.hardcore_torches.fuel_held_message", formattedFuelTime(fuel));
