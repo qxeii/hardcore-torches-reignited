@@ -25,6 +25,7 @@ import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
 import net.qxeii.hardcore_torches.util.ETorchState;
 import net.qxeii.hardcore_torches.util.TorchGroup;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 
 public class TorchItem extends VerticallyAttachableBlockItem implements LightableItem {
 
@@ -134,6 +135,14 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		ItemStack stack = player.getStackInHand(hand);
 		ETorchState torchState = ((TorchItem) stack.getItem()).getTorchState();
 
+		if (player.isSneaking()) {
+			if (Mod.config.fuelMessage) {
+				displayFuelMessage(world, player, stack);
+			}
+
+			return super.use(world, player, hand);
+		}
+
 		switch (torchState) {
 			case UNLIT, SMOLDERING: {
 				useLighterAndLightWithInteraction(world, player, hand);
@@ -158,11 +167,19 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	}
 
 	public boolean useLighterAndLightWithInteraction(World world, PlayerEntity player, Hand hand) {
-		if (!findAndUseLighterItem(player, hand)) {
+		if (!findAndUseLighterItem(player, hand, false)) {
 			return false;
 		}
 
-		return lightWithInteraction(world, player, hand);
+		if (!lightWithInteraction(world, player, hand)) {
+			return false;
+		}
+
+		if (Mod.config.fuelMessage) {
+			displayFuelMessage(world, player, player.getStackInHand(hand));
+		}
+
+		return true;
 	}
 
 	public boolean lightWithInteraction(World world, PlayerEntity player, Hand hand) {
@@ -173,6 +190,13 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 		player.swingHand(hand);
 
 		return true;
+	}
+
+	private void displayFuelMessage(World world, PlayerEntity player, ItemStack stack) {
+		var fuel = TorchItem.getFuel(stack);
+		var fuelText = WorldUtils.formattedFuelText(fuel, true);
+
+		player.sendMessage(fuelText, true);
 	}
 
 	// Actions
@@ -249,13 +273,6 @@ public class TorchItem extends VerticallyAttachableBlockItem implements Lightabl
 	@Override
 	public ActionResult useOnBlock(ItemUsageContext context) {
 		// Light torch in hand on existing torch.
-
-		// var world = context.getWorld();
-		// var blockPosition = context.getBlockPos();
-		// var blockEntity = world.getBlockEntity(blockPosition);
-		// var blockState = world.getBlockState(blockPosition);
-		// var stack = context.getStack();
-
 		return super.useOnBlock(context);
 	}
 

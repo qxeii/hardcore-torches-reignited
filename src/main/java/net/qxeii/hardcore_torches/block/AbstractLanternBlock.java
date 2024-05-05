@@ -147,26 +147,30 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 			BlockHitResult hit) {
 		ItemStack stack = player.getStackInHand(hand);
 
-		// Pick up lantern
-		if (player.isSneaking() && Mod.config.pickUpLanterns) {
-			pickUp(world, position, player, hand);
-			return ActionResult.SUCCESS;
-		}
-
 		// Adding fuel with can
 		if (stack.getItem() instanceof FuelCanItem) {
 			refuelWithInteraction(world, position, state, player, stack, hand);
 			return ActionResult.SUCCESS;
 		}
 
+		// Pick up lantern
+		if (stack.isEmpty() && player.isSneaking()) {
+			if (Mod.config.fuelMessage && !world.isClient) {
+				var blockEntity = (FuelBlockEntity) world.getBlockEntity(position);
+				displayFuelMessage(world, player, blockEntity);
+			}
+
+			return ActionResult.SUCCESS;
+		}
+
 		// Igniting
-		if (!this.isLit && stack.isEmpty()) {
+		if (stack.isEmpty() && !this.isLit) {
 			useFuelAndLightWithInteraction(state, world, position, player, hand);
 			return ActionResult.SUCCESS;
 		}
 
 		// Extinguishing
-		if (this.isLit && stack.isEmpty()) {
+		if (stack.isEmpty() && this.isLit) {
 			extinguishWithInteraction(world, position, state, player, hand);
 			return ActionResult.SUCCESS;
 		}
@@ -203,11 +207,8 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 
 		light(world, position, state);
 
-		if (Mod.config.fuelMessage && !world.isClient && hand == Hand.MAIN_HAND) {
-			var fuel = blockEntity.getFuel();
-			var fuelText = WorldUtils.formattedFuelText(fuel);
-
-			player.sendMessage(fuelText, true);
+		if (Mod.config.fuelMessage && !world.isClient) {
+			displayFuelMessage(world, player, blockEntity);
 		}
 	}
 
@@ -228,6 +229,13 @@ public abstract class AbstractLanternBlock extends BlockWithEntity implements Li
 					SoundCategory.BLOCKS, 1f, 2f);
 			world.playSound(null, position, SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.BLOCKS, 0.3f, 0f);
 		}
+	}
+
+	private void displayFuelMessage(World world, PlayerEntity player, FuelBlockEntity blockEntity) {
+		var fuel = blockEntity.getFuel();
+		var fuelText = WorldUtils.formattedFuelText(fuel);
+
+		player.sendMessage(fuelText, true);
 	}
 
 	// Events

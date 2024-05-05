@@ -42,10 +42,10 @@ public class ModConfig implements ConfigData {
 
 	// Random Effects
 
-	@Comment("Chance value for a smoldering torch to consume fuel per tick (1/x). Default: 5 (1/5)")
+	@Comment("Chance value for a smoldering torch to consume fuel per tick (1/x, default 1/5). Default: 5")
 	public int torchesSmolderFuelUseTickChance = 5;
 
-	@Comment("Chance value for a smoldering torch to extinguish and become unlit per tick (1/x). Default: 1000 (1/1000)")
+	@Comment("Chance value for a smoldering torch to extinguish and become unlit per tick (1/x, default 1/1000). Default: 1000")
 	public int torchesSmolderExtinguishTickChance = 1000;
 
 	// Environmental Effects in World
@@ -53,10 +53,10 @@ public class ModConfig implements ConfigData {
 	@Comment("Torches become unlit in rain. If torchesSmolder is true, they will instead smolder in rain. Default: true")
 	public boolean torchesRain = true;
 
-	@Comment("Chance value for a burning torch to extinguish per tick (1/x). Default: 200 (1/200)")
+	@Comment("Chance value for a burning torch to extinguish per tick (1/x, default 1/200). Default: 200")
 	public int torchesRainAffectTickChance = 200;
 
-	@Comment("Chance value for a burning campfire to extinguish per tick (1/x). Default: 400 (1/200)")
+	@Comment("Chance value for a burning campfire to extinguish per tick (1/x, default 1/400). Default: 400")
 	public int campfiresRainAffectTickChance = 400;
 
 	// Environmental Effects in Inventory
@@ -69,13 +69,13 @@ public class ModConfig implements ConfigData {
 
 	// Item Fuel Defaults
 
-	@Comment("The amount of ticks the torch lasts. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
+	@Comment("The amount of ticks the torch lasts (20 ticks per second, 24000 = 20 minutes). Default: 24000")
 	public int defaultTorchFuel = 24000;
 
-	@Comment("The amount of ticks the campfire can last. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
-	public int defaultCampfireFuel = 24000;
+	@Comment("The amount of ticks the campfire lasts without added fuel (20 ticks per second, 6400 = around 5 minutes). Default: 6400")
+	public int defaultCampfireFuel = 6400;
 
-	@Comment("The amount of ticks the lantern can last. Default: is 24000. 20 ticks per second, 24000 = 20 minutes")
+	@Comment("The amount of ticks the lantern can last (20 ticks per second, 24000 = 20 minutes). Default: 24000")
 	public int defaultLanternFuel = 24000;
 
 	@Comment("The amount a fuel item adds to the lantern by default. Default: 12000")
@@ -84,8 +84,8 @@ public class ModConfig implements ConfigData {
 	@Comment("Default: fuel that a lantern starts with when crafted. Default: 0")
 	public int startingLanternFuel = 0;
 
-	@Comment("The fuel that candles start with. Default: 6000")
-	public int defaultCandleFuel = 6000;
+	@Comment("The fuel that candles start with. Default: 6400")
+	public int defaultCandleFuel = 6400;
 
 	@Comment("The fuel that glowstone starts with. Default: 576000")
 	public int defaultGlowstoneFuel = 576000;
@@ -95,20 +95,26 @@ public class ModConfig implements ConfigData {
 
 	// Item Fuel Use
 
-	@Comment("A lantern must have at least this much fuel (min 600) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 400")
-	public int minLanternIgnitionFuel = 400;
-
-	@Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 800")
-	public int torchesExtinguishFuelLoss = 800;
-
-	@Comment("The amount of fuel wasted in a lantern when it is lit. Used to balance durable lanterns. Default: 200")
-	public int lanternLightFuelLoss = 200;
-
 	@Comment("Items use up more fuel when held by a player (e.g. 2 means items burn half as long). Default: 2")
 	public int itemFuelUseMultiplierWhenHeld = 2;
 
 	@Comment("Items randomly use more or less fuel when held by a player per tick (e.g. 10–100 is minor jitter, 1000 is significant jitter). Default: 0")
 	public int itemFuelUseJitterChanceWhenHeld = 0;
+
+	@Comment("Items added to a campfire have their fuel value multiplied (e.g. 4 means one coal adds the fuel value of 4x coal to the fire). Default: 4")
+	public int campfireFuelAdditionMultiplier = 4;
+
+	@Comment("The amount of damage to a campfire when it is extinguished (by water, rain, or manually). Default: 800")
+	public int campfireExtinguishFuelLoss = 800;
+
+	@Comment("The amount of damage to a torch when it is extinguished (by water, rain, storage, or manually). Default: 800")
+	public int torchesExtinguishFuelLoss = 800;
+
+	@Comment("A lantern must have at least this much fuel (min 600) to be ignited from unlit. Once lit it will continue to burn to 0. Default: 400")
+	public int minLanternIgnitionFuel = 400;
+
+	@Comment("The amount of fuel wasted in a lantern when it is lit. Used to balance durable lanterns. Default: 200")
+	public int lanternLightFuelLoss = 200;
 
 	// Fuel Can
 
