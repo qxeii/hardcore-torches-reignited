@@ -1,5 +1,5 @@
 {
-  "variants": {
-    "": { "model": "hardcore_torches:block/shroomlight" }
-  }
+	"variants": {
+		"": { "model": "hardcore_torches:block/shroomlight" }
+	}
 }

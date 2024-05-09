@@ -1,27 +1,27 @@
 {
-  "type": "minecraft:block",
-  "pools": [
-    {
-      "rolls": 1,
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:air"
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ],
-	  "functions": [
-	    {
-          "function": "hardcore_torches:torch"
-	    },
+	"type": "minecraft:block",
+	"pools": [
 		{
-		  "function": "hardcore_torches:set_damage"
+			"rolls": 1,
+			"entries": [
+				{
+					"type": "minecraft:item",
+					"name": "minecraft:air"
+				}
+			],
+			"conditions": [
+				{
+					"condition": "minecraft:survives_explosion"
+				}
+			],
+			"functions": [
+				{
+					"function": "hardcore_torches:torch"
+				},
+				{
+					"function": "hardcore_torches:set_damage"
+				}
+			]
 		}
-	  ]
-    }
-  ]
+	]
 }

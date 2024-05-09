@@ -1,8 +1,0 @@
-{
-    "replace": false,
-    "values": [
-        "minecraft:torch",
-        "minecraft:lava_bucket",
-        "hardcore_torches:lit_torch"
-    ]
-}

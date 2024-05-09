@@ -1,8 +1,8 @@
 {
-  "replace": true,
-  "values": [
-    "minecraft:netherrack",
-    "minecraft:soul_sand",
-    "minecraft:soul_soil"
-  ]
+	"replace": true,
+	"values": [
+		"minecraft:netherrack",
+		"minecraft:soul_sand",
+		"minecraft:soul_soil"
+	]
 }

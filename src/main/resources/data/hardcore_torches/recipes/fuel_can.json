@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [" # ", "#|#", "###"],
+	"key": {
+		"#": {
+			"item": "minecraft:copper_ingot"
+		},
+		"|": {
+			"item": "minecraft:string"
+		}
+	},
+	"result": {
+		"item": "hardcore_torches:fuel_can",
+		"count": 1
+	}
+}

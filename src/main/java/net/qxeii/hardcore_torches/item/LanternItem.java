@@ -1,145 +1,260 @@
 package net.qxeii.hardcore_torches.item;
 
-import net.qxeii.hardcore_torches.Mod;
-import net.fabricmc.fabric.api.item.v1.FabricItem;
-import net.minecraft.block.Block;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
+import static net.minecraft.util.math.MathHelper.clamp;
 
 import java.util.List;
 
-public class LanternItem extends BlockItem implements FabricItem {
-    int maxFuel;
-    public boolean isLit;
+import org.jetbrains.annotations.Nullable;
 
-    public LanternItem(Block block, Settings settings, int maxFuel, boolean isLit) {
-        super(block, settings);
-        this.maxFuel = maxFuel;
-        this.isLit = isLit;
-    }
+import net.minecraft.block.Block;
+import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.qxeii.hardcore_torches.Mod;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 
-    @Override
-    public boolean isItemBarVisible(ItemStack stack) {
-        int fuel = getFuel(stack);
+public class LanternItem extends BlockItem {
 
-        if (fuel < maxFuel) {
-            return true;
-        }
+	public int maxFuel;
+	public boolean isLit;
 
-        return false;
-    }
+	public LanternItem(Block block, Settings settings, int maxFuel, boolean isLit) {
+		super(block, settings);
+		this.maxFuel = maxFuel;
+		this.isLit = isLit;
+	}
 
-    @Override
-    public int getItemBarStep(ItemStack stack) {
-        int fuel = getFuel(stack);
+	// Properties
 
-        if (maxFuel != 0) {
-            return Math.round(13.0f - (maxFuel - fuel) * 13.0f / maxFuel);
-        }
+	@Override
+	public boolean isItemBarVisible(ItemStack stack) {
+		int fuel = getFuel(stack);
 
-        return 0;
-    }
+		if (fuel < maxFuel) {
+			return true;
+		}
 
-    @Override
-    public int getItemBarColor(ItemStack stack) {
-        return MathHelper.hsvToRgb(3.0f, 1.0f, 1.0f);
-    }
+		return false;
+	}
 
-    public static int getFuel(ItemStack stack) {
-        NbtCompound nbt = stack.getNbt();
+	@Override
+	public int getItemBarStep(ItemStack stack) {
+		int fuel = getFuel(stack);
 
-        if (nbt != null) {
-            return nbt.getInt("Fuel");
-        } else {
-            return ((LanternItem) stack.getItem()).isLit ? Mod.config.defaultLanternFuel : Mod.config.startingLanternFuel;
-        }
-    }
+		if (maxFuel != 0) {
+			return Math.round(13.0f - (maxFuel - fuel) * 13.0f / maxFuel);
+		}
 
-    @Override
-    public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
-        NbtCompound oldNbt = null;
-        NbtCompound newNbt = null;
+		return 0;
+	}
 
-        if (oldStack.getNbt() != null) {
-            oldNbt = oldStack.getNbt().copy();
-            oldNbt.remove("Fuel");
-        }
+	@Override
+	public int getItemBarColor(ItemStack stack) {
+		return MathHelper.hsvToRgb(3.0f, 1.0f, 1.0f);
+	}
 
-        if (newStack.getNbt() != null) {
-            newNbt = newStack.getNbt().copy();
-            newNbt.remove("Fuel");
-        }
+	public static int getFuel(ItemStack stack) {
+		var nbt = stack.getNbt();
+		var isLit = ((LanternItem) stack.getItem()).isLit;
 
-        if (oldNbt == null && newNbt != null) return true;
-        if (oldNbt != null && newNbt == null) return true;
-        if (oldNbt == null && newNbt == null) return false;
+		if (nbt == null) {
+			if (isLit) {
+				return Mod.config.defaultLanternFuel;
+			}
 
-        return oldNbt.equals(null);
-    }
+			return Mod.config.startingLanternFuel;
+		}
 
-    public static ItemStack addFuel(ItemStack stack, World world, int amount) {
+		return clamp(nbt.getInt("Fuel"), 0, Mod.config.defaultLanternFuel);
+	}
 
-        if (stack.getItem() instanceof LanternItem && !world.isClient) {
-            LanternItem item = (LanternItem) stack.getItem();
+	@Override
+	public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+		NbtCompound oldNbt = null;
+		NbtCompound newNbt = null;
 
-            NbtCompound nbt = stack.getNbt();
-            int fuel = item.isLit ? item.maxFuel : 0;
+		if (oldStack.getNbt() != null) {
+			oldNbt = oldStack.getNbt().copy();
+			oldNbt.remove("Fuel");
+		}
 
-            if (nbt != null) {
-                fuel = nbt.getInt("Fuel");
-            } else {
-                nbt = new NbtCompound();
-            }
+		if (newStack.getNbt() != null) {
+			newNbt = newStack.getNbt().copy();
+			newNbt.remove("Fuel");
+		}
 
-            fuel += amount;
+		if (oldNbt == null && newNbt != null)
+			return true;
+		if (oldNbt != null && newNbt == null)
+			return true;
+		if (oldNbt == null && newNbt == null)
+			return false;
 
-            // If burn out
-            if (fuel <= 0) {
-                stack = stateStack(stack, false);
-            } else {
-                if (fuel > Mod.config.defaultLanternFuel) {
-                    fuel = Mod.config.defaultLanternFuel;
-                }
+		return oldNbt.equals(null);
+	}
 
-                nbt.putInt("Fuel", fuel);
-                stack.setNbt(nbt);
-            }
-        }
+	// Interaction
 
-        return stack;
-    }
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+		if (world.isClient) {
+			return super.use(world, player, hand);
+		}
 
-    public static ItemStack stateStack(ItemStack inputStack, boolean isLit) {
-        ItemStack outputStack = ItemStack.EMPTY;
+		if (player.isSneaking()) {
+			if (Mod.config.fuelMessage) {
+				displayFuelMessage(world, player, player.getStackInHand(hand));
+			}
 
-        if (inputStack.getItem() instanceof BlockItem && inputStack.getItem() instanceof LanternItem) {
-            LanternItem newItem = (LanternItem) (isLit ? Mod.LIT_LANTERN.asItem() : Mod.UNLIT_LANTERN.asItem());
+			return super.use(world, player, hand);
+		}
 
-            outputStack = new ItemStack(newItem, inputStack.getCount());
+		if (isLit) {
+			extinguishWithInteraction(world, player, hand);
+		} else {
+			lightWithInteraction(world, player, hand);
+		}
 
-            if (inputStack.getNbt() != null) {
-                outputStack.setNbt(inputStack.getNbt().copy());
-            }
-        }
+		return super.use(world, player, hand);
+	}
 
-        return outputStack;
-    }
+	public void extinguishWithInteraction(World world, PlayerEntity player, Hand hand) {
+		PlayerInventory inventory = player.getInventory();
+		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
 
-    @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        if (Mod.config.lanternsNeedCan) tooltip.add(MutableText.of(new LiteralTextContent("Requires an Oil Can")).formatted(Formatting.GRAY));
-        tooltip.add(MutableText.of(new LiteralTextContent("Light with Flint and Steel")).formatted(Formatting.GRAY));
-        super.appendTooltip(stack, world, tooltip, context);
-    }
+		extinguish(world, player, slot);
+		player.swingHand(hand);
+	}
+
+	public void lightWithInteraction(World world, PlayerEntity player, Hand hand) {
+		PlayerInventory inventory = player.getInventory();
+		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
+
+		light(world, player, slot);
+		player.swingHand(hand);
+
+		if (Mod.config.fuelMessage) {
+			displayFuelMessage(world, player, player.getStackInHand(hand));
+		}
+	}
+
+	private void displayFuelMessage(World world, PlayerEntity player, ItemStack stack) {
+		var fuel = getFuel(stack);
+		player.sendMessage(WorldUtils.formattedFuelText(fuel), true);
+	}
+
+	// Actions
+
+	public void extinguish(World world, PlayerEntity player, int slot) {
+		PlayerInventory inventory = player.getInventory();
+		ItemStack stack = inventory.getStack(slot);
+
+		if (stack.getItem() instanceof LanternItem) {
+			stack = modifiedStackWithState(world, stack, false);
+			inventory.setStack(slot, stack);
+		}
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.5f,
+				1.0f);
+	}
+
+	public void light(World world, PlayerEntity player, int slot) {
+		PlayerInventory inventory = player.getInventory();
+		ItemStack stack = inventory.getStack(slot);
+
+		stack = modifiedStackWithAddedFuel(world, stack, -Mod.config.lanternLightFuelLoss);
+
+		if (getFuel(stack) < Mod.config.minLanternIgnitionFuel) {
+			// Lantern fuel is depleted, do not light and bail.
+			world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 1.0f, 2.0f);
+			return;
+		}
+
+		if (stack.getItem() instanceof LanternItem) {
+			stack = modifiedStackWithState(world, stack, true);
+			inventory.setStack(slot, stack);
+		}
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 0.5f,
+				1.0f);
+	}
+
+	// Fuel
+
+	public static ItemStack modifiedStackWithAddedFuel(World world, ItemStack stack, int amount) {
+		if (world.isClient) {
+			return stack;
+		}
+
+		if (!(stack.getItem() instanceof LanternItem)) {
+			return stack;
+		}
+
+		LanternItem item = (LanternItem) stack.getItem();
+
+		NbtCompound nbt = stack.getNbt();
+		int fuel = item.isLit ? item.maxFuel : 0;
+
+		if (nbt != null) {
+			fuel = nbt.getInt("Fuel");
+		} else {
+			nbt = new NbtCompound();
+		}
+
+		fuel += amount;
+
+		if (fuel <= 0) {
+			return modifiedStackWithState(world, stack, false);
+		}
+
+		if (fuel > Mod.config.defaultLanternFuel) {
+			fuel = Mod.config.defaultLanternFuel;
+		}
+
+		nbt.putInt("Fuel", fuel);
+		stack.setNbt(nbt);
+
+		return stack;
+	}
+
+	// Modification
+
+	public static ItemStack modifiedStackWithState(World world, ItemStack stack, boolean isLit) {
+		if (world.isClient) {
+			return stack;
+		}
+
+		if (!(stack.getItem() instanceof LanternItem)) {
+			return ItemStack.EMPTY;
+		}
+
+		LanternItem newItem = (LanternItem) (isLit ? Mod.LIT_LANTERN.asItem() : Mod.UNLIT_LANTERN.asItem());
+		var modifiedStack = new ItemStack(newItem, stack.getCount());
+
+		if (stack.getNbt() != null) {
+			modifiedStack.setNbt(stack.getNbt().copy());
+		}
+
+		return modifiedStack;
+	}
+
+	// Tooltips
+
+	@Override
+	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+		// tooltip.add(MutableText.of(new LiteralTextContent("Light with Flint and
+		// Steel")).formatted(Formatting.GRAY));
+		super.appendTooltip(stack, world, tooltip, context);
+	}
+
 }

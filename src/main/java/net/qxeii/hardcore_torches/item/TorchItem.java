@@ -1,272 +1,380 @@
 package net.qxeii.hardcore_torches.item;
 
-import net.qxeii.hardcore_torches.util.ETorchState;
-import net.qxeii.hardcore_torches.util.TorchGroup;
-import net.fabricmc.fabric.api.item.v1.FabricItem;
+import static net.minecraft.util.math.MathHelper.clamp;
+
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.StackReference;
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.VerticallyAttachableBlockItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.qxeii.hardcore_torches.Mod;
-import net.qxeii.hardcore_torches.block.AbstractHardcoreTorchBlock;
+import net.qxeii.hardcore_torches.util.ETorchState;
+import net.qxeii.hardcore_torches.util.TorchGroup;
+import net.qxeii.hardcore_torches.util.WorldUtils;
 
-public class TorchItem extends VerticallyAttachableBlockItem implements FabricItem {
-    ETorchState torchState;
-    TorchGroup torchGroup;
-    int maxFuel;
+public class TorchItem extends VerticallyAttachableBlockItem implements LightableItem {
 
-    public TorchItem(Block standingBlock, Block wallBlock, Item.Settings settings, ETorchState torchState, int maxFuel, TorchGroup group) {
-        super(standingBlock, wallBlock, settings, Direction.DOWN);
-        this.torchState = torchState;
-        this.maxFuel = maxFuel;
-        this.torchGroup = group;
-    }
+	ETorchState torchState;
+	TorchGroup torchGroup;
 
-    @Override
-    public boolean isItemBarVisible(ItemStack stack) {
-        int fuel = getFuel(stack);
+	int maxFuel;
 
-        if (fuel > 0 && fuel < maxFuel) {
-            return true;
-        }
+	public TorchItem(Block standingBlock, Block wallBlock, Item.Settings settings, ETorchState torchState, int maxFuel,
+			TorchGroup group) {
+		super(standingBlock, wallBlock, settings, Direction.DOWN);
 
-        return false;
-    }
+		this.torchGroup = group;
+		this.torchState = torchState;
+		this.maxFuel = maxFuel;
+	}
 
-    @Override
-    public int getItemBarStep(ItemStack stack) {
-        int fuel = getFuel(stack);
+	// State & Properties
 
-        if (maxFuel != 0) {
-            return Math.round(13.0f - (maxFuel - fuel) * 13.0f / maxFuel);
-        }
+	public ETorchState getTorchState() {
+		return torchState;
+	}
 
-        return 0;
-    }
+	public TorchGroup getTorchGroup() {
+		return torchGroup;
+	}
 
-    @Override
-    public int getItemBarColor(ItemStack stack) {
-        return MathHelper.hsvToRgb(3.0f, 1.0f, 1.0f);
-    }
+	public static int getFuel(ItemStack stack) {
+		NbtCompound nbt = stack.getNbt();
 
-    @Override
-    public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
-        NbtCompound oldNbt = null;
-        NbtCompound newNbt = null;
+		if (nbt == null) {
+			return Mod.config.defaultTorchFuel;
+		}
 
-        if (oldStack.getNbt() != null) {
-            oldNbt = oldStack.getNbt().copy();
-            oldNbt.remove("Fuel");
-        }
+		return clamp(nbt.getInt("Fuel"), 0, Mod.config.defaultTorchFuel);
+	}
 
-        if (newStack.getNbt() != null) {
-            newNbt = newStack.getNbt().copy();
-            newNbt.remove("Fuel");
-        }
+	public static boolean isUsed(ItemStack stack) {
+		int fuel = getFuel(stack);
 
-        if (oldNbt == null && newNbt != null) return true;
-        if (oldNbt != null && newNbt == null) return true;
-        if (oldNbt == null && newNbt == null) return false;
+		if (fuel < Mod.config.defaultTorchFuel) {
+			return true;
+		}
 
-        return oldNbt.equals(null);
-    }
+		return false;
+	}
 
-    @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        ItemStack stack = context.getStack();
-        World world = context.getWorld();
-        BlockPos pos = context.getBlockPos();
-        BlockState state = world.getBlockState(pos);
+	@Override
+	public boolean isItemBarVisible(ItemStack stack) {
+		return isUsed(stack);
+	}
 
-        // Make sure it's a torch and get its type
-        if (stack.getItem() instanceof TorchItem) {
-            ETorchState torchState = ((TorchItem) stack.getItem()).torchState;
+	@Override
+	public int getItemBarStep(ItemStack stack) {
+		int fuel = getFuel(stack);
 
-            if (torchState == ETorchState.UNLIT || torchState == ETorchState.SMOLDERING) {
+		if (maxFuel != 0) {
+			return Math.round(13.0f - (maxFuel - fuel) * 13.0f / maxFuel);
+		}
 
-                // Unlit and Smoldering
-                if (state.isIn(Mod.FREE_TORCH_LIGHT_BLOCKS)) {
-                    // No lighting on unlit fires etc.
-                    if (state.contains(Properties.LIT))
-                        if (state.get(Properties.LIT).booleanValue() == false)
-                            return super.useOnBlock(context);
+		return 0;
+	}
 
-                    PlayerEntity player = context.getPlayer();
-                    if (player != null && !world.isClient)
-                        player.setStackInHand(context.getHand(), stateStack(stack, ETorchState.LIT));
-                    if (!world.isClient) world.playSound(null, pos, SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.5f, 1.2f);
-                    return ActionResult.SUCCESS;
-                }
-            }
-        }
+	@Override
+	public int getItemBarColor(ItemStack stack) {
+		return MathHelper.hsvToRgb(3.0f, 1.0f, 1.0f);
+	}
 
-        return super.useOnBlock(context);
-    }
+	@Override
+	public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+		NbtCompound oldNbt = null;
+		NbtCompound newNbt = null;
 
-    @Override
-    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
-        // If you are clicking on it with a non HCTorch item or with empty, use vanilla behavior
-        if (!slot.canTakePartial(player) || !(otherStack.getItem() instanceof TorchItem) || otherStack.isEmpty()) {
-            return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
-        }
+		if (oldStack.getNbt() != null) {
+			oldNbt = oldStack.getNbt().copy();
+			oldNbt.remove("Fuel");
+		}
 
-        // Return left click if either is full
-        if (clickType != ClickType.RIGHT && (stack.getCount() >= stack.getMaxCount() || otherStack.getCount() >= otherStack.getMaxCount())) {
-            return false;
-        }
+		if (newStack.getNbt() != null) {
+			newNbt = newStack.getNbt().copy();
+			newNbt.remove("Fuel");
+		}
 
-        // Ensure torches are in same group
-        if (!sameTorchGroup((TorchItem) stack.getItem(), (TorchItem) otherStack.getItem())) {
-            return false;
-        }
+		if (oldNbt == null && newNbt != null) {
+			return true;
+		}
 
-        if (((TorchItem) stack.getItem()).torchState == ETorchState.LIT) {
-            // If clicked is lit, return if clicked with burnt
-            if (((TorchItem) otherStack.getItem()).torchState == ETorchState.BURNT) {
-                return false;
-            }
-        } else if (((TorchItem) stack.getItem()).torchState == ETorchState.UNLIT) {
-            // If clicked is unlit, return if clicked is not unlit
-            if (((TorchItem) otherStack.getItem()).torchState != ETorchState.UNLIT) {
-                return false;
-            }
-        }
+		if (oldNbt != null && newNbt == null) {
+			return true;
+		}
 
-        if (!otherStack.isEmpty()) {
-            int max = stack.getMaxCount();
-            int usedCount = clickType != ClickType.RIGHT ? otherStack.getCount() : 1;
-            int otherMax = otherStack.getMaxCount();
+		if (oldNbt == null && newNbt == null) {
+			return false;
+		}
 
-            int remainder = Math.max(0, usedCount - (max - stack.getCount()));
-            int addedNew = usedCount - remainder;
+		return oldNbt == null || oldNbt.equals(null);
+	}
 
-            // Average both stacks
-            int stack1Fuel = getFuel(stack) * stack.getCount();
-            int stack2Fuel = getFuel(otherStack) * addedNew;
-            int totalFuel = stack1Fuel + stack2Fuel;
+	// Interaction
 
-            // NBT
-            NbtCompound nbt = new NbtCompound();
-            nbt.putInt("Fuel", totalFuel / (stack.getCount() + addedNew));
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+		if (world.isClient) {
+			return super.use(world, player, hand);
+		}
 
-            if (addedNew > 0) {
-                stack.increment(addedNew);
-                stack.setNbt(nbt);
-                otherStack.setCount(otherStack.getCount() - addedNew);
-                return true;
-            }
-        }
-        return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
-    }
+		ItemStack stack = player.getStackInHand(hand);
+		ETorchState torchState = ((TorchItem) stack.getItem()).getTorchState();
 
-    public boolean sameTorchGroup(TorchItem item1, TorchItem item2) {
-        if (item1.torchGroup == item2.torchGroup) {
-            return true;
-        }
-        return false;
-    }
+		if (player.isSneaking()) {
+			if (Mod.config.fuelMessage) {
+				displayFuelMessage(world, player, stack);
+			}
 
-    public static Item stateItem(Item inputItem, ETorchState newState) {
-        Item outputItem = Items.AIR;
+			return super.use(world, player, hand);
+		}
 
-        if (inputItem instanceof BlockItem && inputItem instanceof TorchItem) {
-            AbstractHardcoreTorchBlock newBlock = (AbstractHardcoreTorchBlock) ((BlockItem)inputItem).getBlock();
-            TorchItem newItem = (TorchItem) newBlock.group.getStandingTorch(newState).asItem();
+		switch (torchState) {
+			case UNLIT, SMOLDERING: {
+				useLighterAndLightWithInteraction(world, player, hand);
+				return super.use(world, player, hand);
+			}
+			case LIT: {
+				extinguishWithInteraction(world, player, hand);
+				return super.use(world, player, hand);
+			}
+			default: {
+				return super.use(world, player, hand);
+			}
+		}
+	}
 
-            outputItem = newItem;
-        }
+	public void extinguishWithInteraction(World world, PlayerEntity player, Hand hand) {
+		PlayerInventory inventory = player.getInventory();
+		int slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
 
-        return outputItem;
-    }
+		extinguish(world, player, slot);
+		player.swingHand(hand);
+	}
 
-    public static ItemStack stateStack(ItemStack inputStack, ETorchState newState) {
-        ItemStack outputStack = ItemStack.EMPTY;
+	public boolean useLighterAndLightWithInteraction(World world, PlayerEntity player, Hand hand) {
+		if (!findAndUseLighterItem(player, hand, false)) {
+			return false;
+		}
 
-        if (inputStack.getItem() instanceof BlockItem && inputStack.getItem() instanceof TorchItem) {
-            AbstractHardcoreTorchBlock newBlock = (AbstractHardcoreTorchBlock) ((BlockItem)inputStack.getItem()).getBlock();
-            TorchItem newItem = (TorchItem) newBlock.group.getStandingTorch(newState).asItem();
+		if (!lightWithInteraction(world, player, hand)) {
+			return false;
+		}
 
-            outputStack = changedCopy(inputStack, newItem);
-            if (newState == ETorchState.BURNT) outputStack.setNbt(null);
-        }
+		if (Mod.config.fuelMessage) {
+			displayFuelMessage(world, player, player.getStackInHand(hand));
+		}
 
-        return outputStack;
-    }
+		return true;
+	}
 
-    public static int getFuel(ItemStack stack) {
-        NbtCompound nbt = stack.getNbt();
-        int fuel;
+	public boolean lightWithInteraction(World world, PlayerEntity player, Hand hand) {
+		var inventory = player.getInventory();
+		var slot = hand == Hand.MAIN_HAND ? inventory.selectedSlot : PlayerInventory.OFF_HAND_SLOT;
 
-        if (nbt != null) {
-            return nbt.getInt("Fuel");
-        }
+		light(world, player, slot);
+		player.swingHand(hand);
 
-        return Mod.config.defaultTorchFuel;
-    }
+		return true;
+	}
 
-    public ETorchState getTorchState() {
-        return torchState;
-    }
+	private void displayFuelMessage(World world, PlayerEntity player, ItemStack stack) {
+		var fuel = TorchItem.getFuel(stack);
+		var fuelText = WorldUtils.formattedFuelText(fuel, true);
 
-    public TorchGroup getTorchGroup() {
-        return torchGroup;
-    }
+		player.sendMessage(fuelText, true);
+	}
 
-    public static ItemStack changedCopy(ItemStack stack, Item replacementItem) {
-        if (stack.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack itemStack = new ItemStack(replacementItem, stack.getCount());
-        if (stack.getNbt() != null) {
-            itemStack.setNbt(stack.getNbt().copy());
-        }
-        return itemStack;
-    }
+	// Actions
 
-    public static ItemStack addFuel(ItemStack stack, World world, int amount) {
+	public void extinguish(World world, PlayerEntity player, int slot) {
+		PlayerInventory inventory = player.getInventory();
+		ItemStack stack = inventory.getStack(slot);
+		var state = getTorchState();
 
-        if (stack.getItem() instanceof  TorchItem && !world.isClient) {
-            NbtCompound nbt = stack.getNbt();
-            int fuel = Mod.config.defaultTorchFuel;
+		stack = modifiedStackWithAddedFuel(world, stack, -Mod.config.torchesExtinguishFuelLoss);
 
-            if (nbt != null) {
-                fuel = nbt.getInt("Fuel");
-            } else {
-                nbt = new NbtCompound();
-            }
+		if (getFuel(stack) == 0) {
+			// Torch is expended, break and remove.
+			stack = modifiedStackWithState(world, stack, ETorchState.BURNT);
+			inventory.setStack(slot, stack);
+		} else {
+			// Torch still has fuel left, can smolder or become unlit.
+			if (state == ETorchState.LIT && Mod.config.torchesSmolder) {
+				stack = modifiedStackWithState(world, stack, ETorchState.SMOLDERING);
+			} else {
+				stack = modifiedStackWithState(world, stack, ETorchState.UNLIT);
+			}
 
-            fuel += amount;
+			inventory.setStack(slot, stack);
+		}
 
-            // If burn out
-            if (fuel <= 0) {
-                if (Mod.config.burntStick) {
-                    stack = new ItemStack(Items.STICK, stack.getCount());
-                } else {
-                    stack = stateStack(stack, ETorchState.BURNT);
-                }
-            } else {
-                if (fuel > Mod.config.defaultTorchFuel) {
-                    fuel = Mod.config.defaultTorchFuel;
-                }
+		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 1f,
+				1f);
+	}
 
-                nbt.putInt("Fuel", fuel);
-                stack.setNbt(nbt);
-            }
-        }
+	public void burnOut(World world, PlayerEntity player, int slot) {
+		PlayerInventory inventory = player.getInventory();
+		ItemStack stack = inventory.getStack(slot);
 
-        return stack;
-    }
+		stack = modifiedStackWithState(world, stack, ETorchState.BURNT);
+		inventory.setStack(slot, stack);
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.PLAYERS, 1f, 1f);
+	}
+
+	public void light(World world, PlayerEntity player, int slot) {
+		var inventory = player.getInventory();
+		var stack = inventory.getStack(slot);
+
+		if (stack.getCount() > 1) {
+			// Holding multiple unlit (unused) torches in stack.
+			// Stack must be split, remaining stack of torches moved to free inventory slot,
+			// and one new stack created with lit torch in hand slot.
+
+			int emptySlot = inventory.getEmptySlot();
+			ItemStack deductedTorchStack = stack.copyWithCount(stack.getCount() - 1);
+
+			if (emptySlot == -1) {
+				player.dropItem(deductedTorchStack, true);
+			} else {
+				inventory.setStack(emptySlot, deductedTorchStack);
+			}
+
+			ItemStack heldTorchStack = modifiedStackWithState(world, stack, ETorchState.LIT);
+			heldTorchStack.setCount(1);
+
+			inventory.setStack(slot, heldTorchStack);
+		} else {
+			ItemStack heldTorchStack = modifiedStackWithState(world, stack, ETorchState.LIT);
+			inventory.setStack(slot, heldTorchStack);
+		}
+
+		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 0.3f,
+				1.0f);
+	}
+
+	// Events
+
+	@Override
+	public ActionResult useOnBlock(ItemUsageContext context) {
+		// Light torch in hand on existing torch.
+		return super.useOnBlock(context);
+	}
+
+	@Override
+	public boolean onClicked(ItemStack lhsStack, ItemStack rhsStack, Slot slot, ClickType clickType,
+			PlayerEntity player,
+			StackReference cursorStackReference) {
+		if (!slot.canTakePartial(player) || rhsStack.isEmpty() || !(rhsStack.getItem() instanceof TorchItem)) {
+			return super.onClicked(lhsStack, rhsStack, slot, clickType, player, cursorStackReference);
+		}
+
+		if (isUsed(lhsStack) || isUsed(rhsStack)) {
+			return false;
+		}
+
+		var lhsTorchItem = (TorchItem) lhsStack.getItem();
+		var rhsTorchItem = (TorchItem) rhsStack.getItem();
+
+		if (!equalTorchGroup(lhsTorchItem, rhsTorchItem)) {
+			return false;
+		}
+
+		return super.onClicked(lhsStack, rhsStack, slot, clickType, player, cursorStackReference);
+	}
+
+	public boolean equalTorchGroup(TorchItem lhsItem, TorchItem rhsItem) {
+		if (lhsItem.torchGroup == rhsItem.torchGroup) {
+			return true;
+		}
+
+		return false;
+	}
+
+	// Modification
+
+	public static ItemStack modifiedStackWithState(World world, ItemStack stack, ETorchState newState) {
+		if (world.isClient) {
+			return stack;
+		}
+
+		if (!(stack.getItem() instanceof TorchItem)) {
+			return ItemStack.EMPTY;
+		}
+
+		var nbt = stack.getNbt();
+		var item = torchItemForState(newState);
+		var outputStack = new ItemStack(item, stack.getCount());
+
+		if (nbt != null) {
+			outputStack.setNbt(nbt.copy());
+		}
+
+		if (newState == ETorchState.BURNT) {
+			outputStack.setNbt(null);
+		}
+
+		return outputStack;
+	}
+
+	private static Item torchItemForState(ETorchState state) {
+		switch (state) {
+			case UNLIT:
+				return Mod.UNLIT_TORCH.asItem();
+			case LIT:
+				return Mod.LIT_TORCH.asItem();
+			case SMOLDERING:
+				return Mod.SMOLDERING_TORCH.asItem();
+			case BURNT:
+				return Mod.BURNT_TORCH.asItem();
+			default:
+				return Mod.BURNT_TORCH.asItem();
+		}
+
+	}
+
+	public static ItemStack modifiedStackWithAddedFuel(World world, ItemStack stack, int amount) {
+		if (world.isClient) {
+			return stack;
+		}
+
+		if (!(stack.getItem() instanceof TorchItem)) {
+			return stack;
+		}
+
+		var fuel = getFuel(stack);
+		var nbt = stack.getNbt();
+
+		if (nbt == null) {
+			nbt = new NbtCompound();
+		}
+
+		fuel = clamp(fuel + amount, 0, Mod.config.defaultTorchFuel);
+		nbt.putInt("Fuel", fuel);
+
+		if (fuel < Mod.config.defaultTorchFuel && fuel > 0) {
+			nbt.putInt("Salt", Random.create().nextInt());
+		} else {
+			nbt.remove("Salt");
+		}
+
+		stack.setNbt(nbt);
+		return stack;
+	}
+
 }

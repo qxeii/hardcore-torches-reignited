@@ -1,5 +1,9 @@
 package net.qxeii.hardcore_torches.blockentity;
 
+import java.util.Random;
+
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -8,72 +12,57 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 public class FuelBlockEntity extends BlockEntity {
-    protected int fuel;
-    protected static Random random = new Random();
 
-    public FuelBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state);
-    }
+	public static Random random = new Random();
 
-    // Serialize the BlockEntity
-    @Override
-    public void writeNbt(NbtCompound tag) {
-        super.writeNbt(tag);
+	private int fuel = 0;
 
-        // Save the current value of the number to the tag
-        tag.putInt("Fuel", fuel);
-    }
+	public FuelBlockEntity(BlockEntityType<?> type, BlockPos position, BlockState state) {
+		super(type, position, state);
+	}
 
-    @Nullable
-    @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
-    }
+	// Serialize the BlockEntity
+	@Override
+	public void writeNbt(NbtCompound tag) {
+		tag.putInt("Fuel", fuel);
+		super.writeNbt(tag);
+	}
 
-    @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        return createNbt();
-    }
+	// Deserialize the BlockEntity
+	@Override
+	public void readNbt(NbtCompound tag) {
+		super.readNbt(tag);
+		fuel = tag.getInt("Fuel");
+	}
 
-    // Deserialize the BlockEntity
-    @Override
-    public void readNbt(NbtCompound tag) {
-        super.readNbt(tag);
+	@Nullable
+	@Override
+	public Packet<ClientPlayPacketListener> toUpdatePacket() {
+		return BlockEntityUpdateS2CPacket.create(this);
+	}
 
-        if (tag.contains("number")) {
-            fuel = tag.getInt("number");
-        } else {
-            fuel = tag.getInt("Fuel");
-        }
-    }
+	@Override
+	public NbtCompound toInitialChunkDataNbt() {
+		return createNbt();
+	}
 
-    public int getFuel() {
-        return fuel;
-    }
+	// Fuel Access
 
-    public void setFuel(int newValue) {
-        fuel = newValue;
-    }
+	public boolean isOutOfFuel() {
+		return fuel == 0;
+	}
 
-    public void changeFuel(int increment) {
-        World world = this.getWorld();
-        BlockPos pos = this.getPos();
+	public int getFuel() {
+		return fuel;
+	}
 
-        fuel += increment;
+	public void setFuel(int newValue) {
+		fuel = Math.max(0, newValue);
+	}
 
-        if (fuel <= 0) {
-            fuel = 0;
-
-            if (world.getBlockState(pos).getBlock() instanceof IFuelBlock) {
-                IFuelBlock block = (IFuelBlock) world.getBlockState(pos).getBlock();
-                block.outOfFuel(world, pos, world.getBlockState(pos), false);
-            }
-        }
-    }
+	public void modifyFuel(int increment) {
+		setFuel(fuel + increment);
+	}
 }
